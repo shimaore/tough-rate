@@ -19,13 +19,12 @@ The following parameters are common to all gateways, they might be inserted by c
 They are all optional.
 
     disabled          (default false)
-    response_timeout  (default 2)  from invite to first response - dead-gateway timeout
     progress_timeout  (default 4)  from invite to progress (180, 183, ...) - maximum post-dial-delay
     answer_timeout    (default 90) from progress to answer (200) - maximum ringback time
     dialog_timeout    (default 28800) from answer to end - maximum call duration
     attrs             (default {})
 
-The following attributes are applied to gateways, but generally not defined at the gateway level:
+The following attributes are available as well, but generally not defined at the gateway level:
 
     priority          (default: 0 for the last gateway in a list, 1 for the previous one, etc.)
     local_gateway_extra_priority (default 0.5)  added to priority if the gateway is on the same host
@@ -55,7 +54,6 @@ gateway (individual gateway records)
     carrierid         (optional)
 
     disabled
-    response_timeout
     progress_timeout
     answer_timeout
     dialog_timeout
@@ -75,7 +73,6 @@ Gateways are defined inside `sip_profiles`; the following fields are available i
     egress.carrierid
 
     egress.disabled
-    egress.response_timeout
     egress.progress_timeout
     egress.answer_timeout
     egress.dialog_timeout
@@ -107,7 +104,6 @@ A carrier record might optionally be created to provide carrier-wide default val
 
     local_gateway_extra_priority
     disabled
-    response_timeout
     progress_timeout
     answer_timeout
     dialog_timeout
@@ -148,7 +144,6 @@ A destination record might be referenced by a rule in order to provide defaults 
     destination: destination
 
     disabled
-    response_timeout
     progress_timeout
     answer_timeout
     dialog_timeout
@@ -163,12 +158,11 @@ Rules are defined in a ruleset database. There is one ruleset database per rules
     type: 'rule'
     destination (optional)
     gwlist: [
-      {gwid, attrs,response_timeout,...}
-      {carrierid,try, attrs,response_timeout,...}
+      {gwid, attrs,...}
+      {carrierid,try, attrs,...}
     ]
 
     disabled
-    response_timeout
     progress_timeout
     answer_timeout
     dialog_timeout
