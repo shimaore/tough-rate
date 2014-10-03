@@ -158,8 +158,8 @@ Rules are defined in a ruleset database. There is one ruleset database per rules
     type: 'rule'
     destination (optional)
     gwlist: [
-      {gwid, attrs,...}
-      {carrierid,try, attrs,...}
+      {gwid, weight, attrs,...}
+      {carrierid, weight, try, attrs,...}
     ]
 
     disabled
@@ -174,7 +174,7 @@ The gwlist is converted into a list of gateways as follows:
 - Records which have a `carrierid` and no `gwid` are replaced with a list of the gateways for that carrierid, up to `try` entries. The value of `try` defaults to the number of gateways for that carrier. Gateways are selected using weighted round-robin.
 - Records which have a `gwid` are gateways. Other records are rejected.
 - Any gateway local to the host receives an additional `local_gateway_priority` (by default 0.5).
-- In the resulting list, gateways are sorted by descending priority. Gateways with identical priorities are sorted using weighted round-robin.
+- In the resulting list, gateways are sorted by descending priority if no `weight` field is present.
 
 Differences with ccnq3:
 - Since the `sip_domain_name` and `groupid` are common to all the rules inside a ruleset, they are not repeated inside the individual `rule` records.
