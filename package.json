@@ -4,8 +4,18 @@
   "description": "Event-socket-based LCR engine for FreeSwitch",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --compilers coffee.md:coffee-script/register -R spec"
   },
   "author": "Stéphane Alnet <stephane@shimaore.net> (http://stephane.shimaore.net/)",
-  "license": "Unlicense"
+  "license": "Unlicense",
+  "devDependencies": {
+    "coffee-script": "^1.8.0",
+    "memdown": "^0.10.2",
+    "mocha": "^1.21.4",
+    "pouchdb": "^3.0.6",
+    "should": "^4.0.4"
+  },
+  "dependencies": {
+    "bluebird": "^2.3.4"
+  }
 }
