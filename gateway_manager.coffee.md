@@ -93,14 +93,14 @@ Gateway and carrier properties mapping
       resolve: (gws) ->
         Promise.map gws, (name) =>
           if name[0] is '#'
-            @resolve_carrier name[1..]
+            @_resolve_carrier name[1..]
           else
-            @resolve_gateway name
+            @_resolve_gateway name
         .then flatten
 
 Return gateway data as long as that gateway is available.
 
-      resolve_gateway: (name) ->
+      _resolve_gateway: (name) ->
         @_retrieve_gateway name
         .then (info) ->
           if not info?
@@ -109,7 +109,8 @@ Return gateway data as long as that gateway is available.
             return []
           [info]
 
-      resolve_carrier:  (name) ->
+      _resolve_carrier:  (name) ->
+        carrier = {}
         @_retrieve_carrier name
         .then (carrier) =>
           if not carrier?
@@ -118,7 +119,7 @@ Return gateway data as long as that gateway is available.
             return []
           gateways = Object.getOwnPropertyNames carrier._gateways
           Promise.map gateways, (gw) =>
-            @resolve_gateway gw
+            @_resolve_gateway gw
         .then flatten
 
 Gateway ping

@@ -136,7 +136,7 @@ The steps to placing outbound call(s) are:
       describe 'gw1', ->
         it 'should have progress_timeout from its carrier', (done) ->
           ready.then ->
-            gm.resolve_gateway 'gw1'
+            gm._resolve_gateway 'gw1'
             .then (doc) ->
               doc.should.have.length 1
               doc.should.be.an.instanceOf Array
