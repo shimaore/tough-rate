@@ -14,13 +14,13 @@ The gateway manager provides services to the call handler.
 
     module.exports = class GatewayManager
 
-      constructor: (@provisioning,@sip_domain_name) ->
+      constructor: (@provisioning,@sip_domain_name,@options = {}) ->
         @carriers = {}
         @gateways = {}
 
       init: ->
         @provisioning
-        .bulkDocs startkey:"carrier:", endkey:"carrier;"
+        .allDocs startkey:"carrier:#{@sip_domain_name}:", endkey:"carrier:#{@sip_domain_name};", include_docs:yes
         .then ({rows}) =>
           for row in rows
             do (row) => @_merge_carrier_row row
@@ -34,77 +34,92 @@ The gateway manager provides services to the call handler.
         # TODO Add monitoring of `_changes` on the view to update carriers and gateways
 
       _merge_gateway_row: (row) ->
-        # TODO Add handling of `deleted` rows.
         {gwid,carrierid} = row.value
         assert gwid?
-        @gateways[gwid] = field_merger
-          default: default_parameters
-          # options: options
-          carrier: @carriers[carrierid]
-          gateway: row.value
+
+        if row.deleted or row.doc?._deleted
+          if carrierid?
+            delete @carriers[carrierid]?._gateways[gwid]
+          delete @gateways[gwid]
+          return
 
         if carrierid?
+          @gateways[gwid] = field_merger
+            default: default_parameters
+            options: @options
+            carrier: @carriers[carrierid]
+            gateway: row.value
+
           @carriers[carrierid] ?= _gateways: {}
-          @carriers[carrierid]._gateways[gwid] = @gateways[gwid]
+          @carriers[carrierid]._gateways[gwid] = true
+        else
+          @gateways[gwid] = field_merger
+            default: default_parameters
+            options: @options
+            gateway: row.value
+
+      _reevaluate_gateways: (gateways) ->
+        @provisioning
+        .query "#{pkg.name}-gateway-manager/gateways", keys:gateways.map (x) => [@sip_domain_name,x]
+        .then ({rows}) ->
+          for row in rows when row.value?.address?
+            do (row) => @_merge_gateway_row row
 
       _merge_carrier_row: (row) ->
-        # TODO Add handling of `deleted` rows.
-        carrierid = row.value.carrierid
-        assert carrierid
-        if row.deleted or row.value?._deleted
+        carrierid = row.doc.carrierid
+        assert carrierid?
+
+        if row.deleted or row.doc?._deleted
+          gateways = @carriers[carrierid]._gateways
           delete @carriers[carrierid]
-        else
-          @carriers[carrierid] ?= _gateways: {}
-          for own k,v of row.value
-            @carriers[carrierid][k] = v
+          @_reevaluate_gateways gateways
+          return
 
-      retrieve_gateway: (name) ->
-        new Promise (resolve,reject) =>
-          if @gateways[name]?
-            resolve @gateways[name]
-          else
-            reject "No gateway named #{name}"
+        @carriers[carrierid] ?= _gateways: {}
+        for own k,v of row.doc
+          @carriers[carrierid][k] = v
 
-      retrieve_carrier: (name) ->
-        new Promise (resolve,reject) =>
-          if @carriers[name]?
-            resolve @carriers[name]
-          else
-            reject "No carrier named #{name}"
+      _retrieve_gateway: (name) ->
+        # TODO update with dynamic parameters (temporarily_disabled, ...)
+        Promise.resolve @gateways[name]
+
+      _retrieve_carrier: (name) ->
+        Promise.resolve @carriers[name]
 
 
 Gateway and carrier properties mapping
 --------------------------------------
 
       resolve: (gws) ->
-        Promise.map (x) ->
+        Promise.map gws, (name) =>
           if name[0] is '#'
-            resolve_carrier name[1..]
+            @resolve_carrier name[1..]
           else
-            resolve_gateway name
-        .then (list) ->
-          gws = []
-          gws.concat array for array in list
+            @resolve_gateway name
+        .then flatten
 
 Return gateway data as long as that gateway is available.
 
       resolve_gateway: (name) ->
-        @retrieve_gateway name
+        @_retrieve_gateway name
         .then (info) ->
+          if not info?
+            return []
           if info.disabled or info.temporarily_disabled
-            []
-          else
-            [info]
+            return []
+          [info]
 
-      ###
       resolve_carrier:  (name) ->
-        retrieve_carrier name
-        .then (names) ->
-          Promise.map names, resolve_gateway
-        .filter (x) -> x?
-
-      ###
-
+        @_retrieve_carrier name
+        .then (carrier) =>
+          if not carrier?
+            return []
+          if not carrier._gateways?
+            return []
+          gateways = Object.getOwnPropertyNames carrier._gateways
+          Promise.map gateways, (gw) =>
+            @resolve_gateway gw
+        .then flatten
 
 Gateway ping
 ------------
@@ -173,6 +188,11 @@ The following fields are optional:
                     emit [doc.sip_domain_name, rec.carrierid], rec.egress
 
             return
+
+    flatten = (lists) ->
+      result = []
+      result = result.concat list for list in lists
+      result
 
     field_merger = require './field_merger'
     assert = require 'assert'
