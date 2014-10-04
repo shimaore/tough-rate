@@ -43,7 +43,9 @@ The steps to placing outbound call(s) are:
             gateway_name:'gw4'
         backup:
           _id:'gateway:phone.local:backup'
-          type:'backup'
+          type:'gateway'
+          gwid:'backup'
+          address:'127.0.0.1:5070'
           sip_domain_name:'phone.local'
           gwid:'backup'
 
@@ -77,7 +79,7 @@ The steps to placing outbound call(s) are:
             type:'rule'
             destination:'france'
             gwlist:[
-              {carrier:'the_other_company'}
+              {carrierid:'the_other_company'}
               {gwid:'backup'}
             ]
 
@@ -86,19 +88,27 @@ The steps to placing outbound call(s) are:
             type:'rule'
             destination:'france_mobile'
             gwlist: [
-              {carrier:'the_other_company'}
-              {carrier:'the_phone_company'}
+              {carrierid:'the_other_company'}
+              {carrierid:'the_phone_company'}
             ]
 
     should = require 'should'
     PouchDB = (require 'pouchdb').defaults db: require 'memdown'
     pkg = require '../package.json'
     GatewayManager = require '../gateway_manager'
+    CallRouter = require '../router.coffee.md'
+    statistics = require 'winston'
 
     describe 'Once the database is loaded', ->
       dataset = dataset_1
       provisioning = null
       gm = null
+
+Note: normally ruleset_of would be async, and would query provisioning to find the ruleset and then map it to its database.
+
+      ruleset_of = (x) ->
+        ruleset: dataset.rulesets[x]
+        database: new PouchDB dataset.rulesets[x].database
 
       ready = PouchDB.destroy 'provisioning'
       .then ->
@@ -107,7 +117,6 @@ The steps to placing outbound call(s) are:
         (records.push v) for k,v of dataset.gateways
         (records.push v) for k,v of dataset.carriers
         (records.push v) for k,v of dataset.destinations
-        (records.push v) for k,v of dataset.destinations
         provisioning.bulkDocs records
 
       ready = ready.then ->
@@ -115,7 +124,7 @@ The steps to placing outbound call(s) are:
       .then ->
         default_ruleset = new PouchDB dataset.rulesets.default.database
         rules = []
-        (rules.push v) for k,v of rules.default
+        (rules.push v) for k,v of dataset.rules.default
         default_ruleset.bulkDocs rules
 
       ready = ready.then ->
@@ -133,10 +142,10 @@ The steps to placing outbound call(s) are:
         gm = new GatewayManager provisioning, 'phone.local'
         gm.init()
 
-      describe 'gw1', ->
-        it 'should have progress_timeout from its carrier', (done) ->
+      describe 'Gateways', ->
+        it 'should have progress_timeout from their carrier: gw1', (done) ->
           ready.then ->
-            gm._resolve_gateway 'gw1'
+            gm.resolve_gateway 'gw1'
             .then (doc) ->
               doc.should.have.length 1
               doc.should.be.an.instanceOf Array
@@ -145,38 +154,22 @@ The steps to placing outbound call(s) are:
               doc[0].progress_timeout.should.equal dataset.carriers.the_phone_company.progress_timeout
               done()
 
-         it 'should have progress_timeout from its carrier (when querying multiple)', (done) ->
+        it 'should have progress_timeout from their carrier: gw2', (done) ->
           ready.then ->
-            gm.resolve ['gw1']
+            gm.resolve_gateway 'gw2'
             .then (doc) ->
               doc.should.have.length 1
               doc.should.be.an.instanceOf Array
               doc.should.have.property 0
-              doc[0].should.have.property 'gwid', 'gw1'
+              doc[0].should.have.property 'gwid', 'gw2'
               doc[0].should.have.property 'progress_timeout'
               doc[0].progress_timeout.should.equal dataset.carriers.the_phone_company.progress_timeout
-              done()
-
-         it 'should have progress_timeout from its carrier (when querying with gw2)', (done) ->
-          ready.then ->
-            gm.resolve ['gw1','gw2']
-            .then (doc) ->
-              doc.should.have.length 2
-              doc.should.be.an.instanceOf Array
-              doc.should.have.property 0
-              doc[0].should.have.property 'gwid', 'gw1'
-              doc[0].should.have.property 'progress_timeout'
-              doc[0].progress_timeout.should.equal dataset.carriers.the_phone_company.progress_timeout
-              doc.should.have.property 1
-              doc[1].should.have.property 'gwid', 'gw2'
-              doc[1].should.have.property 'progress_timeout'
-              doc[1].progress_timeout.should.equal dataset.carriers.the_phone_company.progress_timeout
               done()
 
       describe 'the_phone_company', ->
         it 'should return its gateways', (done) ->
           ready.then ->
-            gm.resolve ['#the_phone_company']
+            gm.resolve_carrier 'the_phone_company'
             .then (info) ->
               should(info).be.an.instanceOf Array
               info.should.have.length 2
@@ -185,3 +178,30 @@ The steps to placing outbound call(s) are:
               info.should.have.property 1
               info[1].should.have.property 'gwid', 'gw2'
               done()
+
+      describe 'The gateway manager', ->
+        it 'should route local numbers directly', (done) ->
+          provisioning.put _id:'number:1234',inbound_uri:'sip:foo@bar'
+          .then ->
+            router = new CallRouter {provisioning, gateway_manager:gm, ruleset_of, statistics, respond:done}
+            router.route '3213', '1234'
+            .then (gws) ->
+              gws.should.be.an.instanceOf Array
+              gws.should.have.length 1
+              gws.should.have.property 0
+              gws[0].should.have.property 'uri', 'sip:foo@bar'
+              done()
+          .catch done
+
+        it 'should route numbers using routes', (done) ->
+          router = new CallRouter {provisioning, gateway_manager:gm, ruleset_of, statistics, respond:done, outbound_route:'default'}
+          router.route '336718', '331234'
+          .then (gws) ->
+            gws.should.be.an.instanceOf Array
+            gws.should.have.length 2
+            gws.should.have.property 0
+            gws[0].should.have.property 'gwid', 'gw3'
+            gws.should.have.property 1
+            gws[1].should.have.property 'gwid', 'backup'
+            done()
+          .catch done

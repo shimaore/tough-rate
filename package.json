@@ -13,9 +13,11 @@
     "memdown": "^0.10.2",
     "mocha": "^1.21.4",
     "pouchdb": "^3.0.6",
-    "should": "^4.0.4"
+    "should": "^4.0.4",
+    "winston": "^0.8.0"
   },
   "dependencies": {
-    "bluebird": "^2.3.4"
+    "bluebird": "^2.3.4",
+    "esl": "^0.3.2"
   }
 }

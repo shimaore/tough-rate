@@ -9,8 +9,9 @@ The gateway manager provides services to the call handler.
       answer_timeout: 90
       dialog_timeout: 28800
       attrs: {}
-      local_gateway_extra_priority: 0.5
+      local_gateway_first: true
       weight: 1
+      try: 1
 
     module.exports = class GatewayManager
 
@@ -90,17 +91,9 @@ The gateway manager provides services to the call handler.
 Gateway and carrier properties mapping
 --------------------------------------
 
-      resolve: (gws) ->
-        Promise.map gws, (name) =>
-          if name[0] is '#'
-            @_resolve_carrier name[1..]
-          else
-            @_resolve_gateway name
-        .then flatten
+Return gateway data (inside a list) as long as that gateway is available.
 
-Return gateway data as long as that gateway is available.
-
-      _resolve_gateway: (name) ->
+      resolve_gateway: (name) ->
         @_retrieve_gateway name
         .then (info) ->
           if not info?
@@ -109,7 +102,9 @@ Return gateway data as long as that gateway is available.
             return []
           [info]
 
-      _resolve_carrier:  (name) ->
+Return gateway data (inside a list) for a given carrier.
+
+      resolve_carrier:  (name) ->
         carrier = {}
         @_retrieve_carrier name
         .then (carrier) =>
@@ -118,9 +113,12 @@ Return gateway data as long as that gateway is available.
           if not carrier._gateways?
             return []
           gateways = Object.getOwnPropertyNames carrier._gateways
+
+Note: we could do `@resolve gateways` instead here and allow carrier-within-carrier, but I'm concerned about recursion issues so let's skip that for now.
+
           Promise.map gateways, (gw) =>
-            @_resolve_gateway gw
-        .then flatten
+            @resolve_gateway gw
+        .map ([x]) -> x
 
 Gateway ping
 ------------
@@ -185,15 +183,11 @@ The following fields are optional:
                   rec.egress ?= {}
                   rec.egress.gwid ?= rec.egress_gwid
                   rec.egress.address ?= [ip,port].join ':'
+                  rec.egress.host ?= doc.host
                   if rec.egress.gwid?
                     emit [doc.sip_domain_name, rec.carrierid], rec.egress
 
             return
-
-    flatten = (lists) ->
-      result = []
-      result = result.concat list for list in lists
-      result
 
     field_merger = require './field_merger'
     assert = require 'assert'
