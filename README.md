@@ -33,14 +33,8 @@ The following attributes are available as well, but generally not defined at the
 
 Different attribute values might be present. They are always resolved in the following order: default, carrier, gateway, ruleset, destination, rule, gwlist entry.
 
-For all attributes except `attrs`, the most specific value is selected.
-
-For `attrs`, each top value is either:
-- OR'ed (for booleans).
-- concatenated (for strings and lists); the most specific value is listed last.
-- merged (for objects); for conflicting fields inside an object, the most specific value is selected.
-Values of inconsistent datatypes are ignored.
-
+The values in `attrs` are merged, the most specific value is kept.
+The values for `disabled` are ORed so that any item disabled in the list will disable.
 
 gateway (individual gateway records)
 ------------------------------------
