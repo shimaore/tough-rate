@@ -18,6 +18,7 @@ The gateway manager provides services to the call handler.
       constructor: (@provisioning,@sip_domain_name,@options = {}) ->
         @carriers = {}
         @gateways = {}
+        @gateway_status = {}
 
       init: ->
         @provisioning
@@ -82,7 +83,10 @@ The gateway manager provides services to the call handler.
 
       _retrieve_gateway: (name) ->
         # TODO update with dynamic parameters (temporarily_disabled, ...)
-        Promise.resolve @gateways[name]
+        info = {}
+        info[k] = v for own k,v of @gateways[name]
+        info.temporarily_disabled = @gateway_status[name]?.state in ['faulty']
+        Promise.resolve info
 
       _retrieve_carrier: (name) ->
         Promise.resolve @carriers[name]
@@ -129,6 +133,17 @@ Gateway temporary disable
 -------------------------
 
 Disable a gateway temporarily, for example because it is rejecting too many calls.
+
+      mark_gateway_as_faulty: (name) ->
+        status = @gateway_status[name] ?= new Status()
+        status.mark_as_faulty()
+
+Mark a gateway as suspicious.
+
+      mark_gateway_as_suspicious: (name) ->
+        status = @gateway_status[name] ?= new Status()
+        status.mark_as_suspicious()
+
 
 Carrier temporary disable
 -------------------------
@@ -192,3 +207,4 @@ The following fields are optional:
     field_merger = require './field_merger'
     assert = require 'assert'
     Promise = require 'bluebird'
+    Status = require './status'
