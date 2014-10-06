@@ -37,7 +37,7 @@ This is based on the calling number.
 
       _route_remote: (source,destination) ->
 
-Toute based on the route selected by the source, or using a default route.
+Route based on the route selected by the source, or using a default route.
 
         ruleset = null
         rule = null
@@ -71,13 +71,13 @@ Toute based on the route selected by the source, or using a default route.
           unless rule?
             @options.respond '485'
             @options.statistics.warn 'No route available', {source,rows}
-            throw new CallRouterError "No route available towards #{destination}"
+            throw new CallRouterError "No rule available towards #{destination}"
 
           gwlist = rule.gwlist
           unless gwlist?
             @options.respond '500'
             @options.statistics.warn 'Missing gwlist', rule
-            throw new CallRouterError "Missing gwlist in #{rule._id}"
+            throw new CallRouterError "Missing gwlist in rule #{rule._id}"
 
           Promise.map gwlist, (entry) =>
 
@@ -107,7 +107,8 @@ And select only `try` entries where specified.
                 gateways
 
             else
-              throw new Error "Neither gwid nor carrierid in gwlist of #{rule._id}"
+              @options.statistics.warn "Missing gwid or carrierid", rule
+              throw new CallRouterError "Neither gwid nor carrierid in gwlist of #{rule._id}"
 
             result.then (gateways) ->
               gateways.map (gateway) ->

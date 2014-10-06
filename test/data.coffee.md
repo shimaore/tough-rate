@@ -96,8 +96,16 @@ The steps to placing outbound call(s) are:
     PouchDB = (require 'pouchdb').defaults db: require 'memdown'
     pkg = require '../package.json'
     GatewayManager = require '../gateway_manager'
-    CallRouter = require '../router.coffee.md'
+    CallRouter = require '../router'
+    CallHandler = require '../call_handler'
     statistics = require 'winston'
+    Promise = require 'bluebird'
+
+    class FreeSwitchError extends Error
+      constructor:(@res,@args) ->
+
+      toString: ->
+        JSON.stringify @args
 
     describe 'Once the database is loaded', ->
       dataset = dataset_1
@@ -107,6 +115,8 @@ The steps to placing outbound call(s) are:
 Note: normally ruleset_of would be async, and would query provisioning to find the ruleset and then map it to its database.
 
       ruleset_of = (x) ->
+        if not dataset.rulesets[x]?
+          throw "Unknown ruleset #{x}"
         ruleset: dataset.rulesets[x]
         database: new PouchDB dataset.rulesets[x].database
 
@@ -141,6 +151,16 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
       .then ->
         gm = new GatewayManager provisioning, 'phone.local'
         gm.init()
+
+      one_call = (ctx,outbound_route) ->
+        ready.then ->
+          router = new CallRouter {provisioning, gateway_manager:gm, ruleset_of, statistics, respond:true, outbound_route}
+          ch = CallHandler router,
+            profile: 'something-egress'
+            statistics: statistics
+          ch.apply ctx
+        .catch (exception) ->
+          throw exception
 
       describe 'Gateways', ->
         it 'should have progress_timeout from their carrier: gw1', (done) ->
@@ -179,9 +199,10 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
               info[1].should.have.property 'gwid', 'gw2'
               done()
 
-      describe 'The gateway manager', ->
+      describe 'The call router', ->
         it 'should route local numbers directly', (done) ->
           provisioning.put _id:'number:1234',inbound_uri:'sip:foo@bar'
+          .catch done
           .then ->
             router = new CallRouter {provisioning, gateway_manager:gm, ruleset_of, statistics, respond:done}
             router.route '3213', '1234'
@@ -205,3 +226,108 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             gws[1].should.have.property 'gwid', 'backup'
             done()
           .catch done
+
+        it 'should report an error when no route is found', (done) ->
+          respond = (v) ->
+            v.should.equal '485'
+
+          router = new CallRouter {provisioning, gateway_manager:gm, ruleset_of, statistics, respond, outbound_route:'default'}
+          router.route '336718', '347766'
+          .catch (exception)->
+            console.dir exception
+            done()
+          null
+
+
+      describe 'The call handler', ->
+
+        it 'should reject invalid destination numbers', (done) ->
+          one_call
+            data:
+              'Channel-Destination-Number': 'abcd'
+              'Channel-Caller-ID-Number': '2344'
+            command: (c,v) ->
+              c.should.equal 'respond'
+              v.should.equal '484'
+              done()
+              Promise.resolve()
+
+        it 'should reject invalid source umbers', (done) ->
+          one_call
+            data:
+              'Channel-Destination-Number': '1235'
+              'Channel-Caller-ID-Number': 'abcd'
+            command: (c,v) ->
+              c.should.equal 'respond'
+              v.should.equal '484'
+              done()
+              Promise.resolve()
+
+        it 'should reject unknown destinations', (done) ->
+          one_call
+            data:
+              'Channel-Destination-Number': '1235'
+              'Channel-Caller-ID-Number': '2345'
+            command: (c,v) ->
+              c.should.equal 'respond'
+              v.should.equal '485'
+              done()
+              Promise.resolve()
+
+        it 'should route known destinations', (done) ->
+          ready.then ->
+            provisioning.put _id:'number:1236',inbound_uri:'sip:bar@foo'
+            .catch done
+            .then ->
+              one_call
+                data:
+                  'Channel-Destination-Number': '1236'
+                  'Channel-Caller-ID-Number': '2346'
+                command: (c,v) ->
+                  v.should.equal '[]sofia/something-egress/sip:bar@foo'
+                  c.should.equal 'bridge'
+                  done()
+                  Promise.resolve()
+
+        it 'should route known destinations for specific sources', (done) ->
+          ready.then ->
+            provisioning.put _id:'number:2347',outbound_route:'default'
+            .catch done
+            .then ->
+              one_call
+                data:
+                  'Channel-Destination-Number': '336727'
+                  'Channel-Caller-ID-Number': '2347'
+                command: (c,v) ->
+                  v.should.equal '[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800]sofia/something-egress/sip:336727@127.0.0.1:5068'
+                  c.should.equal 'bridge'
+                  done()
+                  Promise.resolve()
+
+        it 'should route known routes', (done) ->
+          ctx =
+            data:
+              'Channel-Destination-Number': '3368267'
+              'Channel-Caller-ID-Number': '2348'
+            command: (c,v) ->
+              v.should.equal '[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800]sofia/something-egress/sip:3368267@127.0.0.1:5068'
+              c.should.equal 'bridge'
+              done()
+              Promise.resolve()
+          one_call ctx, 'default'
+
+        it 'should report failed destinations', (done) ->
+          ready.then ->
+            ctx =
+              data:
+                'Channel-Destination-Number': '336927'
+                'Channel-Caller-ID-Number': '2349'
+              command: (c,v) ->
+                if c is 'bridge'
+                  Promise.reject new FreeSwitchError {}, reply: '-ERR I_TOLD_YOU_SO'
+                else
+                  v.should.equal '604'
+                  c.should.equal 'respond'
+                  done()
+                  Promise.resolve()
+            one_call ctx, 'default'
