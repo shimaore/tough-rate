@@ -201,42 +201,45 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
 
       describe 'The call router', ->
         it 'should route local numbers directly', (done) ->
-          provisioning.put _id:'number:1234',inbound_uri:'sip:foo@bar'
-          .catch done
-          .then ->
-            router = new CallRouter {provisioning, gateway_manager:gm, ruleset_of, statistics, respond:done}
-            router.route '3213', '1234'
-            .then (gws) ->
-              gws.should.be.an.instanceOf Array
-              gws.should.have.length 1
-              gws.should.have.property 0
-              gws[0].should.have.property 'uri', 'sip:foo@bar'
-              done()
-          .catch done
+          ready.then ->
+            provisioning.put _id:'number:1234',inbound_uri:'sip:foo@bar'
+            .catch done
+            .then ->
+              router = new CallRouter {provisioning, gateway_manager:gm, ruleset_of, statistics, respond:done}
+              router.route '3213', '1234'
+              .then (gws) ->
+                gws.should.be.an.instanceOf Array
+                gws.should.have.length 1
+                gws.should.have.property 0
+                gws[0].should.have.property 'uri', 'sip:foo@bar'
+                done()
+            .catch done
 
         it 'should route numbers using routes', (done) ->
-          router = new CallRouter {provisioning, gateway_manager:gm, ruleset_of, statistics, respond:done, outbound_route:'default'}
-          router.route '336718', '331234'
-          .then (gws) ->
-            gws.should.be.an.instanceOf Array
-            gws.should.have.length 2
-            gws.should.have.property 0
-            gws[0].should.have.property 'gwid', 'gw3'
-            gws.should.have.property 1
-            gws[1].should.have.property 'gwid', 'backup'
-            done()
-          .catch done
+          ready.then ->
+            router = new CallRouter {provisioning, gateway_manager:gm, ruleset_of, statistics, respond:done, outbound_route:'default'}
+            router.route '336718', '331234'
+            .then (gws) ->
+              gws.should.be.an.instanceOf Array
+              gws.should.have.length 2
+              gws.should.have.property 0
+              gws[0].should.have.property 'gwid', 'gw3'
+              gws.should.have.property 1
+              gws[1].should.have.property 'gwid', 'backup'
+              done()
+            .catch done
 
         it 'should report an error when no route is found', (done) ->
-          respond = (v) ->
-            v.should.equal '485'
+          ready.then ->
+            respond = (v) ->
+              v.should.equal '485'
 
-          router = new CallRouter {provisioning, gateway_manager:gm, ruleset_of, statistics, respond, outbound_route:'default'}
-          router.route '336718', '347766'
-          .catch (exception)->
-            console.dir exception
-            done()
-          null
+            router = new CallRouter {provisioning, gateway_manager:gm, ruleset_of, statistics, respond, outbound_route:'default'}
+            router.route '336718', '347766'
+            .catch (exception)->
+              console.dir exception
+              done()
+            null
 
 
       describe 'The call handler', ->
