@@ -34,13 +34,15 @@ We modify the CallRouter's options so that it has access to our respond. (FIXME)
           options.statistics?.warn 'Missing or invalid Channel-Caller-ID-Number', @data
           return
 
+        emergency_ref = @data['variable_sip_h_X-CCNQ3-Routing']
+
 Then, see whether the destination number is an emergency number, and process it.
 
-        # TODO
+        # This is done by the router.
 
 Go through the gateways.
 
-        router.route source, destination
+        router.route source, destination, emergency_ref
         .catch (exception)->
           options.statistics?.error "Call Router exception: #{exception}"
           false
@@ -68,7 +70,8 @@ If a winner was already found simply return it.
 
 Call attempt.
 
-                attempt.call this, destination, gateway, options
+                final_destination = gateway.final_destination ? destination
+                attempt.call this, final_destination, gateway, options
 
 If we've got a winner, propagate it down.
 
@@ -82,7 +85,7 @@ Those error are reported iff the call was not able to connect for some reason.
                   if error?.args?.reply?
                     code = error.args.reply.match(/^-ERR (\w+)/)?[1]
                     if code
-                      response_handlers[code]?.call this, gateway, router, options, destination
+                      response_handlers[code]?.call this, gateway, router, options, destination, final_destination
                     else
                       options.statistics?.warn "Unable to parse reply '#{error.args.reply}'"
                       throw new CallHandlerError "Unable to parse reply '#{error.args.reply}'"

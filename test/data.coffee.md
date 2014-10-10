@@ -254,7 +254,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
               done()
             null
 
-        it.only 'should route emergency numbers', (done) ->
+        it 'should route emergency numbers', (done) ->
           ready.then ->
             router = new CallRouter {provisioning, gateway_manager:gm, ruleset_of, statistics, respond:done, outbound_route:'default'}
             router.route '336718', '330112', 'brest'
@@ -362,3 +362,16 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
                   done()
                   Promise.resolve()
             one_call ctx, 'default'
+
+        it 'should route emergency', (done) ->
+          ctx =
+            data:
+              'Channel-Destination-Number': '330112'
+              'Channel-Caller-ID-Number': '2348'
+              'variable_sip_h_X-CCNQ3-Routing': 'brest'
+            command: (c,v) ->
+              v.should.equal '[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800]sofia/something-egress/sip:33156@127.0.0.1:5068'
+              c.should.equal 'bridge'
+              done()
+              Promise.resolve()
+          one_call ctx, 'default'
