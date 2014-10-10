@@ -72,6 +72,12 @@ The steps to placing outbound call(s) are:
           title:'The default ruleset'
           database: 'the_default_ruleset'
 
+      emergency:
+        '330112#brest':
+          _id:'emergency:330112#brest'
+          type:'emergency'
+          destination:'33156'
+
       rules:
         default:
           33:
@@ -91,6 +97,12 @@ The steps to placing outbound call(s) are:
               {carrierid:'the_other_company'}
               {carrierid:'the_phone_company'}
             ]
+
+          330112:
+            _id:'rule:330112'
+            type:'rule'
+            destination:'france_emergency'
+            emergency:true
 
     should = require 'should'
     PouchDB = (require 'pouchdb').defaults db: require 'memdown'
@@ -127,6 +139,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
         (records.push v) for k,v of dataset.gateways
         (records.push v) for k,v of dataset.carriers
         (records.push v) for k,v of dataset.destinations
+        (records.push v) for k,v of dataset.emergency
         provisioning.bulkDocs records
 
       ready = ready.then ->
@@ -241,6 +254,21 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
               done()
             null
 
+        it.only 'should route emergency numbers', (done) ->
+          ready.then ->
+            router = new CallRouter {provisioning, gateway_manager:gm, ruleset_of, statistics, respond:done, outbound_route:'default'}
+            router.route '336718', '330112', 'brest'
+            .then (gws) ->
+              gws.should.be.an.instanceOf Array
+              gws.should.have.length 2
+              gws.should.have.property 0
+              gws[0].should.have.property 'final_destination', '33156'
+              gws[0].should.have.property 'gwid', 'gw3'
+              gws.should.have.property 1
+              gws[1].should.have.property 'final_destination', '33156'
+              gws[1].should.have.property 'gwid', 'backup'
+              done()
+            .catch done
 
       describe 'The call handler', ->
 

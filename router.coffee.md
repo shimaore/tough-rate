@@ -22,7 +22,7 @@ Options:
         # assert @options.host
         # assert @options.outbound_route
 
-      route: (source,destination) ->
+      route: (source,destination,emergency_ref) ->
 
 First, see whether the destination number is one of our numbers, and route it.
 
@@ -30,17 +30,31 @@ First, see whether the destination number is one of our numbers, and route it.
         .then (doc) =>
           Promise.resolve [{uri: doc.inbound_uri}]
         .catch =>
-          @_route_remote source, destination
+          @_route_remote source, destination, emergency_ref
 
 We first need to determine which routing table we should use, though.
 This is based on the calling number.
 
-      _route_remote: (source,destination) ->
+      _route_remote: (source,destination,emergency_ref) ->
 
 Route based on the route selected by the source, or using a default route.
 
         ruleset = null
-        rule = null
+        final_destination = null
+
+        find_rule_in = (destination,database) =>
+          ids = ("rule:#{destination[0...l]}" for l in [0..destination.length]).reverse()
+
+          database.allDocs keys:ids, include_docs: true
+          .then ({rows}) =>
+            rule = (row.doc for row in rows when row.doc? and not row.doc.disabled)[0]
+
+            unless rule?
+              @options.respond '485'
+              @options.statistics.warn 'No route available', {source,rows}
+              throw new CallRouterError "No rule available towards #{destination}"
+
+            {rule,database}
 
         @provisioning.get "number:#{source}"
         .then (doc) =>
@@ -57,22 +71,28 @@ Route based on the route selected by the source, or using a default route.
 
           @options.ruleset_of route
         .then ({ruleset,database}) =>
-          unless ruleset?
+          unless ruleset? and database?
             @options.respond '500'
             @options.statistics.warn 'Invalid route', {source}
             throw new CallRouterError "Invalid route for #{source}"
 
-          ids = ("rule:#{destination[0...l]}" for l in [0..destination.length]).reverse()
+          find_rule_in destination,database
+        .then ({rule,database}) =>
 
-          database.allDocs keys:ids, include_docs: true
-        .then ({rows}) =>
-          rule = (row.doc for row in rows when row.doc? and not row.doc.disabled)[0]
+          if not rule.emergency
+            return {rule,database}
 
-          unless rule?
-            @options.respond '485'
-            @options.statistics.warn 'No route available', {source,rows}
-            throw new CallRouterError "No rule available towards #{destination}"
+          if emergency_ref?
+            emergency_key = [destination,emergency_ref].join '#'
+          else
+            emergency_key = destination
 
+          @provisioning.get "emergency:#{emergency_key}"
+          .then (doc) =>
+            final_destination = doc.destination ? null
+            find_rule_in final_destination,database
+
+        .then ({rule}) =>
           gwlist = rule.gwlist
           unless gwlist?
             @options.respond '500'
@@ -112,7 +132,7 @@ And select only `try` entries where specified.
 
             result.then (gateways) ->
               gateways.map (gateway) ->
-                field_merger {gateway, ruleset, rule, entry}
+                field_merger {default:{final_destination}, gateway, ruleset, rule, entry}
 
 Then we must flatten the list so that CallHandler can use it.
 
