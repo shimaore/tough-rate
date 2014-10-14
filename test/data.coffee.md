@@ -71,6 +71,14 @@ The steps to placing outbound call(s) are:
           groupid:'default'
           title:'The default ruleset'
           database: 'the_default_ruleset'
+        registrant:
+          _id:'ruleset:phone.local:registrant'
+          type:'ruleset'
+          sip_domain_name:'phone.local'
+          groupid:'registrant'
+          title:'The registrant ruleset'
+          database: 'the_registrant_ruleset'
+
 
       emergency:
         '330112#brest':
@@ -103,6 +111,15 @@ The steps to placing outbound call(s) are:
             type:'rule'
             destination:'france_emergency'
             emergency:true
+
+        registrant:
+          33:
+            _id:'rule:33'
+            type:'rule'
+            destination:'france'
+            gwlist:[
+              {source_registrant:true}
+            ]
 
     should = require 'should'
     PouchDB = (require 'pouchdb').defaults db: require 'memdown'
@@ -149,6 +166,14 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
         rules = []
         (rules.push v) for k,v of dataset.rules.default
         default_ruleset.bulkDocs rules
+
+      ready = ready.then ->
+        PouchDB.destroy dataset.rulesets.registrant.database
+      .then ->
+        the_ruleset = new PouchDB dataset.rulesets.registrant.database
+        rules = []
+        (rules.push v) for k,v of dataset.rules.registrant
+        the_ruleset.bulkDocs rules
 
       ready = ready.then ->
         GatewayManager.should.have.property 'couch'
@@ -225,6 +250,22 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
                 gws.should.have.length 1
                 gws.should.have.property 0
                 gws[0].should.have.property 'uri', 'sip:foo@bar'
+                done()
+            .catch done
+
+        it 'should route registrant_host directly', (done) ->
+          ready.then ->
+            provisioning.put _id:'number:3213',registrant_host:'foo'
+            .catch done
+            .then ->
+              router = new CallRouter {provisioning, gateway_manager:gm, ruleset_of, statistics, respond:done, outbound_route:'registrant'}
+              router.plugin require '../plugin-registrant'
+              router.route '3213', '331234'
+              .then (gws) ->
+                gws.should.be.an.instanceOf Array
+                gws.should.have.length 1
+                gws.should.have.property 0
+                gws[0].should.have.property 'address', 'foo'
                 done()
             .catch done
 
