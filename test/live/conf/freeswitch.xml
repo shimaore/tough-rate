@@ -11,7 +11,7 @@
         <param name="max-sessions" value="2000"/>
         <param name="sessions-per-second" value="2000"/>
         <param name="min-idle-cpu" value="0"/>
-        <param name="loglevel" value="info"/>
+        <param name="loglevel" value="debug"/>
       </settings>
     </configuration>
     <configuration name="modules.conf" description="Modules">
@@ -49,10 +49,17 @@
       <profiles>
         <X-PRE-PROCESS cmd="set" data="timer_t1=250"/>
         <X-PRE-PROCESS cmd="set" data="timer_t4=4000"/>
-
-        <X-PRE-PROCESS cmd="set" data="sip_port=5062"/>
         <X-PRE-PROCESS cmd="set" data="timer_t2=2000"/>
         <X-PRE-PROCESS cmd="set" data="timer_t1x64=$${timer_t2}"/>
+
+        <X-PRE-PROCESS cmd="set" data="name=sender"/>
+        <X-PRE-PROCESS cmd="set" data="sip_port=5062"/>
+        <X-PRE-PROCESS cmd="set" data="context=lcr"/>
+        <X-PRE-PROCESS cmd="include" data="profile-test.xml"/>
+
+        <X-PRE-PROCESS cmd="set" data="name=catcher"/>
+        <X-PRE-PROCESS cmd="set" data="sip_port=5064"/>
+        <X-PRE-PROCESS cmd="set" data="context=answer"/>
         <X-PRE-PROCESS cmd="include" data="profile-test.xml"/>
       </profiles>
     </configuration>
@@ -61,10 +68,19 @@
 
   <section name="dialplan" description="Regex/XML Dialplan">
 
-    <context name="private">
+    <context name="lcr">
       <extension name="lcr">
         <condition field="destination_number" expression="^\d+$">
           <action application="socket" data="172.17.42.1:7002 async full"/>
+        </condition>
+      </extension>
+    </context>
+
+    <context name="answer">
+      <extension name="answer">
+        <condition field="destination_number" expression="^\d+$">
+          <action application="answer"/>
+          <action application="sleep" data="10"/>
         </condition>
       </extension>
     </context>
