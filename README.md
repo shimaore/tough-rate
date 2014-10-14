@@ -1,3 +1,12 @@
+About
+=====
+
+`tough-rate` is a Least Cost Routing (LCR) application for FreeSwitch.
+
+It runs under Node.js and uses CouchDB for provisioning.
+
+It is part of the [CCNQ SoftSwitch](http://ccnq.shimaore.net/).
+
 Architecture
 ============
 

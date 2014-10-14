@@ -1,6 +1,8 @@
 CallServer
 ==========
 
+TODO: add Node.js clustering
+
     module.exports = class CallServer
       constructor: (@port,@options) ->
         options.respond ?= true

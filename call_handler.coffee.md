@@ -112,7 +112,7 @@ We only need to notify if we tried gateways but none responded properly, in whic
             # TODO log the winning gateway
             # Note: winner might be `true` if no gateways were available.
 
-        return it
+          return it
 
       return handler
 

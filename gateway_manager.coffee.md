@@ -21,17 +21,33 @@ The gateway manager provides services to the call handler.
         @gateway_status = {}
 
       init: ->
-        @provisioning
-        .allDocs startkey:"carrier:#{@sip_domain_name}:", endkey:"carrier:#{@sip_domain_name};", include_docs:yes
+        Promise.resolve()
+        .then =>
+          @provisioning
+          .allDocs startkey:"carrier:#{@sip_domain_name}:", endkey:"carrier:#{@sip_domain_name};", include_docs:yes
+        .catch (error) ->
+          console.log "GatewayManager allDocs failed"
+          throw error
         .then ({rows}) =>
           for row in rows
             do (row) => @_merge_carrier_row row
-
-        @provisioning
-        .query "#{pkg.name}-gateway-manager/gateways", startkey:[@sip_domain_name], endkey:[@sip_domain_name,{}]
+          return
+        .catch (error) ->
+          console.log "GatewayManager merge-carrier-row failed"
+          throw error
+        .then =>
+          @provisioning
+          .query "#{pkg.name}-gateway-manager/gateways", startkey:[@sip_domain_name], endkey:[@sip_domain_name,{}]
+        .catch (error) ->
+          console.log "GatewayManager query failed"
+          throw error
         .then ({rows}) =>
           for row in rows when row.value?.address?
             do (row) => @_merge_gateway_row row
+          return
+        .catch (error) ->
+          console.log "GatewayManager merge-gateway-row failed"
+          throw error
 
         # TODO Add monitoring of `_changes` on the view to update carriers and gateways
 
@@ -80,6 +96,8 @@ The gateway manager provides services to the call handler.
         @carriers[carrierid] ?= _gateways: {}
         for own k,v of row.doc
           @carriers[carrierid][k] = v
+
+        return
 
       _retrieve_gateway: (name) ->
         # TODO update with dynamic parameters (temporarily_disabled, ...)
