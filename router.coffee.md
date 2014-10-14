@@ -14,6 +14,7 @@ Options:
 
       constructor: (@options) ->
         {@provisioning,@gateway_manager} = @options
+        @plugins = []
         assert @provisioning, 'Missing `provisioning` database'
         assert @gateway_manager, 'Missing `gateway_manager`'
         assert @options.ruleset_of, 'Missing `ruleset_of`'
@@ -21,6 +22,33 @@ Options:
         assert @options.respond, 'Missing `respond`'
         # assert @options.host
         # assert @options.outbound_route
+
+Handle `gwid` field if present.
+
+        @plugin require './plugin-gwid'
+
+Handle `carrierid` field if present.
+
+        @plugin require './plugin-carrierid'
+
+Plugins
+=======
+
+Plugins will be called as `(entry,params)` where `params` is an object containing:
+* `source` -- the source number
+* `source_doc` -- the source (CouchDB) document
+* `destination` -- the original called number
+* `final_destination` -- optionnally, the modified called number
+* `rule` -- the rule (CouchDB) document
+
+If the plugin is handling the `entry`, it must return `null`.
+Otherwise it must return a Promise which when resolved returns an array of gateways.
+Gateways are defined using objects containing:
+* `uri`: a full SIP URI indicating where to send the call to (be careful to take `final_destination` into account in this case)
+* `address`: a SIP domain part (will be used to build a full URI using the `destination` or `final_destination`)
+
+      plugin: (plugin) ->
+        @plugins.push plugin
 
       route: (source,destination,emergency_ref) ->
 
@@ -41,6 +69,7 @@ Route based on the route selected by the source, or using a default route.
 
         ruleset = null
         final_destination = null
+        source_doc = null
 
         find_rule_in = (destination,database) =>
           ids = ("rule:#{destination[0...l]}" for l in [0..destination.length]).reverse()
@@ -58,6 +87,7 @@ Route based on the route selected by the source, or using a default route.
 
         @provisioning.get "number:#{source}"
         .then (doc) =>
+          source_doc = doc
           route = doc.outbound_route ? @options.outbound_route
         .catch =>
           route = @options.outbound_route
@@ -103,32 +133,14 @@ Route based on the route selected by the source, or using a default route.
 
 The list returned contains one entry (one array) for each original destination.
 
-            result = if entry.gwid?
-              @gateway_manager.resolve_gateway entry.gwid
-            else if entry.carrierid?
-              @gateway_manager.resolve_carrier entry.carrierid
-              .then (gateways) =>
-                gateways.forEach (gateway) =>
-                  gateway.priority = 1
+            result = null
+            for plugin in @plugins
+              result = plugin.call this, entry, {source,source_doc,destination,final_destination,rule}
+              break if result?
 
-First we must sort the carrier entries using the local hostname preference.
-
-                  if gateway.local_gateway_first and @options.host? and gateway.host is @options.host
-                    gateway.priority += 0.5
-
-                gateways.sort (a,b) -> a.priority - b.priority
-
-And select only `try` entries where specified.
-
-                count = gateways[0]?.try
-                if count? and count > 0
-                  gateways = gateways[0...count]
-
-                gateways
-
-            else
-              @options.statistics.warn "Missing gwid or carrierid", rule
-              throw new CallRouterError "Neither gwid nor carrierid in gwlist of #{rule._id}"
+            if not result?
+              @options.statistics.warn "Missing gwid, carrierid, ...; active plugins = #{(@plugins.map (x) -> x.title).join ','}", rule
+              throw new CallRouterError "Invalid entry #{JSON.stringify entry} in gwlist of #{rule._id}"
 
             result.then (gateways) ->
               gateways.map (gateway) ->
