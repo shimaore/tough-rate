@@ -1,9 +1,10 @@
 {
   "name": "tough-rate",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "description": "Event-socket-based LCR engine for FreeSwitch",
   "main": "index.js",
   "scripts": {
+    "prepublish": "coffee -c *.coffee.md",
     "test": "mocha"
   },
   "author": "Stéphane Alnet <stephane@shimaore.net> (http://stephane.shimaore.net/)",
