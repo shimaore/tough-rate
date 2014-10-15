@@ -4,11 +4,13 @@
   "description": "Event-socket-based LCR engine for FreeSwitch",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --compilers coffee.md:coffee-script/register -R spec"
+    "test": "mocha"
   },
   "author": "Stéphane Alnet <stephane@shimaore.net> (http://stephane.shimaore.net/)",
   "license": "Unlicense",
   "devDependencies": {
+    "chai": "^1.9.2",
+    "chai-as-promised": "^4.1.1",
     "coffee-script": "^1.8.0",
     "memdown": "^0.10.2",
     "mocha": "^1.21.4",
