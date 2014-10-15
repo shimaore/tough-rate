@@ -1,5 +1,5 @@
-Test Submitter
-==============
+Live test with FreeSwitch
+=========================
 
     chai = require 'chai'
     chai.use require 'chai-as-promised'
@@ -8,6 +8,9 @@ Test Submitter
     Promise = require 'bluebird'
     real_exec = Promise.promisify (require 'child_process').exec
     pkg = require '../package.json'
+
+Parameters for docker.io image
+==============================
 
     process.chdir (require 'path').dirname __filename
 
@@ -39,28 +42,14 @@ Setup
       console.log "Docker DNS is at #{DNS}"
       exec "docker run -p 127.0.0.1:8022:8022 --dns=#{DNS} -d --name #{p} #{p}"
     .catch (error) ->
-      console.log "Docker run failed"
+      console.log "Failed to locate Docker DNS"
       throw error
     .then -> start_server()
+    .then (s) -> server = s
     .catch (error) ->
       console.log "Start server failed"
       throw error
-    .then (s) -> server = s
-    .catch (error) ->
-      console.log "Preflight failed"
-      throw error
     .delay 17000
-
-Cleanup
-=======
-
-    cleanup = Promise.resolve()
-    .then -> server?.stop()
-    .then -> exec "docker logs #{p} > #{p}.log"
-    .then -> exec "docker kill #{p}"
-    .then -> exec "docker rm #{p}"
-    .then -> exec "docker rmi #{p}"
-    .catch -> true
 
 Server (Unit Under Test)
 ========================
@@ -155,24 +144,18 @@ Test
 ====
 
     test1 = ->
-      console.log "Test 1"
-      console.log "Creating promise for client"
       new Promise (resolve,reject) ->
         setTimeout reject, 4000
         try
-          console.log "Creating client"
           client = FS.client ->
-            console.log "Starting client"
             source = '1234'
             destination = '33142'
             @api "originate {origination_caller_id_number=#{source}}sofia/test-sender/sip:#{destination}@#{domain} &park"
             .then ->
-              console.log "Call established"
               client.end()
               resolve true
             .catch (exception) ->
               client.end()
-              console.log "Test 1 Call failed"
               reject exception
           client.on 'error', (data) ->
             console.dir 'test.on error':data
@@ -184,18 +167,14 @@ Test
           reject exception
 
     test2 = ->
-      console.log "Testing emergency"
       new Promise (resolve,reject) ->
         setTimeout reject, 4000
         try
-          console.log "Creating client"
           client = FS.client ->
-            console.log "Starting client"
             source = '1235'
             destination = '330112'
             @api "originate [origination_caller_id_number=#{source},sip_h_X-CCNQ3-Routing=brest]sofia/test-sender/sip:#{destination}@#{domain} &park"
             .then ->
-              console.log "Call established"
               client.end()
               resolve true
             .catch (exception) ->
@@ -214,9 +193,6 @@ Test
       @timeout 18000
       ready
 
-    after ->
-      cleanup
-
     describe 'FreeSwitch', ->
       @timeout 5000
       it 'should process a regular call', ->
@@ -227,3 +203,15 @@ Test
         t = ready.then test2
         t.should.be.fulfilled
         t.should.eventually.equal true
+
+Cleanup
+=======
+
+    after ->
+      ready
+      .then -> server?.close()
+      .then -> exec "docker logs #{p} > #{p}.log"
+      .then -> exec "docker kill #{p}"
+      .then -> exec "docker rm #{p}"
+      .then -> exec "docker rmi #{p}"
+      .catch -> true
