@@ -14,13 +14,13 @@
     "chai-as-promised": "^4.1.1",
     "coffee-script": "^1.8.0",
     "memdown": "^0.10.2",
-    "mocha": "^1.21.4",
+    "mocha": "^1.21.5",
     "pouchdb": "^3.0.6",
-    "should": "^4.0.4",
-    "winston": "^0.8.0"
+    "should": "^4.1.0",
+    "winston": "^0.8.1"
   },
   "dependencies": {
-    "bluebird": "^2.3.4",
-    "esl": "^2.1.1-pre"
+    "bluebird": "^2.3.6",
+    "esl": "^2.1.3"
   }
 }
