@@ -6,7 +6,7 @@ TODO: add Node.js clustering
     module.exports = class CallServer
       constructor: (@port,@options) ->
         options.respond ?= true
-        router = new Router options
+        router = options.router ? new Router options
         @server = FS.server CallHandler router, options
         @server.listen port
 
