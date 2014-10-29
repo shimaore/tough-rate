@@ -85,10 +85,10 @@ Those error are reported iff the call was not able to connect for some reason.
                   if error?.args?.reply?
                     code = error.args.reply.match(/^-ERR (\w+)/)?[1]
                     if code
-                      response_handlers[code]?.call this, gateway, router, options, destination, final_destination
-                    else
-                      options.statistics?.warn "Unable to parse reply '#{error.args.reply}'"
-                      throw new CallHandlerError "Unable to parse reply '#{error.args.reply}'"
+                      return response_handlers[code]?.call this, gateway, router, options, destination, final_destination
+
+                    options.statistics?.warn "Unable to parse reply '#{error.args.reply}'"
+                    throw new CallHandlerError "Unable to parse reply '#{error.args.reply}'"
 
 However we do not propagate `error`, since it would mean interrupting the call sequence. Since we didn't find any winner, we simply return `null`.
 
