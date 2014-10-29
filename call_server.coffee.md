@@ -8,6 +8,7 @@ TODO: add Node.js clustering
         options.respond ?= true
         router = options.router ? new Router options
         @server = FS.server CallHandler router, options
+        @options.statistics?.log "#{pkg.name} #{pkg.version} starting on port #{port}."
         @server.listen port
 
       stop: ->
