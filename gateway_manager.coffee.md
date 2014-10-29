@@ -19,6 +19,8 @@ The gateway manager provides services to the call handler.
         @carriers = {}
         @gateways = {}
         @gateway_status = {}
+        assert @provisioning, "provisioning DB is required"
+        assert @sip_domain_name, "sip_domaine_name is required"
 
       init: ->
         Promise.resolve()
