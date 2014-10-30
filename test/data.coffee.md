@@ -187,7 +187,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           doc.should.have.property 'views'
           doc.views.should.have.property 'gateways'
       .then ->
-        gm = new GatewayManager provisioning, 'phone.local'
+        gm = new GatewayManager provisioning, 'phone.local', {statistics}
         gm.init()
 
       one_call = (ctx,outbound_route) ->
