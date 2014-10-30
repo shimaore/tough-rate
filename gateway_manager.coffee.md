@@ -21,6 +21,7 @@ The gateway manager provides services to the call handler.
         @gateway_status = {}
         assert @provisioning, "provisioning DB is required"
         assert @sip_domain_name, "sip_domaine_name is required"
+        assert @options.statistics, 'Missing `statistics`'
 
       init: ->
         Promise.resolve()
@@ -28,27 +29,31 @@ The gateway manager provides services to the call handler.
           @provisioning
           .allDocs startkey:"carrier:#{@sip_domain_name}:", endkey:"carrier:#{@sip_domain_name};", include_docs:yes
         .catch (error) ->
-          console.log "GatewayManager allDocs failed"
+          @options.statistics.error error
+          @options.statistics.log "GatewayManager allDocs failed"
           throw error
         .then ({rows}) =>
           for row in rows
             do (row) => @_merge_carrier_row row
           return
         .catch (error) ->
-          console.log "GatewayManager merge-carrier-row failed"
+          @options.statistics.error error
+          @options.statistics.log "GatewayManager merge-carrier-row failed"
           throw error
         .then =>
           @provisioning
           .query "#{pkg.name}-gateway-manager/gateways", startkey:[@sip_domain_name], endkey:[@sip_domain_name,{}]
         .catch (error) ->
-          console.log "GatewayManager query failed"
+          @options.statistics.error error
+          @options.statistics.log "GatewayManager query failed"
           throw error
         .then ({rows}) =>
           for row in rows when row.value?.address?
             do (row) => @_merge_gateway_row row
           return
         .catch (error) ->
-          console.log "GatewayManager merge-gateway-row failed"
+          @options.statistics.error error
+          @options.statistics.log "GatewayManager merge-gateway-row failed"
           throw error
 
         # TODO Add monitoring of `_changes` on the view to update carriers and gateways
