@@ -184,7 +184,7 @@ Toolbox
 
     GatewayManager.couch =
       _id: "_design/#{design}"
-      language: "application/javascript"
+      language: "javascript"
 
 For an individual gateway we expect the following fields must be present in the view:
 
