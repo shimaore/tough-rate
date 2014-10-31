@@ -28,7 +28,7 @@ The gateway manager provides services to the call handler.
         .then =>
           @provisioning
           .allDocs startkey:"carrier:#{@sip_domain_name}:", endkey:"carrier:#{@sip_domain_name};", include_docs:yes
-        .catch (error) ->
+        .catch (error) =>
           @options.statistics.error error
           @options.statistics.log "GatewayManager allDocs failed"
           throw error
@@ -36,14 +36,14 @@ The gateway manager provides services to the call handler.
           for row in rows
             do (row) => @_merge_carrier_row row
           return
-        .catch (error) ->
+        .catch (error) =>
           @options.statistics.error error
           @options.statistics.log "GatewayManager merge-carrier-row failed"
           throw error
         .then =>
           @provisioning
           .query "#{pkg.name}-gateway-manager/gateways", startkey:[@sip_domain_name], endkey:[@sip_domain_name,{}]
-        .catch (error) ->
+        .catch (error) =>
           @options.statistics.error error
           @options.statistics.log "GatewayManager query failed"
           throw error
@@ -51,7 +51,7 @@ The gateway manager provides services to the call handler.
           for row in rows when row.value?.address?
             do (row) => @_merge_gateway_row row
           return
-        .catch (error) ->
+        .catch (error) =>
           @options.statistics.error error
           @options.statistics.log "GatewayManager merge-gateway-row failed"
           throw error
@@ -86,7 +86,7 @@ The gateway manager provides services to the call handler.
       _reevaluate_gateways: (gateways) ->
         @provisioning
         .query "#{pkg.name}-gateway-manager/gateways", keys:gateways.map (x) => [@sip_domain_name,x]
-        .then ({rows}) ->
+        .then ({rows}) =>
           for row in rows when row.value?.address?
             do (row) => @_merge_gateway_row row
 
