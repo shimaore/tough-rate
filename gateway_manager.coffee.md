@@ -20,7 +20,7 @@ The gateway manager provides services to the call handler.
         @gateways = {}
         @gateway_status = {}
         assert @provisioning, "provisioning DB is required"
-        assert @sip_domain_name, "sip_domaine_name is required"
+        assert @sip_domain_name, "sip_domain_name is required"
         assert @options.statistics, 'Missing `statistics`'
 
       init: ->
