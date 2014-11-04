@@ -85,6 +85,8 @@ Route based on the route selected by the source, or using a default route.
 
             {rule,database}
 
+        the_route = null
+
         @provisioning.get "number:#{source}"
         .then (doc) =>
           source_doc = doc
@@ -98,13 +100,14 @@ Route based on the route selected by the source, or using a default route.
             throw new CallRouterError "No route available for #{source}"
 
           route = "#{route}"
+          the_route = route
 
           @options.ruleset_of route
         .then ({ruleset,database}) =>
           unless ruleset? and database?
             @options.respond '500'
-            @options.statistics.warn 'Invalid route', {source}
-            throw new CallRouterError "Invalid route for #{source}"
+            @options.statistics.warn 'No ruleset available', {source,the_route}
+            throw new CallRouterError "Route #{the_route} for #{source} has no ruleset or no database."
 
           find_rule_in destination,database
         .then ({rule,database}) =>
