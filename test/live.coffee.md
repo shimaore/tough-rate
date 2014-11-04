@@ -131,7 +131,7 @@ Server (Unit Under Test)
           ruleset_of: ruleset_of
           statistics: require 'winston'
 
-        options.gateway_manager = new GatewayManager provisioning, sip_domain_name
+        options.gateway_manager = new GatewayManager provisioning, sip_domain_name, options
         options.gateway_manager.init()
       .catch (error) ->
         console.log "Gateway Manager init() failed"
