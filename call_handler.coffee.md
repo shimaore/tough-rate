@@ -9,7 +9,8 @@ Options are:
     class CallHandlerError extends Error
 
     module.exports = CallHandler = (router,options) ->
-      assert options.profile
+      assert options.profile?, 'Missing `profile` option.'
+      assert options.statistics?, 'Missing `statistics` option.'
 
       handler = ->
 
@@ -25,13 +26,13 @@ We modify the CallRouter's options so that it has access to our respond. (FIXME)
         destination = @data['Channel-Destination-Number']
         unless destination? and destination.match /^[\d#*]+$/
           respond '484'
-          options.statistics?.warn 'Missing or invalid Channel-Destination-Number', @data
+          options.statistics.warn 'Missing or invalid Channel-Destination-Number', @data
           return
 
         source = @data['Channel-Caller-ID-Number']
         unless source? and source.match /^\d+$/
           respond '484'
-          options.statistics?.warn 'Missing or invalid Channel-Caller-ID-Number', @data
+          options.statistics.warn 'Missing or invalid Channel-Caller-ID-Number', @data
           return
 
         emergency_ref = @data['variable_sip_h_X-CCNQ3-Routing']
@@ -44,11 +45,11 @@ Go through the gateways.
 
         router.route source, destination, emergency_ref
         .catch (exception)->
-          options.statistics?.error "Call Router exception: #{exception}"
+          options.statistics.error "Call Router exception: #{exception}"
           false
         .then (gateways) =>
 
-          options.statistics?.log JSON.stringify gateways
+          options.statistics.log "CallHandler: gateways = #{JSON.stringify gateways}"
 
 The `it` promise will return either a gateway, `false` if no gateway was found, or null if no gateway was successful.
 
@@ -89,7 +90,7 @@ Those error are reported iff the call was not able to connect for some reason.
                     if code
                       return response_handlers[code]?.call this, gateway, router, options, destination, final_destination
 
-                    options.statistics?.warn "Unable to parse reply '#{error.args.reply}'"
+                    options.statistics.warn "Unable to parse reply '#{error.args.reply}'"
                     throw new CallHandlerError "Unable to parse reply '#{error.args.reply}'"
 
 However we do not propagate `error`, since it would mean interrupting the call sequence. Since we didn't find any winner, we simply return `null`.
@@ -99,7 +100,7 @@ However we do not propagate `error`, since it would mean interrupting the call s
 Last resort, indicate no route found.
 
           it.catch (error) ->
-            options.statistics?.error error
+            options.statistics.error error
             respond '500'
             null
 
@@ -112,6 +113,7 @@ We only need to notify if we tried gateways but none responded properly, in whic
               respond '604' # No Route
 
             # TODO log the winning gateway
+            options.statistics.dir {winner}
             # Note: winner might be `true` if no gateways were available.
 
           return it
