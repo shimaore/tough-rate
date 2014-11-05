@@ -116,6 +116,8 @@ We only need to notify if we tried gateways but none responded properly, in whic
             options.statistics.dir {winner}
             # Note: winner might be `true` if no gateways were available.
 
+            null
+
           return it
 
       return handler
