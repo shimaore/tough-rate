@@ -28,3 +28,4 @@ Toolbox
     Promise = require 'bluebird'
     Router = require './router'
     CallHandler = require './call_handler'
+    assert = require 'assert'
