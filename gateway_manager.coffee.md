@@ -59,6 +59,7 @@ The gateway manager provides services to the call handler.
         # TODO Add monitoring of `_changes` on the view to update carriers and gateways
 
       _merge_gateway_row: (row) ->
+        @options.statistics.log "GatewayManager merge-gateway-row #{JSON.stringify row}"
         {gwid,carrierid} = row.value
         assert gwid?
 
@@ -91,6 +92,7 @@ The gateway manager provides services to the call handler.
             do (row) => @_merge_gateway_row row
 
       _merge_carrier_row: (row) ->
+        @options.statistics.log "GatewayManager merge-carrier-row #{JSON.stringify row}"
         carrierid = row.doc.carrierid
         assert carrierid?
 
@@ -160,12 +162,14 @@ Gateway temporary disable
 Disable a gateway temporarily, for example because it is rejecting too many calls.
 
       mark_gateway_as_faulty: (name) ->
+        @options.statistics.error "GatewayManager mark-gateway-as-faulty: #{name}."
         status = @gateway_status[name] ?= new Status()
         status.mark_as_faulty()
 
 Mark a gateway as suspicious.
 
       mark_gateway_as_suspicious: (name) ->
+        @options.statistics.error "GatewayManager mark-gateway-as-suspicious: #{name}."
         status = @gateway_status[name] ?= new Status()
         status.mark_as_suspicious()
 

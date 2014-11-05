@@ -48,6 +48,8 @@ Go through the gateways.
           false
         .then (gateways) =>
 
+          options.statistics?.log JSON.stringify gateways
+
 The `it` promise will return either a gateway, `false` if no gateway was found, or null if no gateway was successful.
 
           if gateways is false
