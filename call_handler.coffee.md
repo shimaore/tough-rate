@@ -49,7 +49,7 @@ Go through the gateways.
           false
         .then (gateways) =>
 
-          options.statistics.log "CallHandler: gateways = #{JSON.stringify gateways}"
+          options.statistics.info "CallHandler: gateways = #{JSON.stringify gateways}"
 
 The `it` promise will return either a gateway, `false` if no gateway was found, or null if no gateway was successful.
 
@@ -113,7 +113,7 @@ We only need to notify if we tried gateways but none responded properly, in whic
               respond '604' # No Route
 
             # TODO log the winning gateway
-            options.statistics.log "CallHandler: the winning gateway was: #{winner}"
+            options.statistics.info "CallHandler: the winning gateway was: #{winner}"
             # Note: winner might be `true` if no gateways were available.
 
             null

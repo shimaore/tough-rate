@@ -5,10 +5,11 @@ TODO: add Node.js clustering
 
     module.exports = class CallServer
       constructor: (@port,@options) ->
+        assert @options.statistics?, 'Missing `statistics` option.'
         options.respond ?= true
         router = options.router ? new Router options
         @server = FS.server CallHandler router, options
-        @options.statistics?.log "#{pkg.name} #{pkg.version} starting on port #{port}."
+        @options.statistics.info "#{pkg.name} #{pkg.version} starting on port #{port}."
         @server.listen port
 
       stop: ->

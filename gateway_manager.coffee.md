@@ -30,7 +30,7 @@ The gateway manager provides services to the call handler.
           .allDocs startkey:"carrier:#{@sip_domain_name}:", endkey:"carrier:#{@sip_domain_name};", include_docs:yes
         .catch (error) =>
           @options.statistics.error error
-          @options.statistics.log "GatewayManager allDocs failed"
+          @options.statistics.info "GatewayManager allDocs failed"
           throw error
         .then ({rows}) =>
           for row in rows
@@ -38,14 +38,14 @@ The gateway manager provides services to the call handler.
           return
         .catch (error) =>
           @options.statistics.error error
-          @options.statistics.log "GatewayManager merge-carrier-row failed"
+          @options.statistics.info "GatewayManager merge-carrier-row failed"
           throw error
         .then =>
           @provisioning
           .query "#{pkg.name}-gateway-manager/gateways", startkey:[@sip_domain_name], endkey:[@sip_domain_name,{}]
         .catch (error) =>
           @options.statistics.error error
-          @options.statistics.log "GatewayManager query failed"
+          @options.statistics.info "GatewayManager query failed"
           throw error
         .then ({rows}) =>
           for row in rows when row.value?.address?
@@ -53,13 +53,13 @@ The gateway manager provides services to the call handler.
           return
         .catch (error) =>
           @options.statistics.error error
-          @options.statistics.log "GatewayManager merge-gateway-row failed"
+          @options.statistics.info "GatewayManager merge-gateway-row failed"
           throw error
 
         # TODO Add monitoring of `_changes` on the view to update carriers and gateways
 
       _merge_gateway_row: (row) ->
-        @options.statistics.log "GatewayManager merge-gateway-row #{JSON.stringify row}"
+        @options.statistics.info "GatewayManager merge-gateway-row #{JSON.stringify row}"
         {gwid,carrierid} = row.value
         assert gwid?
 
@@ -92,7 +92,7 @@ The gateway manager provides services to the call handler.
             do (row) => @_merge_gateway_row row
 
       _merge_carrier_row: (row) ->
-        @options.statistics.log "GatewayManager merge-carrier-row #{JSON.stringify row}"
+        @options.statistics.info "GatewayManager merge-carrier-row #{JSON.stringify row}"
         carrierid = row.doc.carrierid
         assert carrierid?
 
