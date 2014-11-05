@@ -55,6 +55,10 @@ The gateway manager provides services to the call handler.
           @options.statistics.error error
           @options.statistics.info "GatewayManager merge-gateway-row failed"
           throw error
+        .then =>
+          @options.statistics.info "GatewayManager: gateways = #{JSON.stringify @gateways}"
+          @options.statistics.info "GatewayManager: carriers = #{JSON.stringify @carriers}"
+          return
 
         # TODO Add monitoring of `_changes` on the view to update carriers and gateways
 
