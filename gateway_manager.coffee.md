@@ -233,7 +233,7 @@ The following fields are optional:
                   rec.egress.address ?= [ip,port].join ':'
                   rec.egress.host ?= doc.host
                   if rec.egress.gwid?
-                    emit [doc.sip_domain_name, rec.carrierid], rec.egress
+                    emit [doc.sip_domain_name, rec.egress.carrierid], rec.egress
 
             return
 
