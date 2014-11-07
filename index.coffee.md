@@ -2,8 +2,7 @@
     @GatewayManager = require './gateway_manager'
     @CallServer = require './call_server'
 
-    helpers = require './coffeescript-helpers'
-    p_fun = (f) -> ";#{helpers}(#{f});"
+    {p_fun} = require 'coffeescript-helpers'
 
 The design document that must be installed on the master databases in order for tough-rate hosts to replicate the proper data.
 

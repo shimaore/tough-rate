@@ -193,7 +193,7 @@ Toolbox
 
     pkg = require './package.json'
     design = "#{pkg.name}-gateway-manager"
-    p_fun = (f) -> "(#{f})"
+    {p_fun} = require 'coffeescript-helpers'
 
     GatewayManager.couch =
       _id: "_design/#{design}"
