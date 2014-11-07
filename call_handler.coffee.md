@@ -87,11 +87,20 @@ Those error are reported iff the call was not able to connect for some reason.
 
                   if error?.args?.reply?
                     code = error.args.reply.match(/^-ERR (\w+)/)?[1]
-                    if code
-                      return response_handlers[code]?.call this, gateway, router, options, destination, final_destination
 
-                    options.statistics.warn "Unable to parse reply '#{error.args.reply}'"
-                    throw new CallHandlerError "Unable to parse reply '#{error.args.reply}'"
+                    unless code?
+                      options.statistics.warn "Unable to parse reply '#{error.args.reply}'"
+                      throw new CallHandlerError "Unable to parse reply '#{error.args.reply}'"
+
+                    options.statistics.info "CallHandler: call to #{JSON.stringify gateway} failed: #{code}."
+
+                    thus = Promise.resolve()
+                    .then ->
+                      response_handlers[code]?.call this, gateway, router, options, destination, final_destination
+                    .then ->
+                      null
+
+                    return thus
 
 However we do not propagate `error`, since it would mean interrupting the call sequence. Since we didn't find any winner, we simply return `null`.
 
@@ -172,14 +181,15 @@ Handlers for specific error cases. Keys are FreeSwitch error names.
 
     response_handlers =
         RECOVERY_ON_TIMER_EXPIRE: mark_gateway_as_faulty # 408, 504
-        NETWORK_OUT_OF_ORDER: mark_gateway_as_faulty # 502
-        NORMAL_TEMPORARY_FAILURE: mark_gateway_as_faulty # 503
+        NETWORK_OUT_OF_ORDER: mark_gateway_as_suspicious # 502
+        NORMAL_TEMPORARY_FAILURE: mark_gateway_as_suspicious # 503
         CALL_REJECTED: mark_gateway_as_faulty # 403, 603
 
 Helper to report a gateway as faulty to the gateway manager.
 
     mark_gateway_as_faulty = (gateway,router,options) ->
       # Do something to report the gateway as faulty (e.g. set `temporarily_disabled`).
+      options.statistics.info "Asking the router to mark gateway #{JSON.stringify gateway} as faulty."
       router.gateway_manager.mark_gateway_as_faulty gateway
       # Note that `@` refers to the ongoing call.
 
@@ -187,6 +197,7 @@ Helper to report a gateway as suspicious to the gateway manager.
 
     mark_gateway_as_suspicious = (gateway,router,options) ->
       # Do something to report the gateway as faulty (e.g. set `temporarily_disabled`).
+      options.statistics.info "Asking the router to mark gateway #{JSON.stringify gateway} as suspicious."
       router.gateway_manager.mark_gateway_as_suspicious gateway
       # Note that `@` refers to the ongoing call.
 
