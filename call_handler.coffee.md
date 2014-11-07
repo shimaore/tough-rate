@@ -67,6 +67,8 @@ Should return the winning gateway iff the call was successful and no further att
 
               it = it.then (winner) =>
 
+                options.statistics.info "Handling next gateway.", gateway
+
 If a winner was already found simply return it.
 
                 return winner if winner?
@@ -78,38 +80,48 @@ Call attempt.
 
 If we've got a winner, propagate it down.
 
-                .then ->
-                  gateway
+                .then (res) ->
 
-                .catch (error) ->
+                  options.statistics.warn {res}
+                  cause = res.body.variable_last_bridge_hangup_cause
+
+                  if cause is 'NORMAL_CALL_CLEARING'
+                    options.statistics.info "CallHandler: Successfull Call."
+                    return gateway
+
 
 Those error are reported iff the call was not able to connect for some reason.
 
-                  if error?.args?.reply?
-                    code = error.args.reply.match(/^-ERR (\w+)/)?[1]
+                  unless cause?
+                    options.statistics.warn "Unable to parse reply '#{res}'"
+                    throw new CallHandlerError "Unable to parse reply '#{res}'"
 
-                    unless code?
-                      options.statistics.warn "Unable to parse reply '#{error.args.reply}'"
-                      throw new CallHandlerError "Unable to parse reply '#{error.args.reply}'"
+                  options.statistics.info "CallHandler: call failed: #{cause} when routing #{final_destination} through #{JSON.stringify gateway}."
 
-                    options.statistics.info "CallHandler: call to #{JSON.stringify gateway} failed: #{code}."
+                  thus = Promise.resolve()
+                  .then ->
+                    response_handlers[cause]?.call this, gateway, router, options, destination, final_destination
+                    null
+                  .catch (error) ->
+                    options.statistics.error "Response handler for #{cause} failed.", error
+                    null
 
-                    thus = Promise.resolve()
-                    .then ->
-                      response_handlers[code]?.call this, gateway, router, options, destination, final_destination
-                    .then ->
-                      null
+                  return thus
 
-                    return thus
+              .catch (error) ->
+
+                options.statistics.error "Internal error.", error
 
 However we do not propagate `error`, since it would mean interrupting the call sequence. Since we didn't find any winner, we simply return `null`.
 
-                  null
+                null
+
+              return
 
 Last resort, indicate no route found.
 
           it.catch (error) ->
-            options.statistics.error error
+            options.statistics.error "Caught internal error.", error
             respond '500'
             null
 
@@ -119,6 +131,7 @@ If no gateways were found (`winner === false`) this is because the CallRouter re
 We only need to notify if we tried gateways but none responded properly, in which case `winner === null`.
 
             if not winner?
+              options.statistics.warn "No Route."
               respond '604' # No Route
 
             # TODO log the winning gateway
@@ -140,6 +153,8 @@ Returns an `esl` promise that completes when the call gets connected, or
 
     attempt = (destination,gateway,options) ->
 
+      options.statistics.info "CallHandler: attempt", {destination, gateway}
+
       leg_options = {}
 
       for g,l of field_mapping when gateway[g]?
@@ -153,7 +168,14 @@ Sometimes we'll be provided with a pre-built URI (emergency calls, loopback call
 
       uri = gateway.uri ? "sip:#{destination}@#{gateway.address}"
 
-      @command 'bridge', "[#{leg_options_text}]sofia/#{options.profile}/#{uri}"
+      options.statistics.info "CallHandler: attempt -- set continue_on_fail=true"
+      @command 'set', 'continue_on_fail=true'
+      .then ->
+        options.statistics.info "CallHandler: attempt -- set hangup_after_bridge=false"
+        @command 'set', 'hangup_after_bridge=false'
+      .then ->
+        options.statistics.info "CallHandler: attempt -- bridge [#{leg_options_text}]sofia/#{options.profile}/#{uri}"
+        @command 'bridge', "[#{leg_options_text}]sofia/#{options.profile}/#{uri}"
 
 Field Mapping
 =============
