@@ -218,22 +218,26 @@ The following fields are optional:
       views:
         gateways:
           map: p_fun (doc) ->
-            if doc.type? and doc.type is 'gateway'
-              emit [doc.sip_domain_name, doc.carrierid], doc
+            return unless doc.type?
 
-            if doc.type? and doc.type is 'host' and doc.sip_profiles?
+            if doc.type is 'gateway'
+              return emit [doc.sip_domain_name, doc.carrierid], doc
+
+            if doc.type is 'host' and doc.sip_profiles?
               for name, rec of doc.sip_profiles
                 do (rec) ->
                   # for now we only generate for egress gateways
                   ip = rec.egress_sip_ip ? rec.ingress_sip_ip
                   port = rec.egress_sip_port ? rec.ingress_sip_port+10000
 
-                  rec.egress ?= {}
-                  rec.egress.gwid ?= rec.egress_gwid
-                  rec.egress.address ?= [ip,port].join ':'
-                  rec.egress.host ?= doc.host
-                  if rec.egress.gwid?
-                    emit [doc.sip_domain_name, rec.egress.carrierid], rec.egress
+                  egress = {}
+                  egress[k] = v for own k,v of rec.egress
+                  egress.gwid ?= rec.egress_gwid
+                  egress.address ?= [ip,port].join ':'
+                  egress.host ?= doc.host
+                  if egress.gwid?
+                    emit [doc.sip_domain_name, egress.carrierid], egress
+                  return
 
             return
 
