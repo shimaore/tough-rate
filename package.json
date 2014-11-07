@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "bluebird": "^2.3.6",
-    "coffeescript-helpers": "^1.0.3",
+    "coffeescript-helpers": "^1.0.4",
     "esl": "^2.1.3"
   }
 }
