@@ -174,6 +174,7 @@ Handlers for specific error cases. Keys are FreeSwitch error names.
         RECOVERY_ON_TIMER_EXPIRE: mark_gateway_as_faulty # 408, 504
         NETWORK_OUT_OF_ORDER: mark_gateway_as_faulty # 502
         NORMAL_TEMPORARY_FAILURE: mark_gateway_as_faulty # 503
+        CALL_REJECTED: mark_gateway_as_faulty # 403, 603
 
 Helper to report a gateway as faulty to the gateway manager.
 
