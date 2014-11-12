@@ -319,6 +319,8 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
               'Channel-Destination-Number': 'abcd'
               'Channel-Caller-ID-Number': '2344'
             command: (c,v) ->
+              if c is 'set'
+                return Promise.resolve().bind this
               c.should.equal 'respond'
               v.should.equal '484'
               done()
@@ -330,6 +332,8 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
               'Channel-Destination-Number': '1235'
               'Channel-Caller-ID-Number': 'abcd'
             command: (c,v) ->
+              if c is 'set'
+                return Promise.resolve().bind this
               c.should.equal 'respond'
               v.should.equal '484'
               done()
@@ -341,6 +345,8 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
               'Channel-Destination-Number': '1235'
               'Channel-Caller-ID-Number': '2345'
             command: (c,v) ->
+              if c is 'set'
+                return Promise.resolve().bind this
               c.should.equal 'respond'
               v.should.equal '485'
               done()
@@ -356,6 +362,8 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
                   'Channel-Destination-Number': '1236'
                   'Channel-Caller-ID-Number': '2346'
                 command: (c,v) ->
+                  if c is 'set'
+                    return Promise.resolve().bind this
                   v.should.equal '[]sofia/something-egress/sip:bar@foo'
                   c.should.equal 'bridge'
                   done()
@@ -371,6 +379,8 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
                   'Channel-Destination-Number': '336727'
                   'Channel-Caller-ID-Number': '2347'
                 command: (c,v) ->
+                  if c is 'set'
+                    return Promise.resolve().bind this
                   v.should.equal '[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800]sofia/something-egress/sip:336727@127.0.0.1:5068'
                   c.should.equal 'bridge'
                   done()
@@ -382,6 +392,8 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
               'Channel-Destination-Number': '3368267'
               'Channel-Caller-ID-Number': '2348'
             command: (c,v) ->
+              if c is 'set'
+                return Promise.resolve().bind this
               v.should.equal '[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800]sofia/something-egress/sip:3368267@127.0.0.1:5068'
               c.should.equal 'bridge'
               done()
@@ -395,6 +407,8 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
                 'Channel-Destination-Number': '336927'
                 'Channel-Caller-ID-Number': '2349'
               command: (c,v) ->
+                if c is 'set'
+                  return Promise.resolve().bind this
                 if c is 'bridge'
                   Promise.reject new FreeSwitchError {}, reply: '-ERR I_TOLD_YOU_SO'
                 else
@@ -411,6 +425,8 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
               'Channel-Caller-ID-Number': '2348'
               'variable_sip_h_X-CCNQ3-Routing': 'brest'
             command: (c,v) ->
+              if c is 'set'
+                return Promise.resolve().bind this
               v.should.equal '[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800]sofia/something-egress/sip:33156@127.0.0.1:5068'
               c.should.equal 'bridge'
               done()
