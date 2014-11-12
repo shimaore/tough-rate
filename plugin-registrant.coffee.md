@@ -8,6 +8,8 @@ This plugin provides `registrant_host` as a gateway.
       result = []
       address = source_doc.registrant_host
       if address?
+        if 'string' isnt typeof address
+          address = address[0]
         address = "#{address}:5070" unless address.match /:/
         result.push {address}
       Promise.resolve result
