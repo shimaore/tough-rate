@@ -253,7 +253,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
                 done()
             .catch done
 
-        it 'should route registrant_host directly', (done) ->
+        it 'should route registrant_host directly (adding default port)', (done) ->
           ready.then ->
             provisioning.put _id:'number:3213',registrant_host:'foo'
             .catch done
@@ -265,7 +265,23 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
                 gws.should.be.an.instanceOf Array
                 gws.should.have.length 1
                 gws.should.have.property 0
-                gws[0].should.have.property 'address', 'foo'
+                gws[0].should.have.property 'address', 'foo:5070'
+                done()
+            .catch done
+
+        it 'should route registrant_host directly (using provided port)', (done) ->
+          ready.then ->
+            provisioning.put _id:'number:3243',registrant_host:'foo:5080'
+            .catch done
+            .then ->
+              router = new CallRouter {provisioning, gateway_manager:gm, ruleset_of, statistics, respond:done, outbound_route:'registrant'}
+              router.plugin require '../plugin-registrant'
+              router.route '3243', '331234'
+              .then (gws) ->
+                gws.should.be.an.instanceOf Array
+                gws.should.have.length 1
+                gws.should.have.property 0
+                gws[0].should.have.property 'address', 'foo:5080'
                 done()
             .catch done
 
