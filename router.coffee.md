@@ -41,8 +41,8 @@ Plugins will be called as `(entry,params)` where `params` is an object containin
 * `final_destination` -- optionnally, the modified called number
 * `rule` -- the rule (CouchDB) document
 
-If the plugin is handling the `entry`, it must return `null`.
-Otherwise it must return a Promise which when resolved returns an array of gateways.
+If the plugin is not handling the `entry`, it must return `null`.
+Otherwise it must return a Promise which when resolved returns an array of (explicit) gateways.
 Gateways are defined using objects containing:
 * `uri`: a full SIP URI indicating where to send the call to (be careful to take `final_destination` into account in this case)
 * `address`: a SIP domain part (will be used to build a full URI using the `destination` or `final_destination`)
@@ -111,6 +111,8 @@ Route based on the route selected by the source, or using a default route.
 
           find_rule_in destination,database
         .then ({rule,database}) =>
+
+FIXME Rewrite emergency handling as a plugin.
 
           if not rule.emergency
             return {rule,database}
