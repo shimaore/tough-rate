@@ -160,6 +160,10 @@ Returns an `esl` promise that completes when the call gets connected, or
       for g,l of field_mapping when gateway[g]?
         leg_options[l] = gateway[g]
 
+      if gateway.headers?
+        for h of gateways.headers
+          leg_options["sip_h_#{h}"] = gateway.headers[h]
+
 FIXME: build a more resistant list.
 
       leg_options_text = ("#{k}=#{v}" for k,v of leg_options).join ','
@@ -195,14 +199,6 @@ counts from the progress indication onwards.
 call duration
 
       dialog_timeout: 'sofia_session_timeout'
-
-registrant fields
-
-      registrant_password:    'sip_h_X-CCNQ3-Registrant-Password'
-      registrant_username:    'sip_h_X-CCNQ3-Registrant-Username'
-      registrant_realm:       'sip_h_X-CCNQ3-Registrant-Realm'
-      registrant_remote_ipv4: 'sip_h_X-CCNQ3-Registrant-Target'
-      registrant_socket:      'sip_h_X-CCNQ3-Registrant-HostPort'
 
 Response Handlers
 =================
