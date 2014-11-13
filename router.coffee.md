@@ -127,6 +127,7 @@ Route based on the route selected by the source, or using a default route.
 
         .then ({rule}) =>
           gwlist = rule.gwlist
+          delete rule.gwlist
           unless gwlist?
             @options.respond '500'
             @options.statistics.warn 'Missing gwlist', rule
