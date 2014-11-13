@@ -95,6 +95,7 @@ Server (Unit Under Test)
           {
             _id:'number:1235'
             outbound_route:'default'
+            registrant_host: "#{domain_name}:5064"
           }
         ]
       .then ->
