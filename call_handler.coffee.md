@@ -196,6 +196,14 @@ call duration
 
       dialog_timeout: 'sofia_session_timeout'
 
+registrant fields
+
+      registrant_password:    'sip_h_X-CCNQ3-Registrant-Password'
+      registrant_username:    'sip_h_X-CCNQ3-Registrant-Username'
+      registrant_realm:       'sip_h_X-CCNQ3-Registrant-Realm'
+      registrant_remote_ipv4: 'sip_h_X-CCNQ3-Registrant-Target'
+      registrant_socket:      'sip_h_X-CCNQ3-Registrant-HostPort'
+
 Response Handlers
 =================
 

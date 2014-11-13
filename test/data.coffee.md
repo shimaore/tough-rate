@@ -255,7 +255,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
 
         it 'should route registrant_host directly (adding default port)', (done) ->
           ready.then ->
-            provisioning.put _id:'number:3213',registrant_host:'foo'
+            provisioning.put _id:'number:3213',registrant_host:'foo',registrant_password:'badabing'
             .catch done
             .then ->
               router = new CallRouter {provisioning, gateway_manager:gm, ruleset_of, statistics, respond:done, outbound_route:'registrant'}
@@ -266,6 +266,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
                 gws.should.have.length 1
                 gws.should.have.property 0
                 gws[0].should.have.property 'address', 'foo:5070'
+                gws[0].should.have.property 'registrant_password', 'badabing'
                 done()
             .catch done
 
