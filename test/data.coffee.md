@@ -125,9 +125,8 @@ The steps to placing outbound call(s) are:
     PouchDB = (require 'pouchdb').defaults db: require 'memdown'
     pkg = require '../package.json'
     GatewayManager = require '../gateway_manager'
-    CallRouter = require '../router'
-    CallHandler = require '../call_handler'
-    statistics = require 'winston'
+    ToughRateRouter = require '../router'
+    logger = require 'winston'
     Promise = require 'bluebird'
 
     class FreeSwitchError extends Error
@@ -145,9 +144,11 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
 
       ruleset_of = (x) ->
         if not dataset.rulesets[x]?
+          logger "Unknown ruleset #{x}."
           throw "Unknown ruleset #{x}"
-        ruleset: dataset.rulesets[x]
-        database: new PouchDB dataset.rulesets[x].database
+        response =
+          ruleset: dataset.rulesets[x]
+          ruleset_database: new PouchDB dataset.rulesets[x].database
 
       ready = PouchDB.destroy 'provisioning'
       .then ->
@@ -187,18 +188,37 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           doc.should.have.property 'views'
           doc.views.should.have.property 'gateways'
       .then ->
-        gm = new GatewayManager provisioning, 'phone.local', {statistics}
+        gm = new GatewayManager provisioning, 'phone.local', logger
         gm.init()
+
+      call_ = (source,destination,emergency_ref) ->
+        call =
+          data:
+            'Channel-Caller-ID-Number': source
+            'Channel-Destination-Number': destination
+            'variable_sip_h_X-CCNQ3-Routing': emergency_ref
 
       one_call = (ctx,outbound_route) ->
         ready.then ->
-          router = new CallRouter {provisioning, gateway_manager:gm, ruleset_of, statistics, respond:true, outbound_route}
-          ch = CallHandler router,
-            profile: 'something-egress'
-            statistics: statistics
-          ch.apply ctx
+          logger.info "Building router."
+          router = new ToughRateRouter logger
+          router.use (require '../middleware/numeric')()
+          router.use (require '../middleware/response-handlers') gm
+          router.use (require '../middleware/local-number') provisioning
+          router.use (require '../middleware/ruleset') provisioning, ruleset_of,outbound_route
+          router.use (require '../middleware/emergency') provisioning
+          router.use (require '../middleware/routes-gwid') gm
+          router.use (require '../middleware/routes-carrierid') gm
+          router.use (require '../middleware/routes-registrant') provisioning
+          router.use (require '../middleware/flatten')()
+          router.use (require '../middleware/call-handler') 'something-egress'
+          router.use (require '../middleware/respond')()
+          logger.info "Sending one_call to router."
+          router.route ctx
         .catch (exception) ->
+          logger "Exception setting up one_call", exception
           throw exception
+        null
 
       describe 'Gateways', ->
         it 'should have progress_timeout from their carrier: gw1', (done) ->
@@ -238,111 +258,125 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
               done()
 
       describe 'The call router', ->
-        it 'should route local numbers directly', (done) ->
+        it 'should route local numbers directly', ->
           ready.then ->
             provisioning.put _id:'number:1234',inbound_uri:'sip:foo@bar'
-            .catch done
-            .then ->
-              router = new CallRouter {provisioning, gateway_manager:gm, ruleset_of, statistics, respond:done}
-              router.route '3213', '1234'
-              .then (gws) ->
-                gws.should.be.an.instanceOf Array
-                gws.should.have.length 1
-                gws.should.have.property 0
-                gws[0].should.have.property 'uri', 'sip:foo@bar'
-                done()
-            .catch done
+          .then ->
+            router = new ToughRateRouter logger
+            router.use (require '../middleware/local-number') provisioning
+            router.use (require '../middleware/ruleset') provisioning, ruleset_of
+            router.use (require '../middleware/flatten')()
+            router.route call_ '3213', '1234'
+          .then (ctx) ->
+            ctx.should.have.property 'res'
+            ctx.res.should.have.property 'gateways'
+            gws = ctx.res.gateways
+            gws.should.be.an.instanceOf Array
+            gws.should.have.length 1
+            gws.should.have.property 0
+            gws[0].should.have.property 'uri', 'sip:foo@bar'
 
-        it 'should route registrant_host directly (adding default port)', (done) ->
+        it 'should route registrant_host directly (adding default port)', ->
           ready.then ->
             provisioning.put _id:'number:3213',registrant_host:'foo',registrant_password:'badabing'
-            .catch done
-            .then ->
-              router = new CallRouter {provisioning, gateway_manager:gm, ruleset_of, statistics, respond:done, outbound_route:'registrant'}
-              router.plugin require '../plugin-registrant'
-              router.route '3213', '331234'
-              .then (gws) ->
-                gws.should.be.an.instanceOf Array
-                gws.should.have.length 1
-                gws.should.have.property 0
-                gws[0].should.have.property 'address', 'foo:5070'
-                gws[0].should.have.property 'registrant_password', 'badabing'
-                done()
-            .catch done
+          .then ->
+            router = new ToughRateRouter logger
+            router.use (require '../middleware/ruleset') provisioning, ruleset_of, 'registrant'
+            router.use (require '../middleware/routes-registrant') provisioning
+            router.use (require '../middleware/flatten')()
+            router.route call_ '3213', '331234'
+          .then (ctx) ->
+            gws = ctx.res.gateways
+            gws.should.be.an.instanceOf Array
+            gws.should.have.length 1
+            gws.should.have.property 0
+            gws[0].should.have.property 'address', 'foo:5070'
+            gws[0].should.have.property 'headers'
+            gws[0].headers.should.have.property 'sip_h_X-CCNQ3-Registrant-Password', 'badabing'
 
-        it 'should route registrant_host directly (using provided port)', (done) ->
+        it 'should route registrant_host directly (using provided port)', ->
           ready.then ->
             provisioning.put _id:'number:3243',registrant_host:'foo:5080'
-            .catch done
-            .then ->
-              router = new CallRouter {provisioning, gateway_manager:gm, ruleset_of, statistics, respond:done, outbound_route:'registrant'}
-              router.plugin require '../plugin-registrant'
-              router.route '3243', '331234'
-              .then (gws) ->
-                gws.should.be.an.instanceOf Array
-                gws.should.have.length 1
-                gws.should.have.property 0
-                gws[0].should.have.property 'address', 'foo:5080'
-                done()
-            .catch done
+          .then ->
+            router = new ToughRateRouter logger
+            router.use (require '../middleware/ruleset') provisioning, ruleset_of, 'registrant'
+            router.use (require '../middleware/routes-registrant') provisioning
+            router.use (require '../middleware/flatten')()
+            router.route call_ '3243', '331234'
+          .then (ctx) ->
+            gws = ctx.res.gateways
+            gws.should.be.an.instanceOf Array
+            gws.should.have.length 1
+            gws.should.have.property 0
+            gws[0].should.have.property 'address', 'foo:5080'
 
-        it 'should route registrant_host directly (using array)', (done) ->
+        it 'should route registrant_host directly (using array)', ->
           ready.then ->
             provisioning.put _id:'number:3253',registrant_host:['foo:5080']
-            .catch done
-            .then ->
-              router = new CallRouter {provisioning, gateway_manager:gm, ruleset_of, statistics, respond:done, outbound_route:'registrant'}
-              router.plugin require '../plugin-registrant'
-              router.route '3253', '331234'
-              .then (gws) ->
-                gws.should.be.an.instanceOf Array
-                gws.should.have.length 1
-                gws.should.have.property 0
-                gws[0].should.have.property 'address', 'foo:5080'
-                done()
-            .catch done
+          .then ->
+            router = new ToughRateRouter logger
+            router.use (require '../middleware/ruleset') provisioning, ruleset_of, 'registrant'
+            router.use (require '../middleware/routes-registrant') provisioning
+            router.use (require '../middleware/flatten')()
+            router.route call_ '3253', '331234'
+          .then (ctx) ->
+            gws = ctx.res.gateways
+            gws.should.be.an.instanceOf Array
+            gws.should.have.length 1
+            gws.should.have.property 0
+            gws[0].should.have.property 'address', 'foo:5080'
 
-        it 'should route numbers using routes', (done) ->
+        it 'should route numbers using routes', ->
           ready.then ->
-            router = new CallRouter {provisioning, gateway_manager:gm, ruleset_of, statistics, respond:done, outbound_route:'default'}
-            router.route '336718', '331234'
-            .then (gws) ->
-              gws.should.be.an.instanceOf Array
-              gws.should.have.length 2
-              gws.should.have.property 0
-              gws[0].should.have.property 'gwid', 'gw3'
-              gws.should.have.property 1
-              gws[1].should.have.property 'gwid', 'backup'
-              done()
-            .catch done
+            router = new ToughRateRouter logger
+            router.use (require '../middleware/ruleset') provisioning, ruleset_of, 'default'
+            router.use (require '../middleware/routes-gwid') gm
+            router.use (require '../middleware/routes-carrierid') gm
+            router.use (require '../middleware/flatten')()
+            router.route call_ '336718', '331234'
+          .then (ctx) ->
+            gws = ctx.res.gateways
+            gws.should.be.an.instanceOf Array
+            gws.should.have.length 2
+            gws.should.have.property 0
+            gws[0].should.have.property 'gwid', 'gw3'
+            gws.should.have.property 1
+            gws[1].should.have.property 'gwid', 'backup'
 
         it 'should report an error when no route is found', (done) ->
           ready.then ->
             respond = (v) ->
               v.should.equal '485'
 
-            router = new CallRouter {provisioning, gateway_manager:gm, ruleset_of, statistics, respond, outbound_route:'default'}
-            router.route '336718', '347766'
-            .catch (exception)->
-              console.dir exception
-              done()
-            null
+            router = new ToughRateRouter logger
+            router.use (require '../middleware/ruleset') provisioning, ruleset_of, 'default'
+            router.use (require '../middleware/routes-gwid') gm
+            router.use (require '../middleware/routes-carrierid') gm
+            router.use (require '../middleware/flatten')()
+            router.route call_ '336718', '347766'
+          .catch (exception)->
+            console.dir exception
+            done()
+          null
 
-        it 'should route emergency numbers', (done) ->
+        it 'should route emergency numbers', ->
           ready.then ->
-            router = new CallRouter {provisioning, gateway_manager:gm, ruleset_of, statistics, respond:done, outbound_route:'default'}
-            router.route '336718', '330112', 'brest'
-            .then (gws) ->
-              gws.should.be.an.instanceOf Array
-              gws.should.have.length 2
-              gws.should.have.property 0
-              gws[0].should.have.property 'final_destination', '33156'
-              gws[0].should.have.property 'gwid', 'gw3'
-              gws.should.have.property 1
-              gws[1].should.have.property 'final_destination', '33156'
-              gws[1].should.have.property 'gwid', 'backup'
-              done()
-            .catch done
+            router = new ToughRateRouter logger
+            router.use (require '../middleware/ruleset') provisioning, ruleset_of, 'default'
+            router.use (require '../middleware/emergency') provisioning
+            router.use (require '../middleware/routes-gwid') gm
+            router.use (require '../middleware/routes-carrierid') gm
+            router.use (require '../middleware/flatten')()
+            router.route call_ '336718', '330112', 'brest'
+          .then (ctx) ->
+            ctx.res.should.have.property 'destination', '33156'
+            gws = ctx.res.gateways
+            gws.should.be.an.instanceOf Array
+            gws.should.have.length 2
+            gws.should.have.property 0
+            gws[0].should.have.property 'gwid', 'gw3'
+            gws.should.have.property 1
+            gws[1].should.have.property 'gwid', 'backup'
 
       describe 'The call handler', ->
 
@@ -352,14 +386,15 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
               'Channel-Destination-Number': 'abcd'
               'Channel-Caller-ID-Number': '2344'
             command: (c,v) ->
-              if c is 'set'
+              console.dir {c,v}
+              if c in ['set','export']
                 return Promise.resolve().bind this
               c.should.equal 'respond'
               v.should.equal '484'
               done()
               Promise.resolve()
 
-        it 'should reject invalid source umbers', (done) ->
+        it 'should reject invalid source numbers', (done) ->
           one_call
             data:
               'Channel-Destination-Number': '1235'
@@ -378,14 +413,14 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
               'Channel-Destination-Number': '1235'
               'Channel-Caller-ID-Number': '2345'
             command: (c,v) ->
-              if c is 'set'
+              if c in ['set','export']
                 return Promise.resolve().bind this
               c.should.equal 'respond'
               v.should.equal '485'
               done()
               Promise.resolve()
 
-        it 'should route known destinations', (done) ->
+        it.only 'should route known destinations', (done) ->
           ready.then ->
             provisioning.put _id:'number:1236',inbound_uri:'sip:bar@foo'
             .catch done

@@ -16,12 +16,12 @@
     "memdown": "^0.10.2",
     "mocha": "^1.21.5",
     "pouchdb": "^3.0.6",
-    "should": "^4.1.0",
-    "winston": "^0.8.1"
+    "should": "^4.1.0"
   },
   "dependencies": {
     "bluebird": "^2.3.6",
     "coffeescript-helpers": "^1.0.4",
-    "esl": "^2.2.0"
+    "esl": "^2.2.0",
+    "winston": "^0.8.1"
   }
 }

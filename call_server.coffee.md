@@ -5,12 +5,20 @@ TODO: add Node.js clustering
 
     module.exports = class CallServer
       constructor: (@port,@options) ->
-        assert @options.statistics?, 'Missing `statistics` option.'
-        options.respond ?= true
-        router = options.router ? new Router options
-        @server = FS.server CallHandler router, options
-        @options.statistics.info "#{pkg.name} #{pkg.version} starting on port #{port}."
-        @server.listen port
+        # `host` is not required (carrier-id will simply not sort using it if it's not present).
+        for name in 'provisioning sip_domain_name ruleset_of profile'.split ' '
+          assert @options[name]?, "CallServer: options.#{name} is required"
+        @logger = @options.logger ? require 'winston'
+
+        @gateway_manager = new GatewayManager @options.provisioning, @options.sip_domain_name, @logger
+        router = @options.router ? @default_router()
+        @server = FS.server ->
+          router.route this
+        @logger.info "#{pkg.name} #{pkg.version} starting on port #{port}."
+
+        @gateway_manager.init()
+        .then =>
+          @server.listen port
 
       stop: ->
         new Promise (resolve,reject) =>
@@ -20,6 +28,22 @@ TODO: add Node.js clustering
           catch exception
             reject exception
 
+      default_router: ->
+        router = new Router @logger
+        find_rule_in = require './middleware/ruleset'
+        router.use (require './middleware/numeric')()
+        router.use (require './middleware/response-handlers') @gateway_manager
+        router.use (require './middleware/local-number') @options.provisioning
+        router.use (require './middleware/ruleset') @options.provisioning,@options.ruleset_of,@options.default_outbound_route
+        router.use (require './middleware/emergency') @options.provisioning
+        router.use (require './middleware/routes-gwid') @gateway_manager
+        router.use (require './middleware/routes-carrierid') @gateway_manager, @options.host
+        router.use (require './middleware/routes-registrant') @options.provisioning
+        router.use (require './middleware/flatten')()
+        router.use (require './middleware/call-handler') @options.profile
+        router.use (require './middleware/respond')()
+        router
+
 Toolbox
 =======
 
@@ -27,5 +51,5 @@ Toolbox
     FS = require 'esl'
     Promise = require 'bluebird'
     Router = require './router'
-    CallHandler = require './call_handler'
+    GatewayManager = require './gateway_manager'
     assert = require 'assert'

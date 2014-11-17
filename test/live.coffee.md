@@ -56,7 +56,6 @@ Server (Unit Under Test)
 
     PouchDB = (require 'pouchdb').defaults db: require 'memdown'
     FS = require 'esl'
-    GatewayManager = null
     options = null
 
     start_server = ->
@@ -116,6 +115,7 @@ Server (Unit Under Test)
         console.log "bulkDocs failed"
         throw error
       .then ->
+        console.log 'Inserting Gateway Manager Couch'
         GatewayManager = require '../gateway_manager'
         provisioning.put GatewayManager.couch
       .then ->
@@ -124,20 +124,16 @@ Server (Unit Under Test)
           provisioning.get "ruleset:#{sip_domain_name}:#{x}"
           .then (doc) ->
             ruleset: doc
-            database: new PouchDB doc.database
+            ruleset_database: new PouchDB doc.database
 
         options =
           provisioning: provisioning
           profile: 'test-sender'
           ruleset_of: ruleset_of
-          statistics: require 'winston'
+          logger: require 'winston'
+          sip_domain_name: sip_domain_name
 
-        options.gateway_manager = new GatewayManager provisioning, sip_domain_name, options
-        options.gateway_manager.init()
-      .catch (error) ->
-        console.log "Gateway Manager init() failed"
-        throw error
-      .then ->
+        console.log 'Declaring Server'
         CallServer = require '../call_server'
         new CallServer 7002, options
 
@@ -190,29 +186,27 @@ Test
         catch exception
           reject exception
 
-    before ->
-      @timeout 18000
-      ready
+    describe 'Live Tests', ->
+      before ->
+        @timeout 18000
+        ready
 
-    describe 'FreeSwitch', ->
-      @timeout 5000
-      it 'should process a regular call', ->
-        t = ready.then test1
-        t.should.be.fulfilled
-        t.should.eventually.equal true
-      it 'should process a registrant call', ->
-        t = ready.then test2
-        t.should.be.fulfilled
-        t.should.eventually.equal true
+      describe 'FreeSwitch', ->
+        @timeout 5000
+        it 'should process a regular call', ->
+          t = ready.then test1
+          t.should.be.fulfilled
+          t.should.eventually.equal true
+        it 'should process a registrant call', ->
+          t = ready.then test2
+          t.should.be.fulfilled
+          t.should.eventually.equal true
 
-Cleanup
-=======
-
-    after ->
-      ready
-      .then -> server?.close()
-      .then -> exec "docker logs #{p} > #{p}.log"
-      .then -> exec "docker kill #{p}"
-      .then -> exec "docker rm #{p}"
-      .then -> exec "docker rmi #{p}"
-      .catch -> true
+      after ->
+        ready
+        .then -> server?.close()
+        .then -> exec "docker logs #{p} > #{p}.log"
+        .then -> exec "docker kill #{p}"
+        .then -> exec "docker rm #{p}"
+        .then -> exec "docker rmi #{p}"
+        .catch -> true

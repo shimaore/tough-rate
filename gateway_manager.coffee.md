@@ -15,13 +15,13 @@ The gateway manager provides services to the call handler.
 
     module.exports = class GatewayManager
 
-      constructor: (@provisioning,@sip_domain_name,@options = {}) ->
+      constructor: (@provisioning,@sip_domain_name,@logger = require 'winston') ->
         @carriers = {}
         @gateways = {}
         @gateway_status = {}
-        assert @provisioning, "provisioning DB is required"
-        assert @sip_domain_name, "sip_domain_name is required"
-        assert @options.statistics, 'Missing `statistics`'
+        assert @provisioning, "GatewayManager: provisioning DB is required"
+        assert @sip_domain_name, "GatewayManager: sip_domain_name is required"
+        @logger.info "GatewayManager for #{@sip_domain_name}: waiting for init()"
 
       init: ->
         Promise.resolve()
@@ -29,41 +29,41 @@ The gateway manager provides services to the call handler.
           @provisioning
           .allDocs startkey:"carrier:#{@sip_domain_name}:", endkey:"carrier:#{@sip_domain_name};", include_docs:yes
         .catch (error) =>
-          @options.statistics.error error
-          @options.statistics.info "GatewayManager allDocs failed"
+          @logger.error error
+          @logger.info "GatewayManager allDocs failed"
           throw error
         .then ({rows}) =>
           for row in rows
             do (row) => @_merge_carrier_row row
           return
         .catch (error) =>
-          @options.statistics.error error
-          @options.statistics.info "GatewayManager merge-carrier-row failed"
+          @logger.error error
+          @logger.info "GatewayManager merge-carrier-row failed"
           throw error
         .then =>
           @provisioning
           .query "#{pkg.name}-gateway-manager/gateways", startkey:[@sip_domain_name], endkey:[@sip_domain_name,{}]
         .catch (error) =>
-          @options.statistics.error error
-          @options.statistics.info "GatewayManager query failed"
+          @logger.error error
+          @logger.info "GatewayManager query failed"
           throw error
         .then ({rows}) =>
           for row in rows when row.value?.address?
             do (row) => @_merge_gateway_row row
           return
         .catch (error) =>
-          @options.statistics.error error
-          @options.statistics.info "GatewayManager merge-gateway-row failed"
+          @logger.error error
+          @logger.info "GatewayManager merge-gateway-row failed"
           throw error
         .then =>
-          @options.statistics.info "GatewayManager: gateways = #{JSON.stringify @gateways}"
-          @options.statistics.info "GatewayManager: carriers = #{JSON.stringify @carriers}"
+          @logger.info "GatewayManager for #{@sip_domain_name}: gateways = #{JSON.stringify @gateways}"
+          @logger.info "GatewayManager for #{@sip_domain_name}: carriers = #{JSON.stringify @carriers}"
           return
 
         # TODO Add monitoring of `_changes` on the view to update carriers and gateways
 
       _merge_gateway_row: (row) ->
-        @options.statistics.info "GatewayManager merge-gateway-row #{JSON.stringify row}"
+        @logger.info "GatewayManager merge-gateway-row #{JSON.stringify row}"
         {gwid,carrierid} = row.value
         assert gwid?
 
@@ -76,7 +76,6 @@ The gateway manager provides services to the call handler.
         if carrierid?
           @gateways[gwid] = field_merger
             default: default_parameters
-            options: @options
             carrier: @carriers[carrierid]
             gateway: row.value
 
@@ -85,7 +84,6 @@ The gateway manager provides services to the call handler.
         else
           @gateways[gwid] = field_merger
             default: default_parameters
-            options: @options
             gateway: row.value
 
       _reevaluate_gateways: (gateways) ->
@@ -96,7 +94,7 @@ The gateway manager provides services to the call handler.
             do (row) => @_merge_gateway_row row
 
       _merge_carrier_row: (row) ->
-        @options.statistics.info "GatewayManager merge-carrier-row #{JSON.stringify row}"
+        @logger.info "GatewayManager merge-carrier-row #{JSON.stringify row}"
         carrierid = row.doc.carrierid
         assert carrierid?
 
@@ -166,14 +164,14 @@ Gateway temporary disable
 Disable a gateway temporarily, for example because it is rejecting too many calls.
 
       mark_gateway_as_faulty: (name) ->
-        @options.statistics.error "GatewayManager mark-gateway-as-faulty: #{name}."
+        @logger.error "GatewayManager mark-gateway-as-faulty: #{name}."
         status = @gateway_status[name] ?= new Status()
         status.mark_as_faulty()
 
 Mark a gateway as suspicious.
 
       mark_gateway_as_suspicious: (name) ->
-        @options.statistics.error "GatewayManager mark-gateway-as-suspicious: #{name}."
+        @logger.error "GatewayManager mark-gateway-as-suspicious: #{name}."
         status = @gateway_status[name] ?= new Status()
         status.mark_as_suspicious()
 
