@@ -11,10 +11,10 @@ Since this code rewrites the destination before resolving gateways, it must be c
       middleware = ->
 
         if not @res.rule?
-          @logger.error 'Emergency middleware: no rule is present. (Internal error; ignored.)'
+          @logger.error 'Emergency middleware: no rule is present. (ignored)'
           return
         if not @res.ruleset_database?
-          @logger.error 'Emergency middleware: no ruleset_database is present. (Internal error; ignored.)'
+          @logger.error 'Emergency middleware: no ruleset_database is present. (ignored)'
           return
 
 Then, see whether the destination number is an emergency number, and process it.

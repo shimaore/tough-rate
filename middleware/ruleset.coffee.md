@@ -19,11 +19,9 @@ This is based on the calling number.
 Route based on the route selected by the source, or using a default route.
 
         source = @source
-        console.dir {source}
 
         provisioning.get "number:#{source}"
         .then (doc) =>
-          console.dir doc
           route = doc.outbound_route ? default_outbound_route
         .catch =>
           route = default_outbound_route

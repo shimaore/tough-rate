@@ -10,7 +10,6 @@ We must flatten the list so that CallHandler can use it.
 
         @res.gateways = @res.gateways.map (gateway) =>
           if isArray gateway
-            console.log "Array: #{JSON.stringify gateway}"
             gateway.map (gateway) =>
               field_merger {
                 default: {destination:@res.destination}
@@ -19,7 +18,6 @@ We must flatten the list so that CallHandler can use it.
                 rule:@res.rule
               }
           else
-            console.log "NOT Array: #{JSON.stringify gateway}"
             field_merger {
               default: {destination:@res.destination}
               gateway
