@@ -8,11 +8,17 @@ This middleware is called normally at the end of the stack to process the gatewa
     module.exports = (profile) ->
       assert profile?, 'middleware Call Handler: `profile` is required.'
 
-      middleware = ->
-        @logger.info "Call Handler", @res
+Middleware
+----------
 
-        if @res.response
-          return @call.command 'respond', @res.response
+      middleware = ->
+        send_response = (response) =>
+          return @call.command 'respond', response
+
+        @logger.info "Call Handler: starting."
+
+        if @res.response?
+          return send_response @res.response
 
 The route-set might not be modified anymore.
 
@@ -25,11 +31,11 @@ The route-set might not be modified anymore.
 The `it` promise will return either a gateway, `false` if no gateway was found, or null if no gateway was successful.
 
         it = Promise.resolve()
-        it.bind this
+        it = it.bind this
 
         for own name,value of @res.set
           do (name,value) ->
-            it.then ->
+            it = it.then ->
               if value is null
                 @logger.info "Unset #{name}"
                 @call.command 'unset', name
@@ -39,7 +45,7 @@ The `it` promise will return either a gateway, `false` if no gateway was found, 
 
         for own name,value of @res.export
           do (name,value) ->
-            it.then ->
+            it = it.then ->
               if value is null
                 @logger.info "Export #{name}"
                 @call.command 'export', name
@@ -49,14 +55,15 @@ The `it` promise will return either a gateway, `false` if no gateway was found, 
 
 If there are gateways, attempt to call through them in the order listed.
 
+        it = it.then ->
+          null
+
         for gateway in @res.gateways
-          do (gateway) =>
+          do (gateway) ->
 
 Should return the winning gateway iff the call was successful and no further attempts should be made.
 
-            it = it.then (winner) =>
-
-              @logger.info "Handling next gateway", gateway
+            it = it.then (winner) ->
 
 If a winner was already found simply return it.
 
@@ -64,12 +71,14 @@ If a winner was already found simply return it.
 
 Call attempt.
 
-              destination = gateway.destination ? @res.destination
+              @logger.info "Handling next gateway", gateway
+
+              destination = gateway.destination_number ? @res.destination
               attempt.call this, destination, gateway
               .then (res) =>
-                @logger.warn {res}
+                @logger.warn "FreeSwitch response: ", res
 
-                @res.cause = cause = res.body.variable_last_bridge_hangup_cause
+                @res.cause = cause = res.body?.variable_last_bridge_hangup_cause
 
                 unless cause?
                   @logger.warn "Unable to parse reply '#{res}'"
@@ -80,7 +89,7 @@ Call attempt.
                   @response_handlers.emit cause, gateway
                   cause
                 .catch (error) =>
-                  @logger.error "Response handler(s) for #{cause} failed.", error
+                  @logger.error "Response handler(s) for #{cause} failed.", error.toString()
                   cause
 
               .then (cause) =>
@@ -98,20 +107,20 @@ Call attempt.
 However we do not propagate errors, since it would mean interrupting the call sequence. Since we didn't find any winner, we simply return `null`.
 
               .catch (error) =>
-                @logger.error 'Internal error', error
+                @logger.error 'Internal or FreeSwitch error (ignored, skipping to next gateway): ', error.toString()
                 null
 
             return
 
         it.catch (error) ->
-          @logger.error "Caught internal error", error
-          @respond '500'
+          @logger.error "Caught internal error", error.toString()
+          send_response '500'
           null
 
         it.then (winner) ->
           if not winner?
             @logger.warn "No Route."
-            @respond '604'
+            send_response '604'
           else
             @logger.info "Call Handler: the winning gateway was: #{JSON.stringify winner}"
             @winner = winner
@@ -120,14 +129,14 @@ However we do not propagate errors, since it would mean interrupting the call se
         return it
 
 Attempt Call
-============
+------------
 
 Convert fields found in the record into fields for FreeSwitch `bridge` command.
 Returns an `esl` promise that completes when the call gets connected, or 
 
       attempt = (destination,gateway) ->
 
-        @logger.info "CallHandler: attempt", {destination, gateway}
+        @logger.info "CallHandler: attempt", {destination,gateway}
 
         leg_options = {}
 
@@ -148,6 +157,12 @@ Sometimes we'll be provided with a pre-built URI (emergency calls, loopback call
 
         @logger.info "CallHandler: attempt -- bridge [#{leg_options_text}]sofia/#{profile}/#{uri}"
         @call.command 'bridge', "[#{leg_options_text}]sofia/#{profile}/#{uri}"
+
+
+Plugin
+------
+
+      return middleware
 
 Field Mapping
 =============

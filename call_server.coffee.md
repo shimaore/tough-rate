@@ -41,7 +41,6 @@ TODO: add Node.js clustering
         router.use (require './middleware/routes-registrant') @options.provisioning
         router.use (require './middleware/flatten')()
         router.use (require './middleware/call-handler') @options.profile
-        router.use (require './middleware/respond')()
         router
 
 Toolbox

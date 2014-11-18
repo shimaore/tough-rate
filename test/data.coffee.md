@@ -212,7 +212,6 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           router.use (require '../middleware/routes-registrant') provisioning
           router.use (require '../middleware/flatten')()
           router.use (require '../middleware/call-handler') 'something-egress'
-          router.use (require '../middleware/respond')()
           logger.info "Sending one_call to router."
           router.route ctx
         .catch (exception) ->
@@ -345,8 +344,6 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
 
         it 'should report an error when no route is found', (done) ->
           ready.then ->
-            respond = (v) ->
-              v.should.equal '485'
 
             router = new ToughRateRouter logger
             router.use (require '../middleware/ruleset') provisioning, ruleset_of, 'default'
@@ -354,8 +351,8 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             router.use (require '../middleware/routes-carrierid') gm
             router.use (require '../middleware/flatten')()
             router.route call_ '336718', '347766'
-          .catch (exception)->
-            console.dir exception
+          .then (ctx) ->
+            ctx.res.response.should.equal '485'
             done()
           null
 
@@ -420,22 +417,24 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
               done()
               Promise.resolve()
 
-        it.only 'should route known destinations', (done) ->
+        it 'should route known destinations', (done) ->
           ready.then ->
             provisioning.put _id:'number:1236',inbound_uri:'sip:bar@foo'
-            .catch done
-            .then ->
-              one_call
-                data:
-                  'Channel-Destination-Number': '1236'
-                  'Channel-Caller-ID-Number': '2346'
-                command: (c,v) ->
-                  if c is 'set'
-                    return Promise.resolve().bind this
-                  v.should.equal '[]sofia/something-egress/sip:bar@foo'
-                  c.should.equal 'bridge'
-                  done()
-                  Promise.resolve()
+          .catch done
+          .then ->
+            one_call
+              data:
+                'Channel-Destination-Number': '1236'
+                'Channel-Caller-ID-Number': '2346'
+              command: (c,v) ->
+                if c in ['set','export']
+                  return Promise.resolve().bind this
+                v.should.equal '[]sofia/something-egress/sip:bar@foo'
+                c.should.equal 'bridge'
+                done()
+                Promise.resolve
+                  body:
+                    variable_last_bridge_hangup_cause: 'NORMAL_CALL_CLEARING'
 
         it 'should route known destinations for specific sources', (done) ->
           ready.then ->
@@ -447,12 +446,14 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
                   'Channel-Destination-Number': '336727'
                   'Channel-Caller-ID-Number': '2347'
                 command: (c,v) ->
-                  if c is 'set'
+                  if c in ['set','export']
                     return Promise.resolve().bind this
                   v.should.equal '[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800]sofia/something-egress/sip:336727@127.0.0.1:5068'
                   c.should.equal 'bridge'
                   done()
-                  Promise.resolve()
+                  Promise.resolve
+                    body:
+                      variable_last_bridge_hangup_cause: 'NORMAL_CALL_CLEARING'
 
         it 'should route known routes', (done) ->
           ctx =
@@ -460,13 +461,36 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
               'Channel-Destination-Number': '3368267'
               'Channel-Caller-ID-Number': '2348'
             command: (c,v) ->
-              if c is 'set'
+              if c in ['set','export']
                 return Promise.resolve().bind this
               v.should.equal '[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800]sofia/something-egress/sip:3368267@127.0.0.1:5068'
               c.should.equal 'bridge'
               done()
-              Promise.resolve()
+              Promise.resolve
+                body:
+                  variable_last_bridge_hangup_cause: 'NORMAL_CALL_CLEARING'
+
           one_call ctx, 'default'
+          return
+
+        it 'should report errors', (done) ->
+          ready.then ->
+            ctx =
+              data:
+                'Channel-Destination-Number': '336927'
+                'Channel-Caller-ID-Number': '2349'
+              command: (c,v) ->
+                if c in ['set','export']
+                  return Promise.resolve().bind this
+                if c is 'bridge'
+                  Promise.reject new FreeSwitchError {}, reply: '-ERR I_TOLD_YOU_SO'
+                else
+                  c.should.equal 'respond'
+                  v.should.equal '604'
+                  done()
+                  Promise.resolve()
+
+            one_call ctx, 'default'
 
         it 'should report failed destinations', (done) ->
           ready.then ->
@@ -475,15 +499,18 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
                 'Channel-Destination-Number': '336927'
                 'Channel-Caller-ID-Number': '2349'
               command: (c,v) ->
-                if c is 'set'
+                if c in ['set','export']
                   return Promise.resolve().bind this
                 if c is 'bridge'
-                  Promise.reject new FreeSwitchError {}, reply: '-ERR I_TOLD_YOU_SO'
+                  Promise.resolve
+                    body:
+                      variable_last_bridge_hangup_cause: 'SOMETHING_HAPPENED'
                 else
-                  v.should.equal '604'
                   c.should.equal 'respond'
+                  v.should.equal '604'
                   done()
                   Promise.resolve()
+
             one_call ctx, 'default'
 
         it 'should route emergency', (done) ->
@@ -498,5 +525,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
               v.should.equal '[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800]sofia/something-egress/sip:33156@127.0.0.1:5068'
               c.should.equal 'bridge'
               done()
-              Promise.resolve()
+              Promise.resolve
+                body:
+                  variable_last_bridge_hangup_cause: 'NORMAL_CALL_CLEARING'
           one_call ctx, 'default'

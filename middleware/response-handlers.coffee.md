@@ -9,13 +9,13 @@
 
 Helper to report a gateway as faulty to the gateway manager.
 
-        mark_gateway_as_faulty = (gateway) ->
+        mark_gateway_as_faulty = (gateway) =>
           @logger.info "Asking the gateway manager to mark gateway #{JSON.stringify gateway} as faulty."
           gateway_manager.mark_gateway_as_faulty gateway
 
 Helper to report a gateway as suspicious to the gateway manager.
 
-        mark_gateway_as_suspicious = (gateway) ->
+        mark_gateway_as_suspicious = (gateway) =>
           @logger.info "Asking the router to mark gateway #{JSON.stringify gateway} as suspicious."
           gateway_manager.mark_gateway_as_suspicious gateway
 

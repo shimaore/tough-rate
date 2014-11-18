@@ -2,25 +2,26 @@
     chai.should()
     {EventEmitter} = require 'events'
 
-    describe 'respond', ->
+    describe 'call-handler', ->
 
-      module = require '../middleware/respond'
-      mw = module()
+      module = require '../middleware/call-handler'
+      mw = module 'default'
 
       it 'should call respond', (done) ->
         mw.call
-          response:'604'
-          logger: ->
+          res:
+            response:'604'
+          logger:
+            info: ->
           call:
             command: (command,arg) ->
               command.should.eql 'respond'
               arg.should.eql '604'
               done()
 
-    describe 'response-handlers', ->
+    describe.skip 'response-handlers', ->
 
       module = require '../middleware/response-handlers'
-      GatewayManager = require '../gateway_manager'
 
       it 'should mark gateway faulty on CALL_REJECTED', (done) ->
         gw = {}
@@ -34,4 +35,3 @@
         mw.call
           on: (msg,callback) ->
             ev.on msg, -> callback
-

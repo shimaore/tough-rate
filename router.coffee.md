@@ -47,7 +47,7 @@ This is based on the calling number.
 Manipulate the gateways list.
 
           finalize: (callback) ->
-            if ctx.res.finalized
+            if ctx.finalized()
               ctx.logger.error "`finalize` called when the route-set is already finalized"
               return
             ctx.res.finalized = true
@@ -62,7 +62,7 @@ Manipulate the gateways list.
               ctx.res.response = v
               ctx.res.gateways = []
           attempt: (gateway) ->
-            if ctx.finalized
+            if ctx.finalized()
               ctx.logger.error "`attempt` called when the route-set is already finalized", gateway
               return
             ctx.res.gateways.push gateway
@@ -95,7 +95,7 @@ Manipulate the gateways list.
         }
 
         it = Promise.resolve()
-        it.bind ctx
+        it = it.bind ctx
         for middleware in @middlewares
           do (middleware) ->
             it = it.then ->

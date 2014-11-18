@@ -38,6 +38,8 @@ Then, see whether the destination number is an emergency number, and process it.
             @logger.error "Emergency middleware: record for `#{emergency_key} has no `destination`."
             throw new EmergencyMiddlewareError "Record for `#{emergency_key} has no `destination`."
 
+The `destination` field in a `emergency` record historically is the target, destination number, not a reference to a `destination` record.
+
           @logger.info "Emergency middleware: routing call for `#{emergency_key}` to `#{doc.destination}`."
           @redirect doc.destination
           find_rule_in doc.destination, @res.ruleset_database
