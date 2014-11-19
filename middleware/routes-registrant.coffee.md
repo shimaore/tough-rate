@@ -4,11 +4,11 @@ Registrant plugin
 This plugin provides `registrant_host` as a gateway.
 
     registrant_fields =
-      registrant_password:    'sip_h_X-CCNQ3-Registrant-Password'
-      registrant_username:    'sip_h_X-CCNQ3-Registrant-Username'
-      registrant_realm:       'sip_h_X-CCNQ3-Registrant-Realm'
-      registrant_remote_ipv4: 'sip_h_X-CCNQ3-Registrant-Target'
-      registrant_socket:      'sip_h_X-CCNQ3-Registrant-HostPort'
+      registrant_password:    'X-CCNQ3-Registrant-Password'
+      registrant_username:    'X-CCNQ3-Registrant-Username'
+      registrant_realm:       'X-CCNQ3-Registrant-Realm'
+      registrant_remote_ipv4: 'X-CCNQ3-Registrant-Target'
+      registrant_socket:      'X-CCNQ3-Registrant-HostPort'
 
     update = (entry,ref) ->
       return entry unless entry.source_registrant? and entry.source_registrant is true
