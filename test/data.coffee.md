@@ -529,3 +529,6 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
                 body:
                   variable_last_bridge_hangup_cause: 'NORMAL_CALL_CLEARING'
           one_call ctx, 'default'
+
+    describe.skip 'The Call Handler', ->
+      it 'should handle additional headers', ->
