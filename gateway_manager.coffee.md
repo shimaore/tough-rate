@@ -5,7 +5,7 @@ The gateway manager provides services to the call handler.
 
     default_parameters =
       disabled: false
-      progress_timeout: 4
+      progress_timeout: 12
       answer_timeout: 90
       dialog_timeout: 28800
       attrs: {}
