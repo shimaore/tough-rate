@@ -22,18 +22,21 @@ Route based on the route selected by the source, or using a default route.
 
         provisioning.get "number:#{source}"
         .then (doc) =>
+          @logger.info "RuleSet Middleware: number:#{source} :", doc
           route = doc.outbound_route ? default_outbound_route
-        .catch =>
+        .catch (error) =>
+          @logger.error "RuleSet Middleware: error retrieving number:#{source}, using #{default_outbound_route} as route :", error.toString()
           route = default_outbound_route
         .then (route) =>
           unless route?
             @respond '485'
-            @logger.warn 'No route available', {source}
+            @logger.warn 'RuleSet Middleware: No route available', {source}
             throw new CCNQBaseMiddlewareError "No route available for #{source}"
 
           route = "#{route}"
           @res.route = route
 
+          @logger.info "RuleSet Middleware: loading ruleset_of", {source,route}
           ruleset_of route
         .then ({ruleset,ruleset_database}) =>
           unless ruleset? and ruleset_database?
