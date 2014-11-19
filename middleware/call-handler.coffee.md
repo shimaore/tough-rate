@@ -144,7 +144,7 @@ Returns an `esl` promise that completes when the call gets connected, or
           leg_options[l] = gateway[g]
 
         if gateway.headers?
-          for h of gateways.headers
+          for h of gateway.headers
             leg_options["sip_h_#{h}"] = gateway.headers[h]
 
 FIXME: build a more resistant list.
