@@ -78,11 +78,13 @@ Call attempt.
               .then (res) =>
                 @logger.warn "FreeSwitch response: ", res
 
-                @res.cause = cause = res.body?.variable_last_bridge_hangup_cause
+On CANCEL we get `variable_originate_disposition=ORIGINATOR_CANCEL` instead of a proper `last_bridge_hangup_cause`.
+
+                @res.cause = cause = res.body?.variable_last_bridge_hangup_cause ? res.body?.variable_originate_disposition
 
                 unless cause?
-                  @logger.warn "Unable to parse reply '#{res}'"
-                  throw new CallHandlerMiddlewareError "Unable to parse reply '#{res}'"
+                  @logger.warn "Unable to parse reply '#{res}'", res
+                  throw new CallHandlerMiddlewareError "Unable to parse reply"
 
                 thus = Promise.resolve()
                 .then =>
