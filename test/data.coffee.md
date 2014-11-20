@@ -189,6 +189,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           doc.views.should.have.property 'gateways'
       .then ->
         gm = new GatewayManager provisioning, 'phone.local', logger
+        gm.set 'progress_timeout', 4
         gm.init()
 
       call_ = (source,destination,emergency_ref) ->
@@ -291,7 +292,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             gws.should.have.property 0
             gws[0].should.have.property 'address', 'foo:5070'
             gws[0].should.have.property 'headers'
-            gws[0].headers.should.have.property 'sip_h_X-CCNQ3-Registrant-Password', 'badabing'
+            gws[0].headers.should.have.property 'X-CCNQ3-Registrant-Password', 'badabing'
 
         it 'should route registrant_host directly (using provided port)', ->
           ready.then ->
