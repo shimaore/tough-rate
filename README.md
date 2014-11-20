@@ -7,6 +7,25 @@ It runs under Node.js and uses CouchDB for provisioning.
 
 It is part of the [CCNQ SoftSwitch](http://ccnq.shimaore.net/).
 
+Usage
+=====
+
+You might want to look into the [matching docker image](https://github.com/shimaore/docker.tough-rate) which includes supervisord and FreeSwitch; its [server script](https://github.com/shimaore/docker.tough-rate/blob/master/server.coffee.md) demonstrates how to use this package.
+
+Note that the present package's `CallServer` module provides a default router equivalent to:
+
+    router = new Router logger
+    router.use (require './middleware/numeric')()
+    router.use (require './middleware/response-handlers') gateway_manager
+    router.use (require './middleware/local-number') options.provisioning
+    router.use (require './middleware/ruleset') options.provisioning,options.ruleset_of,options.default_outbound_route
+    router.use (require './middleware/emergency') options.provisioning
+    router.use (require './middleware/routes-gwid') gateway_manager
+    router.use (require './middleware/routes-carrierid') gateway_manager, options.host
+    router.use (require './middleware/routes-registrant') options.provisioning
+    router.use (require './middleware/flatten')()
+    router.use (require './middleware/call-handler') options.profile
+
 Architecture
 ============
 
