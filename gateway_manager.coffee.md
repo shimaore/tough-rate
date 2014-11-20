@@ -21,7 +21,19 @@ The gateway manager provides services to the call handler.
         @gateway_status = {}
         assert @provisioning, "GatewayManager: provisioning DB is required"
         assert @sip_domain_name, "GatewayManager: sip_domain_name is required"
+        @default_parameters = {}
+        for own k,v of default_parameters
+          @default_parameters[k] ?= v
         @logger.info "GatewayManager for #{@sip_domain_name}: waiting for init()"
+
+`set` accepts either `set(name,value)` or `set({name:value,name2:value,...})`.
+
+      set: (name,value) ->
+        if typeof name is 'string'
+          @default_parameters[name] = value
+        else
+          for own k,v of name
+            @default_parameters[k] = v
 
       init: ->
         Promise.resolve()
@@ -75,7 +87,7 @@ The gateway manager provides services to the call handler.
 
         if carrierid?
           @gateways[gwid] = field_merger
-            default: default_parameters
+            default: @default_parameters
             carrier: @carriers[carrierid]
             gateway: row.value
 
@@ -83,7 +95,7 @@ The gateway manager provides services to the call handler.
           @carriers[carrierid]._gateways[gwid] = true
         else
           @gateways[gwid] = field_merger
-            default: default_parameters
+            default: @default_parameters
             gateway: row.value
 
       _reevaluate_gateways: (gateways) ->
