@@ -30,7 +30,6 @@ TODO: add Node.js clustering
 
       default_router: ->
         router = new Router @logger
-        find_rule_in = require './middleware/ruleset'
         router.use (require './middleware/numeric')()
         router.use (require './middleware/response-handlers') @gateway_manager
         router.use (require './middleware/local-number') @options.provisioning
