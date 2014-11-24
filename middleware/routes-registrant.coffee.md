@@ -27,7 +27,8 @@ This plugin provides `registrant_host` as a gateway.
           result.push gateway
         result
 
-    plugin = (provisioning) ->
+    plugin = ->
+      provisioning = @options.provisioning
       assert provisioning?, 'Missing provisioning'
 
       middleware = ->

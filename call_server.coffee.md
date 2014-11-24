@@ -45,7 +45,7 @@ TODO: add Node.js clustering
           when 'routes-carrierid'
             router.use (require './middleware/routes-carrierid') @gateway_manager, @options.host
           when 'routes-registrant'
-            router.use (require './middleware/routes-registrant') @options.provisioning
+            router.use (require './middleware/routes-registrant').call this, router
           when 'flatten'
             router.use (require './middleware/flatten')()
           when 'call-handler'
