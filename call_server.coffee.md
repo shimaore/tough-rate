@@ -33,8 +33,10 @@ TODO: add Node.js clustering
           module = "./middleware/#{module}"
 
         mw = if typeof module is 'string'
+              @logger.info "CallServer: loading middleware `#{module}`."
               (require module).call this, router
             else
+              @logger.info "CallServer: loading middleware."
               module.call this, router
         router.use mw
 
