@@ -48,7 +48,7 @@ Manipulate the gateways list.
 
           finalize: (callback) ->
             if ctx.finalized()
-              ctx.logger.error "`finalize` called when the route-set is already finalized"
+              ctx.logger.error "ToughRateRouter: `finalize` called when the route-set is already finalized"
               return
             ctx.res.finalized = true
             callback?()
@@ -63,7 +63,7 @@ Manipulate the gateways list.
               ctx.res.gateways = []
           attempt: (gateway) ->
             if ctx.finalized()
-              ctx.logger.error "`attempt` called when the route-set is already finalized", gateway
+              ctx.logger.error "ToughRateRouter: `attempt` called when the route-set is already finalized", gateway
               return
             ctx.res.gateways.push gateway
 

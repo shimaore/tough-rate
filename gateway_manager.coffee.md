@@ -24,7 +24,7 @@ The gateway manager provides services to the call handler.
         @default_parameters = {}
         for own k,v of default_parameters
           @default_parameters[k] ?= v
-        @logger.info "GatewayManager for #{@sip_domain_name}: waiting for init()"
+        @logger.info "GatewayManager #{pkg.name} #{pkg.version} for #{@sip_domain_name}: waiting for init()"
 
 `set` accepts either `set(name,value)` or `set({name:value,name2:value,...})`.
 
