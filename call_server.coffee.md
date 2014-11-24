@@ -29,27 +29,27 @@ TODO: add Node.js clustering
             reject exception
 
       use: (module, router = @router) ->
-        switch module
+        router.use switch module
           when 'numeric'
-            router.use (require './middleware/numeric')()
+            (require './middleware/numeric')()
           when 'response-handlers'
-            router.use (require './middleware/response-handlers') @gateway_manager
+            (require './middleware/response-handlers') @gateway_manager
           when 'local-number'
-            router.use (require './middleware/local-number') @options.provisioning
+            (require './middleware/local-number') @options.provisioning
           when 'ruleset'
-            router.use (require './middleware/ruleset') @options.provisioning,@options.ruleset_of,@options.default_outbound_route
+            (require './middleware/ruleset') @options.provisioning,@options.ruleset_of,@options.default_outbound_route
           when 'emergency'
-            router.use (require './middleware/emergency') @options.provisioning
+            (require './middleware/emergency') @options.provisioning
           when 'routes-gwid'
-            router.use (require './middleware/routes-gwid') @gateway_manager
+            (require './middleware/routes-gwid') @gateway_manager
           when 'routes-carrierid'
-            router.use (require './middleware/routes-carrierid') @gateway_manager, @options.host
+            (require './middleware/routes-carrierid') @gateway_manager, @options.host
           when 'routes-registrant'
-            router.use (require './middleware/routes-registrant').call this, router
+            (require './middleware/routes-registrant').call this, router
           when 'flatten'
-            router.use (require './middleware/flatten')()
+            (require './middleware/flatten')()
           when 'call-handler'
-            router.use (require './middleware/call-handler') @options.profile
+            (require './middleware/call-handler') @options.profile
           else
             if typeof module is 'string'
               (require module).call this, router
