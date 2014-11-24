@@ -27,19 +27,23 @@ This plugin provides `registrant_host` as a gateway.
           result.push gateway
         result
 
+    build_ref = (provisioning) ->
+      provisioning.get "number:#{@source}"
+
     plugin = ->
       provisioning = @options.provisioning
       assert provisioning?, 'Missing provisioning'
 
       middleware = ->
         return if @finalized()
-        ref = provisioning.get "number:#{@source}"
-        promise_all @res.gateways, (x) -> update x, ref
+        ref = plugin.build_ref.call this, provisioning
+        promise_all @res.gateways, (x) => update.call this, x, ref
         .then (gws) =>
           @res.gateways = gws
 
     plugin.title = 'Registrant router plugin'
     plugin.description = "A router plugin that injects the source's `registrant_host` as a gateway."
+    plugin.build_ref = build_ref
     module.exports = plugin
 
 Toolbox
