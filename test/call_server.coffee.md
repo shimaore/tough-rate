@@ -204,9 +204,11 @@ Test
 
       after ->
         ready
-        .then -> server?.close()
+        .then -> server?.stop()
         .then -> exec "docker logs #{p} > #{p}.log"
         .then -> exec "docker kill #{p}"
         .then -> exec "docker rm #{p}"
         .then -> exec "docker rmi #{p}"
-        .catch -> true
+        .catch (error) ->
+          console.log "`after` failed (ignored): #{error}"
+          true
