@@ -1,4 +1,24 @@
-The middleware is used with a Sinatra/ZappaJS type of API.
+The middleware is used with a Sinatra/ZappaJS type of API. Compare with ExpressJS middleware.
+
+Module
+======
+
+Each module is inserted as follows:
+
+    call_server = new CallServer ...
+    module.call call_server, router
+
+See the CallServer source for parameters available at that time, such as:
+
+    @gateway_manager
+    @options.provisioning
+    @options.ruleset_of
+    ...
+
+The module must return a middleware function.
+
+Middleware
+==========
 
 The following fields are available as input:
 
@@ -34,18 +54,3 @@ The following fields are available to late middleware (i.e. after the call attem
 Other fields might be set by the middlewares, e.g.:
 
     @res.rule
-
-
-Typical ordering:
-
-    @use 'middleware/numeric'
-    @use 'middleware/response-handlers'
-    @use 'middleware/local-number'
-    @use 'middleware/emergency'
-    @use 'middleware/ccnq-base'
-    @use 'middleware/routes-gwid'
-    @use 'middleware/routes-carrierid'
-    @use 'middleware/routes-registrant'
-    @use 'middleware/ccnq-gwlist'
-    @use 'middleware/call-handler'
-    @use 'middleware/respond'
