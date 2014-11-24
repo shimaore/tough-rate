@@ -1,7 +1,8 @@
 Local number middleware
 =======================
 
-    module.exports = (provisioning) ->
+    module.exports = () ->
+      provisioning = @options.provisioning
       assert provisioning, 'Missing `provisioning`.'
 
       middleware = ->

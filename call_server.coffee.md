@@ -29,49 +29,33 @@ TODO: add Node.js clustering
             reject exception
 
       use: (module, router = @router) ->
-        router.use switch module
-          when 'numeric'
-            (require './middleware/numeric')()
-          when 'response-handlers'
-            (require './middleware/response-handlers') @gateway_manager
-          when 'local-number'
-            (require './middleware/local-number') @options.provisioning
-          when 'ruleset'
-            (require './middleware/ruleset') @options.provisioning,@options.ruleset_of,@options.default_outbound_route
-          when 'emergency'
-            (require './middleware/emergency') @options.provisioning
-          when 'routes-gwid'
-            (require './middleware/routes-gwid') @gateway_manager
-          when 'routes-carrierid'
-            (require './middleware/routes-carrierid') @gateway_manager, @options.host
-          when 'routes-registrant'
-            (require './middleware/routes-registrant').call this, router
-          when 'flatten'
-            (require './middleware/flatten')()
-          when 'call-handler'
-            (require './middleware/call-handler') @options.profile
-          else
-            if typeof module is 'string'
+        if module in included_middlewares
+          module = "./middleware/#{module}"
+
+        mw = if typeof module is 'string'
               (require module).call this, router
             else
               module.call this, router
+        router.use mw
 
       default_router: (use, router) ->
-        use ?= [
-          'numeric'
-          'response-handlers'
-          'local-number'
-          'ruleset'
-          'emergency'
-          'routes-gwid'
-          'routes-carrierid'
-          'routes-registrant'
-          'flatten'
-          'call-handler'
-        ]
+        use ?= included_middlewares
         router ?= new Router @logger
         @use module, router for module in use
         router
+
+    included_middlewares = [
+      'numeric'
+      'response-handlers'
+      'local-number'
+      'ruleset'
+      'emergency'
+      'routes-gwid'
+      'routes-carrierid'
+      'routes-registrant'
+      'flatten'
+      'call-handler'
+    ]
 
 Toolbox
 =======

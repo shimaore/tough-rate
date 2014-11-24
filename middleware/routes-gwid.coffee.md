@@ -5,7 +5,8 @@ Default `gwid` router plugin
       return entry unless entry.gwid?
       gateway_manager.resolve_gateway entry.gwid
 
-    plugin = (gateway_manager) ->
+    plugin = ->
+      gateway_manager = @gateway_manager
       assert gateway_manager?, 'Missing gateway manager.'
 
       middleware = ->

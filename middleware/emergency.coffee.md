@@ -5,7 +5,8 @@ Emergency Middleware
 
 Since this code rewrites the destination before resolving gateways, it must be called early on (i.e. after the rule is located but before the gateways are processed).
 
-    module.exports = (provisioning) ->
+    module.exports = ->
+      provisioning = @options.provisioning
       assert provisioning, 'Missing `provisioning`.'
 
       middleware = ->

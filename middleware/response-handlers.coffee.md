@@ -1,4 +1,5 @@
-    module.exports = (gateway_manager) ->
+    module.exports = ->
+      gateway_manager = @gateway_manager
       assert gateway_manager, 'Missing gateway_manager'
 
       middleware = ->

@@ -28,7 +28,9 @@ And select only `try` entries where specified.
 Middleware definition
 ---------------------
 
-    plugin = (gateway_manager,host) ->
+    plugin = ->
+      gateway_manager = @gateway_manager
+      host = @options.host
       assert gateway_manager?, 'Missing gateway manager.'
 
       middleware = ->

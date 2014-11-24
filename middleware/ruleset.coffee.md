@@ -5,7 +5,10 @@ Ruleset Loader
 
     class CCNQBaseMiddlewareError extends Error
 
-    module.exports = (provisioning,ruleset_of,default_outbound_route) ->
+    module.exports = ->
+      provisioning = @options.provisioning
+      ruleset_of = @options.ruleset_of
+      default_outbound_route = @options.default_outbound_route
       assert provisioning, 'Missing provisioning'
       assert ruleset_of, 'Missing ruleset_of'
 

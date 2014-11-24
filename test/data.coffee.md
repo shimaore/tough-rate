@@ -203,16 +203,24 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
         ready.then ->
           logger.info "Building router."
           router = new ToughRateRouter logger
-          router.use (require '../middleware/numeric')()
-          router.use (require '../middleware/response-handlers') gm
-          router.use (require '../middleware/local-number') provisioning
-          router.use (require '../middleware/ruleset') provisioning, ruleset_of,outbound_route
-          router.use (require '../middleware/emergency') provisioning
-          router.use (require '../middleware/routes-gwid') gm
-          router.use (require '../middleware/routes-carrierid') gm
-          router.use (require '../middleware/routes-registrant') provisioning
-          router.use (require '../middleware/flatten')()
-          router.use (require '../middleware/call-handler') 'something-egress'
+          us =
+            gateway_manager: gm
+            options: {
+              provisioning
+              ruleset_of
+              default_outbound_route: outbound_route
+              profile: 'something-egress'
+            }
+          router.use (require '../middleware/numeric').call us, router
+          router.use (require '../middleware/response-handlers').call us, router
+          router.use (require '../middleware/local-number').call us, router
+          router.use (require '../middleware/ruleset').call us, router
+          router.use (require '../middleware/emergency').call us, router
+          router.use (require '../middleware/routes-gwid').call us, router
+          router.use (require '../middleware/routes-carrierid').call us, router
+          router.use (require '../middleware/routes-registrant').call us, router
+          router.use (require '../middleware/flatten').call us, router
+          router.use (require '../middleware/call-handler').call us, router
           logger.info "Sending one_call to router."
           router.route ctx
         .catch (exception) ->
@@ -263,9 +271,10 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             provisioning.put _id:'number:1234',inbound_uri:'sip:foo@bar'
           .then ->
             router = new ToughRateRouter logger
-            router.use (require '../middleware/local-number') provisioning
-            router.use (require '../middleware/ruleset') provisioning, ruleset_of
-            router.use (require '../middleware/flatten')()
+            us = options: {provisioning,ruleset_of}
+            router.use (require '../middleware/local-number').call us, router
+            router.use (require '../middleware/ruleset').call us, router
+            router.use (require '../middleware/flatten').call us, router
             router.route call_ '3213', '1234'
           .then (ctx) ->
             ctx.should.have.property 'res'
@@ -281,9 +290,10 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             provisioning.put _id:'number:3213',registrant_host:'foo',registrant_password:'badabing'
           .then ->
             router = new ToughRateRouter logger
-            router.use (require '../middleware/ruleset') provisioning, ruleset_of, 'registrant'
-            router.use (require '../middleware/routes-registrant') provisioning
-            router.use (require '../middleware/flatten')()
+            us = options: {provisioning,ruleset_of,default_outbound_route:'registrant'}
+            router.use (require '../middleware/ruleset').call us, router
+            router.use (require '../middleware/routes-registrant').call us, router
+            router.use (require '../middleware/flatten').call us, router
             router.route call_ '3213', '331234'
           .then (ctx) ->
             gws = ctx.res.gateways
@@ -299,9 +309,10 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             provisioning.put _id:'number:3243',registrant_host:'foo:5080'
           .then ->
             router = new ToughRateRouter logger
-            router.use (require '../middleware/ruleset') provisioning, ruleset_of, 'registrant'
-            router.use (require '../middleware/routes-registrant') provisioning
-            router.use (require '../middleware/flatten')()
+            us = options: {provisioning,ruleset_of,default_outbound_route:'registrant'}
+            router.use (require '../middleware/ruleset').call us, router
+            router.use (require '../middleware/routes-registrant').call us, router
+            router.use (require '../middleware/flatten').call us, router
             router.route call_ '3243', '331234'
           .then (ctx) ->
             gws = ctx.res.gateways
@@ -315,9 +326,10 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             provisioning.put _id:'number:3253',registrant_host:['foo:5080']
           .then ->
             router = new ToughRateRouter logger
-            router.use (require '../middleware/ruleset') provisioning, ruleset_of, 'registrant'
-            router.use (require '../middleware/routes-registrant') provisioning
-            router.use (require '../middleware/flatten')()
+            us = options: {provisioning,ruleset_of,default_outbound_route:'registrant'}
+            router.use (require '../middleware/ruleset').call us, router
+            router.use (require '../middleware/routes-registrant').call us, router
+            router.use (require '../middleware/flatten').call us, router
             router.route call_ '3253', '331234'
           .then (ctx) ->
             gws = ctx.res.gateways
@@ -329,10 +341,13 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
         it 'should route numbers using routes', ->
           ready.then ->
             router = new ToughRateRouter logger
-            router.use (require '../middleware/ruleset') provisioning, ruleset_of, 'default'
-            router.use (require '../middleware/routes-gwid') gm
-            router.use (require '../middleware/routes-carrierid') gm
-            router.use (require '../middleware/flatten')()
+            us =
+              gateway_manager: gm
+              options: {provisioning,ruleset_of,default_outbound_route:'default'}
+            router.use (require '../middleware/ruleset').call us, router
+            router.use (require '../middleware/routes-gwid').call us, router
+            router.use (require '../middleware/routes-carrierid').call us, router
+            router.use (require '../middleware/flatten').call us, router
             router.route call_ '336718', '331234'
           .then (ctx) ->
             gws = ctx.res.gateways
@@ -347,10 +362,13 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           ready.then ->
 
             router = new ToughRateRouter logger
-            router.use (require '../middleware/ruleset') provisioning, ruleset_of, 'default'
-            router.use (require '../middleware/routes-gwid') gm
-            router.use (require '../middleware/routes-carrierid') gm
-            router.use (require '../middleware/flatten')()
+            us =
+              gateway_manager: gm
+              options: {provisioning,ruleset_of,default_outbound_route:'default'}
+            router.use (require '../middleware/ruleset').call us, router
+            router.use (require '../middleware/routes-gwid').call us, router
+            router.use (require '../middleware/routes-carrierid').call us, router
+            router.use (require '../middleware/flatten').call us, router
             router.route call_ '336718', '347766'
           .then (ctx) ->
             ctx.res.response.should.equal '485'
@@ -360,11 +378,14 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
         it 'should route emergency numbers', ->
           ready.then ->
             router = new ToughRateRouter logger
-            router.use (require '../middleware/ruleset') provisioning, ruleset_of, 'default'
-            router.use (require '../middleware/emergency') provisioning
-            router.use (require '../middleware/routes-gwid') gm
-            router.use (require '../middleware/routes-carrierid') gm
-            router.use (require '../middleware/flatten')()
+            us =
+              gateway_manager: gm
+              options: {provisioning,ruleset_of,default_outbound_route:'default'}
+            router.use (require '../middleware/ruleset').call us, router
+            router.use (require '../middleware/emergency').call us, router
+            router.use (require '../middleware/routes-gwid').call us, router
+            router.use (require '../middleware/routes-carrierid').call us, router
+            router.use (require '../middleware/flatten').call us, router
             router.route call_ '336718', '330112', 'brest'
           .then (ctx) ->
             ctx.res.should.have.property 'destination', '33156'
