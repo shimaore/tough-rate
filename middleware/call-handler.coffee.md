@@ -80,6 +80,7 @@ Call attempt.
                 @logger.warn "FreeSwitch response: ", res
 
 On CANCEL we get `variable_originate_disposition=ORIGINATOR_CANCEL` instead of a proper `last_bridge_hangup_cause`.
+On successful connection we also get `variable_originate_disposition=SUCCESS, variable_DIALSTATUS=SUCCESS`.
 
                 @res.cause = cause = res.body?.variable_last_bridge_hangup_cause ? res.body?.variable_originate_disposition
 
@@ -98,9 +99,9 @@ On CANCEL we get `variable_originate_disposition=ORIGINATOR_CANCEL` instead of a
 
               .then (cause) =>
 
-                if cause is 'NORMAL_CALL_CLEARING'
+                if cause in ['NORMAL_CALL_CLEARING', 'SUCCESS']
 
-                  @logger.info "CallHandler: Successfull Call."
+                  @logger.info "CallHandler: Successful call: ", {cause}
                   return gateway # Winner
 
                 else
