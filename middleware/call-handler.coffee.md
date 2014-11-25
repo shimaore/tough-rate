@@ -90,6 +90,7 @@ On CANCEL we get `variable_originate_disposition=ORIGINATOR_CANCEL` instead of a
                 thus = Promise.resolve()
                 .then =>
                   @response_handlers.emit cause, gateway
+                  @response_handlers.emit 'call-completed', gateway
                   cause
                 .catch (error) =>
                   @logger.error "Response handler(s) for #{cause} failed.", error.toString()
