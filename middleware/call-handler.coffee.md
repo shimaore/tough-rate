@@ -16,7 +16,7 @@ Middleware
         send_response = (response) =>
           return @call.command 'respond', response
 
-        @logger.info "Call Handler: starting."
+        @logger.info "CallHandler: starting."
 
         if @res.response?
           return send_response @res.response
@@ -38,20 +38,20 @@ The `it` promise will return either a gateway, `false` if no gateway was found, 
           do (name,value) ->
             it = it.then ->
               if value is null
-                @logger.info "Unset #{name}"
+                @logger.info "CallHandler: unset #{name}"
                 @call.command 'unset', name
               else
-                @logger.info "Set #{name} to value #{value}"
+                @logger.info "CallHandler: set #{name} to value #{value}"
                 @call.command 'set', "#{name}=#{value}"
 
         for own name,value of @res.export
           do (name,value) ->
             it = it.then ->
               if value is null
-                @logger.info "Export #{name}"
+                @logger.info "CallHandler: export #{name}"
                 @call.command 'export', name
               else
-                @logger.info "Export #{name} with value #{value}"
+                @logger.info "CallHandler: export #{name} with value #{value}"
                 @call.command 'export', "#{name}=#{value}"
 
 If there are gateways, attempt to call through them in the order listed.
@@ -72,12 +72,12 @@ If a winner was already found simply return it.
 
 Call attempt.
 
-              @logger.info "Handling next gateway", gateway
+              @logger.info "CallHandler: handling (next) gateway", gateway
 
               destination = gateway.destination_number ? @res.destination
               attempt.call this, destination, gateway
               .then (res) =>
-                @logger.warn "FreeSwitch response: ", res
+                @logger.warn "CallHandler: FreeSwitch response: ", res
 
 On CANCEL we get `variable_originate_disposition=ORIGINATOR_CANCEL` instead of a proper `last_bridge_hangup_cause`.
 On successful connection we also get `variable_originate_disposition=SUCCESS, variable_DIALSTATUS=SUCCESS`.
@@ -85,7 +85,7 @@ On successful connection we also get `variable_originate_disposition=SUCCESS, va
                 @res.cause = cause = res.body?.variable_last_bridge_hangup_cause ? res.body?.variable_originate_disposition
 
                 unless cause?
-                  @logger.warn "Unable to parse reply '#{res}'", res
+                  @logger.warn "CallHandler: Unable to parse reply '#{res}'", res
                   throw new CallHandlerMiddlewareError "Unable to parse reply"
 
                 thus = Promise.resolve()
@@ -94,14 +94,14 @@ On successful connection we also get `variable_originate_disposition=SUCCESS, va
                   @response_handlers.emit 'call-completed', gateway
                   cause
                 .catch (error) =>
-                  @logger.error "Response handler(s) for #{cause} failed.", error.toString()
+                  @logger.error "CallHandler: Response handler(s) for #{cause} failed.", error.toString()
                   cause
 
               .then (cause) =>
 
                 if cause in ['NORMAL_CALL_CLEARING', 'SUCCESS']
 
-                  @logger.info "CallHandler: Successful call: ", {cause}
+                  @logger.info "CallHandler: successful call: ", {cause}
                   return gateway # Winner
 
                 else
@@ -118,16 +118,16 @@ However we do not propagate errors, since it would mean interrupting the call se
             return
 
         it.catch (error) ->
-          @logger.error "Caught internal error", error.toString()
+          @logger.error "CallHandler: Caught internal error", error.toString()
           send_response '500'
           null
 
-        it.then (winner) ->
+        .then (winner) ->
           if not winner?
-            @logger.warn "No Route."
+            @logger.warn "CallHandler: No Route."
             send_response '604'
           else
-            @logger.info "Call Handler: the winning gateway was: #{JSON.stringify winner}"
+            @logger.info "CallHandler: the winning gateway was: #{JSON.stringify winner}"
             @winner = winner
           null
 
