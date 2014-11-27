@@ -11,18 +11,18 @@
   "author": "Stéphane Alnet <stephane@shimaore.net> (http://stephane.shimaore.net/)",
   "license": "Unlicense",
   "devDependencies": {
-    "chai": "^1.9.2",
+    "chai": "^1.10.0",
     "chai-as-promised": "^4.1.1",
     "coffee-script": "^1.8.0",
-    "memdown": "^0.10.2",
-    "mocha": "^1.21.5",
-    "pouchdb": "^3.0.6",
-    "should": "^4.1.0"
+    "memdown": "^1.0.0",
+    "mocha": "^2.0.1",
+    "pouchdb": "^3.1.0",
+    "should": "^4.3.0"
   },
   "dependencies": {
-    "bluebird": "^2.3.6",
+    "bluebird": "^2.3.11",
     "coffeescript-helpers": "^1.0.4",
-    "esl": "^2.2.0",
-    "winston": "^0.8.1"
+    "esl": "^2.3.0",
+    "winston": "^0.8.3"
   }
 }
