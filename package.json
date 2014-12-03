@@ -6,7 +6,7 @@
   "scripts": {
     "prepublish": "coffee -m -c *.coffee.md middleware/*.coffee.md",
     "test": "mocha",
-    "clean": "rm -rf *.js{,.map} middleware/*.js{,.map} node_modules/ npm-debug.log"
+    "clean": "rm -rf *.js *.js.map middleware/*.js middleware/*.js.map node_modules/ npm-debug.log"
   },
   "author": "Stéphane Alnet <stephane@shimaore.net> (http://stephane.shimaore.net/)",
   "license": "Unlicense",
