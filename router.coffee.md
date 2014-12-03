@@ -66,6 +66,11 @@ Manipulate the gateways list.
               ctx.logger.error "ToughRateRouter: `attempt` called when the route-set is already finalized", gateway
               return
             ctx.res.gateways.push gateway
+          clear: ->
+            if ctx.finalized()
+              ctx.logger.error "ToughRateRouter: `clear` called when the route-set is already finalized", gateway
+              return
+            ctx.res.gateways = []
 
           set: (name,value) ->
             if 'string' is typeof name
