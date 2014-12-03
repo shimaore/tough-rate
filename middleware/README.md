@@ -25,7 +25,7 @@ The following fields are available as input:
     @data         Data provided by CouchDB
     @source       The originating number (caller)
     @destination  The (original) destination number (callee)
-    @req.header   Get extra SIP headers (`variable_sip_h`)
+    @req.header() Get extra SIP headers (`variable_sip_h`)
 
 The following operations are available to modify the responses:
 
