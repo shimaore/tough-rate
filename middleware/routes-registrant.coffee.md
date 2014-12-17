@@ -40,7 +40,8 @@ This plugin provides `registrant_host` as a gateway.
       @logger.info "Routes Registrant build_ref locating #{@source}."
       provisioning.get "number:#{@source}"
 
-    plugin = (ref_builder = build_ref)->
+    plugin = ->
+      ref_builder = @ref_builder ? build_ref
       provisioning = @options.provisioning
       assert provisioning?, 'Missing provisioning'
 
