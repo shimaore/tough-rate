@@ -13,7 +13,9 @@ This plugin provides `registrant_host` as a gateway.
     default_port = 5070
 
     update = (entry,ref) ->
-      return entry unless entry.source_registrant? and entry.source_registrant is true
+      unless entry.source_registrant? and entry.source_registrant is true
+        @logger.info "Routes Registrant: entry is not source_registrant, skipping", entry
+        return entry
 
       ref.then (source_doc) ->
         result = []
@@ -22,6 +24,7 @@ This plugin provides `registrant_host` as a gateway.
           @logger.error 'No registrant_host for source in a route that requires registrant.', source_doc
           return result
 
+        @logger.info "Routes Registrant: mapping registrant", source_doc
         if 'string' isnt typeof address
           address = address[0]
         address = "#{address}:#{default_port}" unless address.match /:/
