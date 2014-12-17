@@ -40,7 +40,7 @@ This plugin provides `registrant_host` as a gateway.
       @logger.info "Routes Registrant build_ref locating #{@source}."
       provisioning.get "number:#{@source}"
 
-    plugin = ->
+    plugin = (ref_builder = build_ref)->
       provisioning = @options.provisioning
       assert provisioning?, 'Missing provisioning'
 
@@ -48,7 +48,7 @@ This plugin provides `registrant_host` as a gateway.
         if @finalized()
           @logger.info 'Routes Registrant: already finalized.'
           return
-        ref = plugin.build_ref.call this, provisioning
+        ref = ref_builder.call this, provisioning
         promise_all @res.gateways, (x) => update.call this, x, ref
         .then (gws) =>
           @res.gateways = gws
