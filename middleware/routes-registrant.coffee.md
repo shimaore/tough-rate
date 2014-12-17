@@ -17,7 +17,8 @@ This plugin provides `registrant_host` as a gateway.
         @logger.info "Routes Registrant: entry is not source_registrant, skipping", entry
         return entry
 
-      ref.then (source_doc) ->
+      ref
+      .then (source_doc) =>
         result = []
         address = source_doc.registrant_host
         unless address?
