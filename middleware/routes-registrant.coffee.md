@@ -40,7 +40,9 @@ This plugin provides `registrant_host` as a gateway.
       assert provisioning?, 'Missing provisioning'
 
       middleware = ->
-        return if @finalized()
+        if @finalized()
+          @logger.info 'Routes Registrant: already finalized.'
+          return
         ref = plugin.build_ref.call this, provisioning
         promise_all @res.gateways, (x) => update.call this, x, ref
         .then (gws) =>

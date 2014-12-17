@@ -10,7 +10,9 @@ Default `gwid` router plugin
       assert gateway_manager?, 'Missing gateway manager.'
 
       middleware = ->
-        return if @finalized()
+        if @finalized()
+          @logger.info 'Routes GwID: already finalized.'
+          return
         promise_all @res.gateways, (x) -> update gateway_manager, x
         .then (gws) =>
           @res.gateways = gws

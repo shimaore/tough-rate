@@ -21,6 +21,7 @@ Since this code rewrites the destination before resolving gateways, it must be c
 Then, see whether the destination number is an emergency number, and process it.
 
         if not @res.rule.emergency
+          @logger.info 'Emergency middleware: not an emergency rule.'
           return
 
         emergency_ref = @req.header 'X-CCNQ3-Routing'

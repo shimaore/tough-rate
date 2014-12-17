@@ -34,7 +34,9 @@ Middleware definition
       assert gateway_manager?, 'Missing gateway manager.'
 
       middleware = ->
-        return if @finalized()
+        if @finalized()
+          @logger.info "Routes CarrierID: already finalized."
+          return
         promise_all @res.gateways, (x) -> update gateway_manager, host, x
         .then (gws) =>
           @res.gateways = gws
