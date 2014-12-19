@@ -20,15 +20,19 @@ This plugin provides `registrant_host` as a gateway.
       ref
       .then (source_doc) =>
         result = []
-        address = source_doc.registrant_host
-        unless address?
-          @logger.error 'No registrant_host for source in a route that requires registrant.', source_doc
-          return result
+        if source_doc.address?
+          address = source_doc.address
+        else
+          address = source_doc.registrant_host
+          unless address?
+            @logger.error 'No registrant_host for source in a route that requires registrant.', source_doc
+            return result
 
-        @logger.info "Routes Registrant: mapping registrant", source_doc
-        if 'string' isnt typeof address
-          address = address[0]
-        address = "#{address}:#{default_port}" unless address.match /:/
+          @logger.info "Routes Registrant: mapping registrant", source_doc
+          if 'string' isnt typeof address
+            address = address[0]
+          address = "#{address}:#{default_port}" unless address.match /:/
+
         gateway = {address}
         gateway.headers ?= {}
         for field, header of registrant_fields
