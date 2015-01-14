@@ -13,6 +13,8 @@
             response:'604'
           logger:
             info: ->
+          statistics:
+            add: ->
           call:
             command: (command,arg) ->
               command.should.eql 'respond'

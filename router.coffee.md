@@ -6,7 +6,11 @@ This is based on the calling number.
 
     module.exports = class ToughRateRouter
 
-      constructor: (@logger = require 'winston') ->
+      constructor: (@logger,@statistics) ->
+        @logger ?= require 'winston'
+        if not @statistics?
+          CaringBand = require 'caring-band'
+          @statistics = new CaringBand()
         @logger.info "ToughRateRouter #{pkg.name} #{pkg.version} ready."
         @middlewares = []
 
@@ -20,6 +24,7 @@ This is based on the calling number.
 
         ctx = {
           logger: @logger
+          statistics: @statistics
           router: this
           call
           data: call.data

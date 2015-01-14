@@ -9,6 +9,10 @@ TODO: add Node.js clustering
         for name in 'provisioning sip_domain_name ruleset_of profile'.split ' '
           assert @options[name]?, "CallServer: options.#{name} is required"
         @logger = @options.logger ? require 'winston'
+        @statistics = @options.statistics
+        if not @statistics?
+          CaringBand = require 'caring-band'
+          @statistics = new CaringBand()
 
         @gateway_manager = new GatewayManager @options.provisioning, @options.sip_domain_name, @logger
         router = @options.router ? @default_router @options.use
@@ -42,7 +46,7 @@ TODO: add Node.js clustering
 
       default_router: (use, router) ->
         use ?= included_middlewares
-        router ?= new Router @logger
+        router ?= new Router @logger, @statistics
         @use module, router for module in use
         router
 

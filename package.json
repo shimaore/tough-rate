@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "bluebird": "^2.3.11",
+    "caring-band": "^1.2.0",
     "coffeescript-helpers": "^1.0.4",
     "esl": "^2.3.0",
     "winston": "^0.8.3"
