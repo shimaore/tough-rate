@@ -5,7 +5,7 @@ From README.md:
 
 Different attribute values might be present. They are always resolved in the following order: default, carrier, gateway, ruleset, destination, rule, gwlist entry.
 
-    resolution_order = 'default carrier gateway ruleset destination rule entry'.split ' '
+    resolution_order = 'default extra carrier gateway ruleset destination rule entry'.split ' '
     combiners =
       disabled: (a,b) -> a or b
       temporarily_disabled: (a,b) -> a or b
