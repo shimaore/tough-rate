@@ -91,6 +91,7 @@ The steps to placing outbound call(s) are:
           33:
             _id:'rule:33'
             type:'rule'
+            prefix:'33'
             destination:'france'
             gwlist:[
               {carrierid:'the_other_company'}
@@ -100,6 +101,7 @@ The steps to placing outbound call(s) are:
           336:
             _id:'rule:336'
             type:'rule'
+            prefix:'336'
             destination:'france_mobile'
             gwlist: [
               {carrierid:'the_other_company'}
@@ -109,6 +111,7 @@ The steps to placing outbound call(s) are:
           330112:
             _id:'rule:330112'
             type:'rule'
+            prefix:'330112'
             destination:'france_emergency'
             emergency:true
 
@@ -116,6 +119,7 @@ The steps to placing outbound call(s) are:
           33:
             _id:'rule:33'
             type:'rule'
+            prefix:'33'
             destination:'france'
             gwlist:[
               {source_registrant:true}

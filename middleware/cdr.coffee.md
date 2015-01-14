@@ -9,6 +9,13 @@
           data = res.body
 
           @logger.info "CDR: Channel Hangup Complete", billmsec: data.variable_billmsec
+          @statistics.add 'duration', data.variable_mduration
+          @statistics.add 'billable', data.variable_billmsec
+          @statistics.add 'progresss', data.variable_progressmsec
+          @statistics.add 'answer', data.variable_answermsec
+          @statistics.add 'wait', data.variable_waitmsec
+          @statistics.add 'progress_media', data.variable_progress_mediamsec
+          @statistics.add 'flow_bill', data.variable_flow_billmsec
 
 variable_mduration: # total duration
 variable_billmsec: # billable (connected)

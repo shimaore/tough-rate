@@ -13,12 +13,16 @@ Middleware
 ----------
 
       middleware = ->
+        @statistics.add 'incoming-calls'
+        @statistics.add ['incoming-calls',@rule?.prefix]
+
         send_response = (response) =>
           return @call.command 'respond', response
 
         @logger.info "CallHandler: starting."
 
         if @res.response?
+          @statistics.add ['immediate-response',@res.response]
           return send_response @res.response
 
 The route-set might not be modified anymore.
@@ -73,6 +77,8 @@ If a winner was already found simply return it.
 Call attempt.
 
               @logger.info "CallHandler: handling (next) gateway", gateway
+              @statistics.add 'call-attempts'
+              @statistics.add ['call-attempts',@rule?.prefix]
 
               destination = gateway.destination_number ? @res.destination
               attempt.call this, destination, gateway
@@ -80,6 +86,7 @@ Call attempt.
                 data = res.body
 
                 @logger.warn "CallHandler: FreeSwitch response: ", res
+                @statistics.add 'call-status'
 
 On CANCEL we get `variable_originate_disposition=ORIGINATOR_CANCEL` instead of a proper `last_bridge_hangup_cause`.
 On successful connection we also get `variable_originate_disposition=SUCCESS, variable_DIALSTATUS=SUCCESS`.
@@ -101,35 +108,53 @@ On successful connection we also get `variable_originate_disposition=SUCCESS, va
 
               .then (cause) =>
 
+                @statistics.add ['cause',cause]
+                @statistics.add ['cause-gw',cause,gateway.gwid]
+                @statistics.add ['cause-gw',cause,gateway.gwid,@rule?.prefix]
+                @statistics.add ['cause-carrier',cause,gateway.carrierid]
+                @statistics.add ['cause-carrier',cause,gateway.carrierid,@rule?.prefix]
+
                 if cause in ['NORMAL_CALL_CLEARING', 'SUCCESS']
 
                   @logger.info "CallHandler: successful call: #{cause} when routing #{destination} through #{JSON.stringify gateway}."
+                  @statistics.add 'connected-calls'
+                  @statistics.add ['connected-calls-gw',gateway.gwid]
+                  @statistics.add ['connected-calls-carrier',gateway.carrierid]
                   return gateway # Winner
 
                 else
 
                   @logger.info "CallHandler: call failed: #{cause} when routing #{destination} through #{JSON.stringify gateway}."
+                  @statistics.add 'failed-attempts'
+                  @statistics.add ['failed-attempts-gw',gateway.gwid]
+                  @statistics.add ['failed-attempts-gw',gateway.gwid,cause]
+                  @statistics.add ['failed-attempts-carrier',gateway.carrierid]
+                  @statistics.add ['failed-attempts-carrier',gateway.carrierid,cause]
                   return null # No winner yet
 
 However we do not propagate errors, since it would mean interrupting the call sequence. Since we didn't find any winner, we simply return `null`.
 
               .catch (error) =>
                 @logger.error 'Internal or FreeSwitch error (ignored, skipping to next gateway): ', error.toString()
+                @statistics.add 'gateway-skip'
                 null
 
             return
 
         it.catch (error) ->
           @logger.error "CallHandler: Caught internal error", error.toString()
+          @statistics.add 'internal-error'
           send_response '500'
           null
 
         .then (winner) ->
           if not winner?
             @logger.warn "CallHandler: No Route."
+            @statistics.add 'no-route'
             send_response '604'
           else
             @logger.info "CallHandler: the winning gateway was: #{JSON.stringify winner}"
+            @statistics.add 'route'
             @winner = winner
           null
 
