@@ -70,4 +70,3 @@ Route based on the route selected by the source, or using a default route.
 
 
     assert = require 'assert'
-    field_merger = require '../field_merger'
