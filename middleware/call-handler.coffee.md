@@ -103,7 +103,7 @@ On successful connection we also get `variable_originate_disposition=SUCCESS, va
 
                 if cause in ['NORMAL_CALL_CLEARING', 'SUCCESS']
 
-                  @logger.info "CallHandler: successful call: ", {cause}
+                  @logger.info "CallHandler: successful call: #{cause} when routing #{destination} through #{JSON.stringify gateway}."
                   return gateway # Winner
 
                 else
