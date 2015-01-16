@@ -447,42 +447,50 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
               Promise.resolve()
 
         it 'should route known destinations', (done) ->
+          ctx =
+            data:
+              'Channel-Destination-Number': '1236'
+              'Channel-Caller-ID-Number': '2346'
+            command: (c,v) ->
+              if c in ['set','export']
+                return Promise.resolve().bind this
+              v.should.equal '[]sofia/something-egress/sip:bar@foo'
+              c.should.equal 'bridge'
+              done()
+              Promise.resolve
+                body:
+                  variable_last_bridge_hangup_cause: 'NORMAL_CALL_CLEARING'
+
           ready.then ->
             provisioning.put _id:'number:1236',inbound_uri:'sip:bar@foo'
           .catch done
           .then ->
-            one_call
-              data:
-                'Channel-Destination-Number': '1236'
-                'Channel-Caller-ID-Number': '2346'
-              command: (c,v) ->
-                if c in ['set','export']
-                  return Promise.resolve().bind this
-                v.should.equal '[]sofia/something-egress/sip:bar@foo'
-                c.should.equal 'bridge'
-                done()
-                Promise.resolve
-                  body:
-                    variable_last_bridge_hangup_cause: 'NORMAL_CALL_CLEARING'
+            one_call ctx
+          .catch done
+          null
 
         it 'should route known destinations for specific sources', (done) ->
+          ctx =
+            data:
+              'Channel-Destination-Number': '336727'
+              'Channel-Caller-ID-Number': '2347'
+            command: (c,v) ->
+              if c in ['set','export']
+                return Promise.resolve().bind this
+              v.should.equal '[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800]sofia/something-egress/sip:336727@127.0.0.1:5068'
+              c.should.equal 'bridge'
+              done()
+              Promise.resolve
+                body:
+                  variable_last_bridge_hangup_cause: 'NORMAL_CALL_CLEARING'
+
           ready.then ->
             provisioning.put _id:'number:2347',outbound_route:'default'
-            .catch done
-            .then ->
-              one_call
-                data:
-                  'Channel-Destination-Number': '336727'
-                  'Channel-Caller-ID-Number': '2347'
-                command: (c,v) ->
-                  if c in ['set','export']
-                    return Promise.resolve().bind this
-                  v.should.equal '[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800]sofia/something-egress/sip:336727@127.0.0.1:5068'
-                  c.should.equal 'bridge'
-                  done()
-                  Promise.resolve
-                    body:
-                      variable_last_bridge_hangup_cause: 'NORMAL_CALL_CLEARING'
+          .catch done
+          .then ->
+            one_call ctx
+          .catch done
+          null
 
         it 'should route known routes', (done) ->
           ctx =
@@ -500,47 +508,51 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
                   variable_last_bridge_hangup_cause: 'NORMAL_CALL_CLEARING'
 
           one_call ctx, 'default'
-          return
+          null
 
         it 'should report errors', (done) ->
-          ready.then ->
-            ctx =
-              data:
-                'Channel-Destination-Number': '336927'
-                'Channel-Caller-ID-Number': '2349'
-              command: (c,v) ->
-                if c in ['set','export']
-                  return Promise.resolve().bind this
-                if c is 'bridge'
-                  Promise.reject new FreeSwitchError {}, reply: '-ERR I_TOLD_YOU_SO'
-                else
-                  c.should.equal 'respond'
-                  v.should.equal '604'
-                  done()
-                  Promise.resolve()
+          ctx =
+            data:
+              'Channel-Destination-Number': '336927'
+              'Channel-Caller-ID-Number': '2349'
+            command: (c,v) ->
+              if c in ['set','export']
+                return Promise.resolve().bind this
+              if c is 'bridge'
+                Promise.reject new FreeSwitchError {}, reply: '-ERR I_TOLD_YOU_SO'
+              else
+                c.should.equal 'respond'
+                v.should.equal '604'
+                done()
+                Promise.resolve()
 
+          ready.then ->
             one_call ctx, 'default'
+          .catch done
+          null
 
         it 'should report failed destinations', (done) ->
-          ready.then ->
-            ctx =
-              data:
-                'Channel-Destination-Number': '336927'
-                'Channel-Caller-ID-Number': '2349'
-              command: (c,v) ->
-                if c in ['set','export']
-                  return Promise.resolve().bind this
-                if c is 'bridge'
-                  Promise.resolve
-                    body:
-                      variable_last_bridge_hangup_cause: 'SOMETHING_HAPPENED'
-                else
-                  c.should.equal 'respond'
-                  v.should.equal '604'
-                  done()
-                  Promise.resolve()
+          ctx =
+            data:
+              'Channel-Destination-Number': '336927'
+              'Channel-Caller-ID-Number': '2349'
+            command: (c,v) ->
+              if c in ['set','export']
+                return Promise.resolve().bind this
+              if c is 'bridge'
+                Promise.resolve
+                  body:
+                    variable_last_bridge_hangup_cause: 'SOMETHING_HAPPENED'
+              else
+                c.should.equal 'respond'
+                v.should.equal '604'
+                done()
+                Promise.resolve()
 
+          ready.then ->
             one_call ctx, 'default'
+          .catch done
+          null
 
         it 'should route emergency', (done) ->
           ctx =
