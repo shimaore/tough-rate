@@ -31,6 +31,9 @@ We must flatten the list so that CallHandler can use it.
         @res.gateways = flatten @res.gateways
         @logger.info "Gateways after flatten", JSON.stringify @res.gateways
 
+      middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
+      return middleware
+
 Toolbox
 -------
 
@@ -42,3 +45,4 @@ Toolbox
     field_merger = require '../field_merger'
     Promise = require 'bluebird'
     {isArray} = require 'util'
+    pkg = require '../package.json'

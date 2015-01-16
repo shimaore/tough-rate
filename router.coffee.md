@@ -11,10 +11,11 @@ This is based on the calling number.
         if not @statistics?
           CaringBand = require 'caring-band'
           @statistics = new CaringBand()
-        @logger.info "ToughRateRouter #{pkg.name} #{pkg.version} ready."
+        @logger.info "ToughRateRouter #{pkg.name} #{pkg.version}: ready."
         @middlewares = []
 
       use: (middleware) ->
+        assert middleware.info?, "ToughRateRouter #{pkg.name} #{pkg.version}: middleware #{middleware} should have info."
         @middlewares.push middleware
 
       route: (call) ->
@@ -53,7 +54,7 @@ Manipulate the gateways list.
 
           finalize: (callback) ->
             if ctx.finalized()
-              ctx.logger.error "ToughRateRouter: `finalize` called when the route-set is already finalized"
+              ctx.logger.error "ToughRateRouter #{pkg.name} #{pkg.version}: `finalize` called when the route-set is already finalized"
               return
             ctx.res.finalized = true
             callback?()
@@ -68,12 +69,12 @@ Manipulate the gateways list.
               ctx.res.gateways = []
           attempt: (gateway) ->
             if ctx.finalized()
-              ctx.logger.error "ToughRateRouter: `attempt` called when the route-set is already finalized", gateway
+              ctx.logger.error "ToughRateRouter #{pkg.name} #{pkg.version}: `attempt` called when the route-set is already finalized", gateway
               return
             ctx.res.gateways.push gateway
           clear: ->
             if ctx.finalized()
-              ctx.logger.error "ToughRateRouter: `clear` called when the route-set is already finalized", gateway
+              ctx.logger.error "ToughRateRouter #{pkg.name} #{pkg.version}: `clear` called when the route-set is already finalized", gateway
               return
             ctx.res.gateways = []
 
@@ -107,17 +108,20 @@ Manipulate the gateways list.
         it = Promise.resolve()
         it = it.bind ctx
         for middleware in @middlewares
-          do (middleware) ->
+          do (middleware) =>
             it = it.then ->
               middleware.call ctx, ctx
+            .catch (error) ->
+              @logger.error "ToughRateRouter #{pkg.name} #{pkg.version}: middleware #{middleware.info} failure", error.toString()
         it
         .catch (error) =>
-          @logger.error "ToughRateRouter middleware failure:", error.toString()
+          @logger.error "ToughRateRouter #{pkg.name} #{pkg.version}: middleware failure", error.toString()
           throw error
 
 Instrument for testing.
 
         .then ->
+          @logger.info "ToughRateRouter #{pkg.name} #{pkg.version}: completed."
           ctx
 
 Toolbox

@@ -41,6 +41,9 @@ Middleware definition
         .then (gws) =>
           @res.gateways = gws
 
+      middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
+      return middleware
+
     plugin.title = 'Default `carrierid` plugin'
     plugin.description = "Injects the gateways described by the `carrierid` into the router's list of gateways."
     module.exports = plugin
@@ -51,3 +54,4 @@ Toolbox
     assert = require 'assert'
     promise_all = require '../promise-all'
     field_merger = require '../field_merger'
+    pkg = require '../package.json'

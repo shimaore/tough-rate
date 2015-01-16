@@ -17,9 +17,13 @@ Default `gwid` router plugin
         .then (gws) =>
           @res.gateways = gws
 
+      middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
+      return middleware
+
     plugin.title = 'Default `gwid` router plugin'
     plugin.description = "Injects the gateway described by the `gwid` into the list of gateways."
     module.exports = plugin
 
     assert = require 'assert'
     promise_all = require '../promise-all'
+    pkg = require '../package.json'

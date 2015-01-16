@@ -19,3 +19,8 @@ This is a dedicated bit of code that should be inserted before `ruleset` to forc
           if doc.global_route?
             @clear()
             @attempt doc.global_route
+
+      middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
+      return middleware
+
+    pkg = require '../package.json'

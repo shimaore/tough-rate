@@ -50,6 +50,10 @@ The `destination` field in a `emergency` record historically is the target, dest
           delete rule.gwlist
           @res.rule = rule
 
+      middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
+      return middleware
+
 Toolbox
 
     assert = require 'assert'
+    pkg = require '../package.json'

@@ -194,6 +194,7 @@ Sometimes we'll be provided with a pre-built URI (emergency calls, loopback call
 Plugin
 ------
 
+      middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
       return middleware
 
 Field Mapping
@@ -220,3 +221,4 @@ Toolbox
 
     Promise = require 'bluebird'
     assert = require 'assert'
+    pkg = require '../package.json'

@@ -9,3 +9,8 @@
           @respond '484'
           @logger.warn 'Missing or invalid destination', @data
           return
+
+      middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
+      return middleware
+
+    pkg = require '../package.json'

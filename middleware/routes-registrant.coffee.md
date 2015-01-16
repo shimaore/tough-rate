@@ -58,6 +58,9 @@ This plugin provides `registrant_host` as a gateway.
         .then (gws) =>
           @res.gateways = gws
 
+      middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
+      return middleware
+
     plugin.title = 'Registrant router plugin'
     plugin.description = "A router plugin that injects the source's `registrant_host` as a gateway."
     plugin.build_ref = build_ref
@@ -68,3 +71,4 @@ Toolbox
 
     assert = require 'assert'
     promise_all = require '../promise-all'
+    pkg = require '../package.json'

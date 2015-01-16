@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "prepublish": "coffee -m -c *.coffee.md middleware/*.coffee.md",
+    "pretest": "npm install",
     "test": "mocha",
     "clean": "rm -rf *.js *.js.map middleware/*.js middleware/*.js.map node_modules/ npm-debug.log"
   },

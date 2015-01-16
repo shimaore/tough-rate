@@ -23,6 +23,10 @@ Default call post-processing.
         @on 'NETWORK_OUT_OF_ORDER',     mark_gateway_as_suspicious # 502
         @on 'NORMAL_TEMPORARY_FAILURE', mark_gateway_as_suspicious # 503
 
+      middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
+      return middleware
+
 Toolbox
 
     assert = require 'assert'
+    pkg = require '../package.json'

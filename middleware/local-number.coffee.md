@@ -15,6 +15,10 @@ Local number middleware
         .catch (error) =>
           @logger.info "Checking whether #{@destination} is local:", error
 
+      middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
+      return middleware
+
 Toolbox
 
     assert = require 'assert'
+    pkg = require '../package.json'

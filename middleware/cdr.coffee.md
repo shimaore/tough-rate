@@ -17,6 +17,11 @@
           @statistics.add 'progress_media', data.variable_progress_mediamsec
           @statistics.add 'flow_bill', data.variable_flow_billmsec
 
+      middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
+      return middleware
+
+    pkg = require '../package.json'
+
 variable_mduration: # total duration
 variable_billmsec: # billable (connected)
 variable_progressmsec: # progress
