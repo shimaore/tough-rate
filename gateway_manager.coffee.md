@@ -104,6 +104,8 @@ The gateway manager provides services to the call handler.
         .then ({rows}) =>
           for row in rows when row.value?.address?
             do (row) => @_merge_gateway_row row
+        .catch (error) ->
+          @logger.error "GatewayManager reevaluate_gateways: #{error}"
 
       _merge_carrier_row: (row) ->
         @logger.info "GatewayManager merge-carrier-row #{JSON.stringify row}"
