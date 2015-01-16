@@ -3,9 +3,9 @@
 
       middleware = ->
 
-        @call.trace true
         @call.once 'CHANNEL_HANGUP_COMPLETE'
         .then (res) =>
+          @logger.info "CDR: Channel Hangup Complete"
           data = res.body
 
           @logger.info "CDR: Channel Hangup Complete", billmsec: data.variable_billmsec
@@ -16,6 +16,8 @@
           @statistics.add 'wait', data.variable_waitmsec
           @statistics.add 'progress_media', data.variable_progress_mediamsec
           @statistics.add 'flow_bill', data.variable_flow_billmsec
+
+        null
 
       middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
       return middleware

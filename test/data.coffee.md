@@ -204,6 +204,8 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             'variable_sip_h_X-CCNQ3-Routing': emergency_ref
 
       one_call = (ctx,outbound_route) ->
+        ctx.once ?= ->
+          then: ->
         ready.then ->
           logger.info "Building router."
           router = new ToughRateRouter logger
@@ -224,6 +226,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           router.use (require '../middleware/routes-carrierid').call us, router
           router.use (require '../middleware/routes-registrant').call us, router
           router.use (require '../middleware/flatten').call us, router
+          router.use (require '../middleware/cdr').call us, router
           router.use (require '../middleware/call-handler').call us, router
           logger.info "Sending one_call to router."
           router.route ctx

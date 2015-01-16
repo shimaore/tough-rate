@@ -85,7 +85,7 @@ Call attempt.
               .then (res) =>
                 data = res.body
 
-                @logger.warn "CallHandler: FreeSwitch response: ", res
+                @logger.debug "CallHandler: FreeSwitch response: ", res
                 @statistics.add 'call-status'
 
 On CANCEL we get `variable_originate_disposition=ORIGINATOR_CANCEL` instead of a proper `last_bridge_hangup_cause`.

@@ -60,6 +60,7 @@ TODO: add Node.js clustering
       'routes-carrierid'
       'routes-registrant'
       'flatten'
+      'cdr'
       'call-handler'
     ]
 
