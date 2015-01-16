@@ -131,6 +131,7 @@ The steps to placing outbound call(s) are:
     GatewayManager = require '../gateway_manager'
     ToughRateRouter = require '../router'
     logger = require 'winston'
+    logger.transports.Console.level = 'error'
     Promise = require 'bluebird'
 
     class FreeSwitchError extends Error
