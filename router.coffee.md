@@ -101,7 +101,7 @@ Manipulate the gateways list.
           response_handlers: new EventEmitter()
           on: (response,handler) ->
             ctx.response_handlers.on response, ->
-              handler.call this
+              handler.apply this, arguments
 
         }
 
