@@ -66,7 +66,7 @@ Route based on the route selected by the source, or using a default route.
           @res.rule = rule
 
         .catch (error) =>
-          @logger.error "Ruleset middleware failed:", error
+          @logger.error "Ruleset middleware failed: #{error}"
 
       middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
       return middleware

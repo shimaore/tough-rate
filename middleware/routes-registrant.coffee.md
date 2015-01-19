@@ -57,6 +57,8 @@ This plugin provides `registrant_host` as a gateway.
         promise_all @res.gateways, (x) => update.call this, x, ref
         .then (gws) =>
           @res.gateways = gws
+        .catch (error) =>
+          @logger.error "Routes Registrant: #{error}"
 
       middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
       return middleware

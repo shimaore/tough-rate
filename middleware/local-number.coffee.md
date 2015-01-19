@@ -13,7 +13,7 @@ Local number middleware
         .then (doc) =>
           @sendto doc.inbound_uri
         .catch (error) =>
-          @logger.info "Checking whether #{@destination} is local:", error
+          @logger.info "Checking whether #{@destination} is local: #{error}"
 
       middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
       return middleware

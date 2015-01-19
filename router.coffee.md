@@ -116,7 +116,6 @@ Manipulate the gateways list.
         it
         .catch (error) =>
           @logger.error "ToughRateRouter #{pkg.name} #{pkg.version}: middleware failure", error.toString()
-          throw error
 
 Instrument for testing.
 
