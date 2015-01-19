@@ -15,6 +15,9 @@ First we must sort the carrier entries using the local hostname preference.
           if gateway.local_gateway_first and host? and gateway.host is host
             gateway.priority += 0.5
 
+          gateway.name ?= "carrier #{entry.carrierid}"
+          # TODO Lookup faulty/suspicious status and skip in that case (i.e. set priority to 0)
+
         gateways.sort (a,b) -> a.priority - b.priority
 
 And select only `try` entries where specified.

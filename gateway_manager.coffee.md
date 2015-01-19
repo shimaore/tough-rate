@@ -178,6 +178,7 @@ Gateway temporary disable
 Disable a gateway temporarily, for example because it is rejecting too many calls.
 
       mark_gateway_as_faulty: (name) ->
+        assert name?, 'GatewayManager mark-gateway-as-faulty: name is required'
         @logger.error "GatewayManager mark-gateway-as-faulty: #{name}."
         status = @gateway_status[name] ?= new Status()
         status.mark_as_faulty()
@@ -185,6 +186,7 @@ Disable a gateway temporarily, for example because it is rejecting too many call
 Mark a gateway as suspicious.
 
       mark_gateway_as_suspicious: (name) ->
+        assert name?, 'GatewayManager mark-gateway-as-suspicious: name is required'
         @logger.error "GatewayManager mark-gateway-as-suspicious: #{name}."
         status = @gateway_status[name] ?= new Status()
         status.mark_as_suspicious()

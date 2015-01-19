@@ -3,6 +3,8 @@ Default `gwid` router plugin
 
     update = (gateway_manager,entry) ->
       return entry unless entry.gwid?
+      entry.name ?= entry.gwid
+      # TODO Add lookup for gateway-faulty or suspicious, and skip the resolution in that case.
       gateway_manager.resolve_gateway entry.gwid
 
     plugin = ->
