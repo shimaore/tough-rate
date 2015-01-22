@@ -15,10 +15,13 @@ This is a dedicated bit of code that should be inserted before `ruleset` to forc
         return unless endpoint?
 
         provisioning.get "endpoint:#{endpoint}"
-        .then (doc) ->
+        .then (doc) =>
           if doc.global_route?
             @clear()
             @attempt doc.global_route
+        .catch (error) =>
+          @logger.error "Override-route-from-endpoint: #{error}"
+
 
       middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
       return middleware
