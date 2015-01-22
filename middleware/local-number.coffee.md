@@ -11,6 +11,8 @@ Local number middleware
         @logger.info "Checking whether #{@destination} is local."
         provisioning.get "number:#{@destination}"
         .then (doc) =>
+          return if doc.disabled
+
           @sendto doc.inbound_uri
         .catch (error) =>
           @logger.info "Checking whether #{@destination} is local: #{error}"

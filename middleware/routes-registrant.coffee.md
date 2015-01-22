@@ -19,6 +19,8 @@ This plugin provides `registrant_host` as a gateway.
 
       ref
       .then (source_doc) =>
+        return if source_doc.disabled
+
         result = []
         if source_doc.address?
           address = source_doc.address
