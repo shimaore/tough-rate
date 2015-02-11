@@ -20,7 +20,7 @@ Do not attempt to replicate CouchDB-special documents (especially `_design` docu
 
 Since (for now) we do not enforce changes to respect replication filters, use the `_id` to guess the doc type.
 
-            replicate_types = ['number','gateway','carrier','ruleset','destination','emergency','host']
+            replicate_types = ['config','number','gateway','carrier','ruleset','destination','emergency','host']
 
             type_from_id = doc._id.split(':')[0]
 
