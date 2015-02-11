@@ -97,6 +97,8 @@ The steps to placing outbound call(s) are:
               {carrierid:'the_other_company'}
               {gwid:'backup'}
             ]
+            attrs:
+              cdr: 'foo-bar'
 
           336:
             _id:'rule:336'
@@ -502,6 +504,26 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
               if c in ['set','export']
                 return Promise.resolve().bind this
               v.should.equal '[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800]sofia/something-egress/sip:3368267@127.0.0.1:5068'
+              c.should.equal 'bridge'
+              done()
+              Promise.resolve
+                body:
+                  variable_last_bridge_hangup_cause: 'NORMAL_CALL_CLEARING'
+
+          one_call ctx, 'default'
+          null
+
+        it 'should insert CDR data', (done) ->
+          ctx =
+            data:
+              'Channel-Destination-Number': '331234'
+              'Channel-Caller-ID-Number': '2348'
+            command: (c,v) ->
+              if c is 'set' and m = v.match /^sip_h_X-CCNQ3-Attrs=(.*)$/
+                m[1].should.equal '{"cdr":"foo-bar"}'
+              if c in ['set','export']
+                return Promise.resolve().bind this
+              v.should.equal '[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800]sofia/something-egress/sip:331234@127.0.0.1:5068'
               c.should.equal 'bridge'
               done()
               Promise.resolve

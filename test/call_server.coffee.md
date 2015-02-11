@@ -105,6 +105,8 @@ Server (Unit Under Test)
             gwlist: [
               {gwid:'gw1'}
             ]
+            attrs:
+              cdr: 'foo-bar'
           }
           {
             _id:'rule:330112'

@@ -17,6 +17,10 @@
           @statistics.add 'progress_media', data.variable_progress_mediamsec
           @statistics.add 'flow_bill', data.variable_flow_billmsec
 
+Compatibility layer for CCNQ3 -- remove once the LCR generates its own CDRs.
+
+        @set 'sip_h_X-CCNQ3-Attrs', JSON.stringify @res.rule.attrs
+
         null
 
       middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
