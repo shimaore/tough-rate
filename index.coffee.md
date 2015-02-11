@@ -31,7 +31,7 @@ Since (for now) we do not enforce changes to respect replication filters, use th
 
 Make sure we're replicating a somewhat-consistent document though.
 
-            if not doc.type? or doc.type isnt type_from_id or not doc[doc.type]?
+            if not doc.type? or doc.type isnt type_from_id
               return false
 
 We only replicate some documents types, not all of them.
