@@ -1,6 +1,7 @@
     @Router = require './router'
     @GatewayManager = require './gateway_manager'
     @CallServer = require './call_server'
+    pkg = require './package.json'
 
     {p_fun} = require 'coffeescript-helpers'
 
@@ -9,6 +10,7 @@ The design document that must be installed on the master databases in order for 
     @couch =
       _id: "_design/tough-rate-source"
       language: "javascript"
+      version: pkg.version
 
       filters:
         replication: p_fun (doc,req) ->
