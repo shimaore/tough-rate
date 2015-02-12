@@ -19,7 +19,10 @@
 
 Compatibility layer for CCNQ3 -- remove once the LCR generates its own CDRs.
 
-        @set 'sip_h_X-CCNQ3-Attrs', JSON.stringify @res.rule.attrs
+        attrs = {}
+        for own k,v of @res.attrs when v?
+          attrs[k] = v
+        @set 'sip_h_X-CCNQ3-Attrs', JSON.stringify attrs
 
         null
 

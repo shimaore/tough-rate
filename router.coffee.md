@@ -46,6 +46,7 @@ This is based on the calling number.
             winner: null
             set: {}
             export: {}
+            attrs: {}
 
           redirect: (destination) ->
             ctx.res.destination = destination
@@ -90,6 +91,14 @@ Manipulate the gateways list.
             else
               for own n,v of name
                 ctx.res.set[n] = null
+
+          attr: (name,value) ->
+            return unless name?
+            if 'string' is typeof key
+              ctx.res.attrs[name] = value
+            else
+              for own n,v of name
+                ctx.res.attrs[n] = v
 
           export: (name,value) ->
             if 'string' is typeof name

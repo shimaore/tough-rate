@@ -43,6 +43,8 @@ The following operations are available to modify the responses:
 
     @on           How to handle specific error codes (upon call attempts); the callback receives the gateway description.
 
+    @attr         Add value to attributes (recorded in CDRs)
+
 The following fields are available to late middleware (i.e. after the call attempts are processed):
 
     @res.response     The response set by `respond` if any.

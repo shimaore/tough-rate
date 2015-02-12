@@ -64,6 +64,7 @@ Route based on the route selected by the source, or using a default route.
             @logger.warn 'Missing gwlist', rule
 
           @res.rule = rule
+          @attr rule.attrs
 
         .catch (error) =>
           @logger.error "Ruleset middleware failed: #{error}"

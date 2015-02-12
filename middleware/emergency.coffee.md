@@ -49,6 +49,7 @@ The `destination` field in a `emergency` record historically is the target, dest
           @res.gateways = rule.gwlist
           delete rule.gwlist
           @res.rule = rule
+          @attr emergency: true
 
       middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
       return middleware

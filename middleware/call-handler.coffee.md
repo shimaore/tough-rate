@@ -156,6 +156,7 @@ However we do not propagate errors, since it would mean interrupting the call se
             @logger.info "CallHandler: the winning gateway was: #{JSON.stringify winner}"
             @statistics.add 'route'
             @winner = winner
+            @attr @winner.attrs
           null
 
         return it
