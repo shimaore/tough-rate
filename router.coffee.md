@@ -80,12 +80,14 @@ Manipulate the gateways list.
             ctx.res.gateways = []
 
           set: (name,value) ->
+            return unless name?
             if 'string' is typeof name
               ctx.res.set[name] = value
             else
               for own n,v of name
                 ctx.res.set[n] = v
           unset: (name) ->
+            return unless name?
             if 'string' is typeof name
               ctx.res.set[name] = null
             else
@@ -101,6 +103,7 @@ Manipulate the gateways list.
                 ctx.res.attrs[n] = v
 
           export: (name,value) ->
+            return unless name?
             if 'string' is typeof name
               ctx.res.export[name] = value
             else
