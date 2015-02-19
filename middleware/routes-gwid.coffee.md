@@ -15,7 +15,14 @@ Default `gwid` router plugin
         if @finalized()
           @logger.info 'Routes GwID: already finalized.'
           return
-        promise_all @res.gateways, (x) -> update gateway_manager, x
+        promise_all @res.gateways, (x) ->
+          Promise.resolve()
+          .then ->
+            update gateway_manager, x
+          .then (r) ->
+            for gw in r
+              gw.destination_number ?= x.destination_number if x.destination_number?
+            r
         .then (gws) =>
           @res.gateways = gws
 
@@ -27,5 +34,6 @@ Default `gwid` router plugin
     module.exports = plugin
 
     assert = require 'assert'
+    Promise = require 'bluebird'
     promise_all = require '../promise-all'
     pkg = require '../package.json'

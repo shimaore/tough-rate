@@ -40,7 +40,14 @@ Middleware definition
         if @finalized()
           @logger.info "Routes CarrierID: already finalized."
           return
-        promise_all @res.gateways, (x) -> update gateway_manager, host, x
+        promise_all @res.gateways, (x) ->
+          Promise.resolve()
+          .then ->
+            update gateway_manager, host, x
+          .then (r) ->
+            for gw in r
+              gw.destination_number ?= x.destination_number if x.destination_number?
+            r
         .then (gws) =>
           @res.gateways = gws
 
@@ -55,6 +62,7 @@ Toolbox
 -------
 
     assert = require 'assert'
+    Promise = require 'bluebird'
     promise_all = require '../promise-all'
     field_merger = require '../field_merger'
     pkg = require '../package.json'
