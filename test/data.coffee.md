@@ -86,6 +86,11 @@ The steps to placing outbound call(s) are:
           type:'emergency'
           destination:'33156'
 
+        '330112#paris':
+          _id:'emergency:330112#paris'
+          type:'emergency'
+          destination:['33157','33158']
+
       rules:
         default:
           33:
@@ -406,6 +411,30 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             gws[0].should.have.property 'gwid', 'gw3'
             gws.should.have.property 1
             gws[1].should.have.property 'gwid', 'backup'
+
+        it 'should route emergency numbers with multiple destinations', ->
+          ready.then ->
+            router = new ToughRateRouter logger
+            us =
+              gateway_manager: gm
+              options: {provisioning,ruleset_of,default_outbound_route:'default'}
+            router.use (require '../middleware/ruleset').call us, router
+            router.use (require '../middleware/emergency').call us, router
+            router.use (require '../middleware/routes-gwid').call us, router
+            router.use (require '../middleware/routes-carrierid').call us, router
+            router.use (require '../middleware/flatten').call us, router
+            router.route call_ '336718', '330112', 'paris'
+          .then (ctx) ->
+            ctx.res.should.have.property 'destination', '330112'
+            gws = ctx.res.gateways
+            gws.should.be.an.instanceOf Array
+            gws.should.have.length 2
+            gws.should.have.property 0
+            gws[0].should.have.property 'destination_number', '33157'
+            gws[0].should.have.property 'gwid', 'gw3'
+            gws.should.have.property 1
+            gws[1].should.have.property 'destination_number', '33158'
+            gws[1].should.have.property 'gwid', 'gw3'
 
       describe 'The call handler', ->
 
