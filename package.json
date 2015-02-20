@@ -14,7 +14,7 @@
   "devDependencies": {
     "chai": "^1.10.0",
     "chai-as-promised": "^4.1.1",
-    "coffee-script": "^1.8.0",
+    "coffee-script": "^1.9.1",
     "memdown": "^1.0.0",
     "mocha": "^2.0.1",
     "pouchdb": "^3.1.0",
@@ -23,7 +23,7 @@
   "dependencies": {
     "bluebird": "^2.3.11",
     "caring-band": "^1.2.0",
-    "coffeescript-helpers": "^1.0.4",
+    "coffeescript-helpers": "^2.0.0",
     "esl": "^2.3.0",
     "winston": "^0.8.3"
   },
