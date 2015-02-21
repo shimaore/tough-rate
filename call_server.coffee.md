@@ -22,7 +22,7 @@ TODO: add Node.js clustering
 
         @gateway_manager.init()
         .then =>
-          @server.listen port
+          @server.listen @port
         .catch (error) =>
           @logger.error "CallServer runtime error: #{error}"
 
