@@ -1,6 +1,6 @@
 {
   "name": "tough-rate",
-  "version": "5.7.2",
+  "version": "5.7.3",
   "description": "Event-socket-based LCR engine for FreeSwitch",
   "main": "index.js",
   "scripts": {
