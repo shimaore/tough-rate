@@ -18,7 +18,7 @@ TODO: add Node.js clustering
         router = @options.router ? @default_router @options.use
         @server = FS.server ->
           router.route this
-        @logger.info "CallServer #{pkg.name} #{pkg.version} starting on port #{port}."
+        @logger.info "CallServer #{pkg.name} #{pkg.version} starting on port #{@port}."
 
         @gateway_manager.init()
         .then =>
