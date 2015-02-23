@@ -15,12 +15,13 @@ The gateway manager provides services to the call handler.
 
     module.exports = class GatewayManager
 
-      constructor: (@provisioning,@sip_domain_name,@logger = require 'winston') ->
+      constructor: (@provisioning,@sip_domain_name,@logger) ->
         @carriers = {}
         @gateways = {}
         @gateway_status = {}
         assert @provisioning, "GatewayManager: provisioning DB is required"
         assert @sip_domain_name, "GatewayManager: sip_domain_name is required"
+        assert @logger, "GatewayManager: logger is required"
         @default_parameters = {}
         for own k,v of default_parameters
           @default_parameters[k] ?= v

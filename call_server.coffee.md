@@ -6,9 +6,9 @@ TODO: add Node.js clustering
     module.exports = class CallServer
       constructor: (@port,@options) ->
         # `host` is not required (carrier-id will simply not sort using it if it's not present).
-        for name in 'provisioning sip_domain_name ruleset_of profile'.split ' '
+        for name in 'provisioning sip_domain_name ruleset_of profile logger'.split ' '
           assert @options[name]?, "CallServer: options.#{name} is required"
-        @logger = @options.logger ? require 'winston'
+        @logger = @options.logger
         @statistics = @options.statistics
         if not @statistics?
           CaringBand = require 'caring-band'
