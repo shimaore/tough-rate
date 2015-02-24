@@ -26,17 +26,6 @@ Note that the present package's `CallServer` module provides a default router eq
     router.use (require './middleware/flatten')()
     router.use (require './middleware/call-handler') options.profile
 
-Architecture
-============
-
-- some server-management piece (daemon, forever, etc.)
-- clusterized, respawn children
-- web interface for management, notifications, stats
-- CDRs
-- gateway management; alerting
-...
-
-
 Controlling Records
 ===================
 
