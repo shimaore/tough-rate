@@ -21,6 +21,9 @@ TODO: add Node.js clustering
         @logger.info "CallServer #{pkg.name} #{pkg.version} starting on port #{@port}."
 
         @gateway_manager.init()
+        .catch (error) =>
+          @logger.error "CallServer startup error: Gateway Manager failed: #{error}, bailing out."
+          throw error
         .then =>
           @server.listen @port
         .catch (error) =>
