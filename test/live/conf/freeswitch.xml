@@ -71,7 +71,9 @@
     <context name="lcr">
       <extension name="lcr">
         <condition field="destination_number" expression="^\d+$">
+          <action application="set" data="socket_resume=true"/>
           <action application="socket" data="172.17.42.1:7002 async full"/>
+          <action application="respond" data="500 socket failure"/>
         </condition>
       </extension>
     </context>
