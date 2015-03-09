@@ -64,6 +64,7 @@ Manipulate the gateways list.
           sendto: (uri) ->
             ctx.finalize ->
               ctx.res.gateways = [{uri}]
+              ctx.res.gateways[0]
           respond: (v) ->
             ctx.finalize ->
               ctx.res.response = v

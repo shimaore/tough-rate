@@ -37,7 +37,7 @@ The following operations are available to modify the responses:
 
     @attempt      Add a gateway to the route-set.
     @finalize     Indicate that no more modifications of the route-set will be allowed.
-    @sendto       Set the route-set to a single, final destination URI; the route-set is finalized.
+    @sendto       Set the route-set to a single, final destination URI, and returns that gateway; the route-set is finalized.
     @respond      Respond with a (numeric) error code; the route-set is cleared and finalised.
     @finalized()  Indicates whether the route-set has been finalized.
 
