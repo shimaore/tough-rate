@@ -124,11 +124,13 @@ Manipulate the gateways list.
           do (middleware) =>
             it = it.then ->
               middleware.call ctx, ctx
-            .catch (error) ->
+            .catch (error) =>
               @logger.error "ToughRateRouter #{pkg.name} #{pkg.version}: middleware #{middleware.info} failure", error.toString()
+              null
         it
         .catch (error) =>
           @logger.error "ToughRateRouter #{pkg.name} #{pkg.version}: middleware failure", error.toString()
+          null
 
 Instrument for testing.
 
