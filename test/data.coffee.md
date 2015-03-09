@@ -3,12 +3,13 @@ The steps to placing outbound call(s) are:
 - from that rule's gwlist, build a single list of unique gateways we will attempt in order
 - place the calls
 
+    sip_domain_name = 'phone.local'
     dataset_1 =
       gateways:
         gw1:
           _id:'gateway:phone.local:gw1'
           type:'gateway'
-          sip_domain_name:'phone.local'
+          sip_domain_name: sip_domain_name
           gwid:'gw1'
           address:'127.0.0.1:5066'
           carrierid:'the_phone_company'
@@ -17,7 +18,7 @@ The steps to placing outbound call(s) are:
         gw2:
           _id:'gateway:phone.local:gw2'
           type:'gateway'
-          sip_domain_name:'phone.local'
+          sip_domain_name: sip_domain_name
           gwid:'gw2'
           address:'127.0.0.1:5067'
           carrierid:'the_phone_company'
@@ -26,7 +27,7 @@ The steps to placing outbound call(s) are:
         gw3:
           _id:'gateway:phone.local:gw3'
           type:'gateway'
-          sip_domain_name:'phone.local'
+          sip_domain_name: sip_domain_name
           gwid:'gw3'
           address:'127.0.0.1:5068'
           carrierid:'the_other_company'
@@ -35,7 +36,7 @@ The steps to placing outbound call(s) are:
         gw4:
           _id:'gateway:phone.local:gw4'
           type:'gateway'
-          sip_domain_name:'phone.local'
+          sip_domain_name: sip_domain_name
           gwid:'gw4'
           address:'127.0.0.1:5069'
           carrierid:'the_other_company'
@@ -46,14 +47,14 @@ The steps to placing outbound call(s) are:
           type:'gateway'
           gwid:'backup'
           address:'127.0.0.1:5070'
-          sip_domain_name:'phone.local'
+          sip_domain_name: sip_domain_name
           gwid:'backup'
 
       carriers:
         the_phone_company:
           _id:'carrier:phone.local:the_phone_company'
           type:'carrier'
-          sip_domain_name:'phone.local'
+          sip_domain_name: sip_domain_name
           carrierid:'the_phone_company'
           progress_timeout: 20
 
@@ -67,14 +68,14 @@ The steps to placing outbound call(s) are:
         default:
           _id:'ruleset:phone.local:default'
           type:'ruleset'
-          sip_domain_name:'phone.local'
+          sip_domain_name: sip_domain_name
           groupid:'default'
           title:'The default ruleset'
           database: 'the_default_ruleset'
         registrant:
           _id:'ruleset:phone.local:registrant'
           type:'ruleset'
-          sip_domain_name:'phone.local'
+          sip_domain_name: sip_domain_name
           groupid:'registrant'
           title:'The registrant ruleset'
           database: 'the_registrant_ruleset'
@@ -286,7 +287,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             provisioning.put _id:'number:1234',inbound_uri:'sip:foo@bar'
           .then ->
             router = new ToughRateRouter logger
-            us = options: {provisioning,ruleset_of}
+            us = options: {provisioning,ruleset_of,sip_domain_name}
             router.use (require '../middleware/local-number').call us, router
             router.use (require '../middleware/ruleset').call us, router
             router.use (require '../middleware/flatten').call us, router
@@ -299,6 +300,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             gws.should.have.length 1
             gws.should.have.property 0
             gws[0].should.have.property 'uri', 'sip:foo@bar'
+            gws[0].should.not.have.property 'headers'
 
         it 'should route registrant_host directly (adding default port)', ->
           ready.then ->
