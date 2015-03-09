@@ -15,6 +15,7 @@
             info: ->
           statistics:
             add: ->
+            emit: ->
           call:
             command: (command,arg) ->
               command.should.eql 'respond'

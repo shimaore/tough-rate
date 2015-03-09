@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "bluebird": "^2.3.11",
-    "caring-band": "^1.2.0",
+    "caring-band": "^1.3.0",
     "coffeescript-helpers": "^2.0.0",
     "esl": "^3.0.0",
     "winston": "^0.8.3"

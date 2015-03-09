@@ -22,10 +22,14 @@ Middleware
 
 The following fields are available as input:
 
-    @data         Data provided by CouchDB
+    @data         Data provided by FreeSwitch
     @source       The originating number (caller)
     @destination  The (original) destination number (callee)
     @req.header() Get extra SIP headers (`variable_sip_h`)
+
+The following attributes are also available:
+
+    @call         The current `esl` `FreeSwitchResponse` object.
 
 The following operations are available to modify the responses:
 

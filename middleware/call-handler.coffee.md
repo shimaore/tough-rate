@@ -15,6 +15,11 @@ Middleware
       middleware = ->
         @statistics.add 'incoming-calls'
         @statistics.add ['incoming-calls',@rule?.prefix]
+        @statistics.emit 'call',
+          state: 'incoming-call'
+          call: @call.uuid
+          source: @source
+          destination: @destination
 
         send_response = (response) =>
           return @call.command 'respond', response
@@ -23,6 +28,11 @@ Middleware
 
         if @res.response?
           @statistics.add ['immediate-response',@res.response]
+          @statistics.emit 'call',
+            state: 'immediate-response'
+            call: @call.uuid
+            source: @source
+            destination: @destination
           return send_response @res.response
 
 The route-set might not be modified anymore.
@@ -79,6 +89,11 @@ Call attempt.
               @logger.info "CallHandler: handling (next) gateway", gateway
               @statistics.add 'call-attempts'
               @statistics.add ['call-attempts',@rule?.prefix]
+              @statistics.emit 'call',
+                state: 'call-attempt'
+                call: @call.uuid
+                source: @source
+                destination: @destination
 
               destination = gateway.destination_number ? @res.destination
               attempt.call this, destination, gateway
