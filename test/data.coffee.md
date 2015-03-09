@@ -302,6 +302,27 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             gws[0].should.have.property 'uri', 'sip:foo@bar'
             gws[0].should.not.have.property 'headers'
 
+        it 'should route local numbers with account', ->
+          ready.then ->
+            provisioning.put _id:'number:1432',inbound_uri:'sip:foo@bar',account:'foo_bar'
+          .then ->
+            router = new ToughRateRouter logger
+            us = options: {provisioning,ruleset_of,sip_domain_name}
+            router.use (require '../middleware/local-number').call us, router
+            router.use (require '../middleware/ruleset').call us, router
+            router.use (require '../middleware/flatten').call us, router
+            router.route call_ '3216', '1432'
+          .then (ctx) ->
+            ctx.should.have.property 'res'
+            ctx.res.should.have.property 'gateways'
+            gws = ctx.res.gateways
+            gws.should.be.an.instanceOf Array
+            gws.should.have.length 1
+            gws.should.have.property 0
+            gws[0].should.have.property 'uri', 'sip:foo@bar'
+            gws[0].should.have.property 'headers'
+            gws[0].headers.should.deep.equal 'P-Charge-Info':'sip:foo_bar@phone.local'
+
         it 'should route registrant_host directly (adding default port)', ->
           ready.then ->
             provisioning.put _id:'number:3213',registrant_host:'foo',registrant_password:'badabing'
