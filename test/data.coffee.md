@@ -205,12 +205,13 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
         gm.set 'progress_timeout', 4
         gm.init()
 
-      call_ = (source,destination,emergency_ref) ->
+      call_ = (source,destination,emergency_ref,ccnq_to_e164) ->
         call =
           data:
             'Channel-Caller-ID-Number': source
             'Channel-Destination-Number': destination
             'variable_sip_h_X-CCNQ3-Routing': emergency_ref
+            'variable_ccnq_to_e164': ccnq_to_e164
 
       one_call = (ctx,outbound_route) ->
         ctx.once ?= ->
@@ -292,6 +293,27 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             router.use (require '../middleware/ruleset').call us, router
             router.use (require '../middleware/flatten').call us, router
             router.route call_ '3213', '1234'
+          .then (ctx) ->
+            ctx.should.have.property 'res'
+            ctx.res.should.have.property 'gateways'
+            gws = ctx.res.gateways
+            gws.should.be.an.instanceOf Array
+            gws.should.have.length 1
+            gws.should.have.property 0
+            gws[0].should.have.property 'uri', 'sip:foo@bar'
+            gws[0].should.not.have.property 'headers'
+
+        it 'should route ccnq_to_164', ->
+          ready.then ->
+            provisioning.put _id:'number:1244',inbound_uri:'sip:foo@bar'
+          .then ->
+            router = new ToughRateRouter logger
+            us = options: {provisioning,ruleset_of,sip_domain_name}
+            router.use (require '../middleware/use-ccnq-to-e164').call us, router
+            router.use (require '../middleware/local-number').call us, router
+            router.use (require '../middleware/ruleset').call us, router
+            router.use (require '../middleware/flatten').call us, router
+            router.route call_ '3213', 'abcd', null, '1244'
           .then (ctx) ->
             ctx.should.have.property 'res'
             ctx.res.should.have.property 'gateways'
