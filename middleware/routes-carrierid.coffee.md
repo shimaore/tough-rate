@@ -31,32 +31,25 @@ And select only `try` entries where specified.
 Middleware definition
 ---------------------
 
-    plugin = ->
+    @name = 'routes-carrierid'
+    @include = ->
       gateway_manager = @cfg.gateway_manager
       host = @cfg.options.host
       assert gateway_manager?, 'Missing gateway manager.'
 
-      middleware = ->
-        if @finalized()
-          debug "Routes CarrierID: already finalized."
-          return
-        promise_all @res.gateways, (x) ->
-          Promise.resolve()
-          .then ->
-            update gateway_manager, host, x
-          .then (r) ->
-            for gw in r
-              gw.destination_number ?= x.destination_number if x.destination_number?
-            r
-        .then (gws) =>
-          @res.gateways = gws
-
-      middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
-      middleware.call this
-
-    plugin.title = 'Default `carrierid` plugin'
-    plugin.description = "Injects the gateways described by the `carrierid` into the router's list of gateways."
-    module.exports = plugin
+      if @finalized()
+        debug "Routes CarrierID: already finalized."
+        return
+      promise_all @res.gateways, (x) ->
+        Promise.resolve()
+        .then ->
+          update gateway_manager, host, x
+        .then (r) ->
+          for gw in r
+            gw.destination_number ?= x.destination_number if x.destination_number?
+          r
+      .then (gws) =>
+        @res.gateways = gws
 
 Toolbox
 -------

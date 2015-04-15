@@ -1,24 +1,16 @@
 Flatten the gateways
 ====================
 
-    module.exports = ->
-      middleware = ->
+    @name = 'flatten'
+    @include = ->
 
-        debug "Gateways before ops", JSON.stringify @res.gateways
+      debug "Gateways before ops", JSON.stringify @res.gateways
 
 We must flatten the list so that CallHandler can use it.
 
-        @res.gateways = @res.gateways.map (gateway) =>
-          if isArray gateway
-            gateway.map (gateway) =>
-              field_merger {
-                default: {destination:@res.destination}
-                extra: @res.extra
-                gateway
-                ruleset:@res.ruleset
-                rule:@res.rule
-              }
-          else
+      @res.gateways = @res.gateways.map (gateway) =>
+        if isArray gateway
+          gateway.map (gateway) =>
             field_merger {
               default: {destination:@res.destination}
               extra: @res.extra
@@ -26,13 +18,19 @@ We must flatten the list so that CallHandler can use it.
               ruleset:@res.ruleset
               rule:@res.rule
             }
+        else
+          field_merger {
+            default: {destination:@res.destination}
+            extra: @res.extra
+            gateway
+            ruleset:@res.ruleset
+            rule:@res.rule
+          }
 
-        debug "Gateways after ops", JSON.stringify @res.gateways
-        @res.gateways = flatten @res.gateways
-        debug "Gateways after flatten", JSON.stringify @res.gateways
-
-      middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
-      middleware.call this
+      debug "Gateways after ops", JSON.stringify @res.gateways
+      @res.gateways = flatten @res.gateways
+      debug "Gateways after flatten", JSON.stringify @res.gateways
+      return
 
 Toolbox
 -------

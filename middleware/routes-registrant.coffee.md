@@ -46,29 +46,21 @@ This plugin provides `registrant_host` as a gateway.
       debug "Routes Registrant build_ref locating #{@source}."
       provisioning.get "number:#{@source}"
 
-    plugin = ->
+    @name = 'routes-registrant'
+    @include = ->
       ref_builder = @session.ref_builder ? build_ref
       provisioning = @cfg.options.provisioning
       assert provisioning?, 'Missing provisioning'
 
-      middleware = ->
-        if @finalized()
-          debug 'Routes Registrant: already finalized.'
-          return
-        ref = ref_builder.call this, provisioning
-        promise_all @res.gateways, (x) => update.call this, x, ref
-        .then (gws) =>
-          @res.gateways = gws
-        .catch (error) =>
-          debug "Routes Registrant: #{error}"
-
-      middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
-      middleware.call this
-
-    plugin.title = 'Registrant router plugin'
-    plugin.description = "A router plugin that injects the source's `registrant_host` as a gateway."
-    plugin.build_ref = build_ref
-    module.exports = plugin
+      if @finalized()
+        debug 'Routes Registrant: already finalized.'
+        return
+      ref = ref_builder.call this, provisioning
+      promise_all @res.gateways, (x) => update.call this, x, ref
+      .then (gws) =>
+        @res.gateways = gws
+      .catch (error) =>
+        debug "Routes Registrant: #{error}"
 
 Toolbox
 -------
