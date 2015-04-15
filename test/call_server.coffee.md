@@ -132,7 +132,6 @@ Server (Unit Under Test)
           provisioning: provisioning
           profile: 'test-sender'
           ruleset_of: ruleset_of
-          logger: require 'winston'
           sip_domain_name: sip_domain_name
 
         console.log 'Declaring Server'

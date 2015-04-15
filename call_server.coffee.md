@@ -6,11 +6,11 @@ TODO: add Node.js clustering
     module.exports = class CallServer extends UsefulWindCallServer
       constructor: (@port,@options) ->
         # `host` is not required (carrier-id will simply not sort using it if it's not present).
-        for name in 'provisioning sip_domain_name ruleset_of profile logger'.split ' '
+        for name in 'provisioning sip_domain_name ruleset_of profile'.split ' '
           assert @options[name]?, "CallServer: options.#{name} is required"
         @statistics = @options.statistics ? new CaringBand()
 
-        @gateway_manager = new GatewayManager @options.provisioning, @options.sip_domain_name, @options.logger
+        @gateway_manager = new GatewayManager @options.provisioning, @options.sip_domain_name
 
         @gateway_manager.init()
         .catch (error) =>

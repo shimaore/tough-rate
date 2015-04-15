@@ -25,27 +25,27 @@ Route based on the route selected by the source, or using a default route.
 
         provisioning.get "number:#{source}"
         .then (doc) =>
-          @logger.info "RuleSet Middleware: number:#{source} :", doc
+          debug "RuleSet Middleware: number:#{source} :", doc
           route = doc.outbound_route ? default_outbound_route
         .catch (error) =>
-          @logger.error "RuleSet Middleware: error retrieving number:#{source}, using #{default_outbound_route} as route :", error.toString()
+          debug "RuleSet Middleware: error retrieving number:#{source}, using #{default_outbound_route} as route :", error.toString()
           route = default_outbound_route
         .then (route) =>
           unless route?
             @respond '485'
-            @logger.warn 'RuleSet Middleware: No route available', {source}
+            debug 'RuleSet Middleware: No route available', {source}
             @statistics.emit 'report', {error:'missing-route', source}
             throw new CCNQBaseMiddlewareError "No route available for #{source}"
 
           route = "#{route}"
           @res.route = route
 
-          @logger.info "RuleSet Middleware: loading ruleset_of", {source,route}
+          debug "RuleSet Middleware: loading ruleset_of", {source,route}
           ruleset_of route
         .then ({ruleset,ruleset_database}) =>
           unless ruleset? and ruleset_database?
             @respond '500'
-            @logger.warn 'No ruleset available', {source,route:@res.route,ruleset,ruleset_database}
+            debug 'No ruleset available', {source,route:@res.route,ruleset,ruleset_database}
             @statistics.emit 'report', {error:'missing-ruleset',source,route:@res.route,ruleset,ruleset_database}
             throw new CCNQBaseMiddlewareError "Route `#{@res.route}` for `#{source}` has no ruleset or no database."
 
@@ -56,7 +56,7 @@ Route based on the route selected by the source, or using a default route.
         .then (rule) =>
           unless rule?
             @respond '485'
-            @logger.warn 'No route available', {source,destination:@res.destination,ruleset:@res.ruleset}
+            debug 'No route available', {source,destination:@res.destination,ruleset:@res.ruleset}
             @statistics.emit 'report', {error:'missing-rule',source,destination:@res.destination,ruleset:@res.ruleset}
             throw new CCNQBaseMiddlewareError "No rule available towards #{@res.destination}"
 
@@ -64,14 +64,14 @@ Route based on the route selected by the source, or using a default route.
             @res.gateways = rule.gwlist
             delete rule.gwlist
           else
-            @logger.warn 'Missing gwlist', rule
+            debug 'Missing gwlist', rule
             @statistics.emit 'report', {error:'missing-gwlist',rule}
 
           @res.rule = rule
           @attr rule.attrs
 
         .catch (error) =>
-          @logger.error "Ruleset middleware failed: #{error}"
+          debug "Ruleset middleware failed: #{error}"
           @statistics.emit 'report', {error:error.toString(),when:'ruleset-middleware'}
 
       middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
@@ -79,3 +79,4 @@ Route based on the route selected by the source, or using a default route.
 
     assert = require 'assert'
     pkg = require '../package.json'
+    debug = (require 'debug') "#{pkg.name}:ruleset"

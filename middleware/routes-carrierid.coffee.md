@@ -38,7 +38,7 @@ Middleware definition
 
       middleware = ->
         if @finalized()
-          @logger.info "Routes CarrierID: already finalized."
+          debug "Routes CarrierID: already finalized."
           return
         promise_all @res.gateways, (x) ->
           Promise.resolve()
@@ -66,3 +66,4 @@ Toolbox
     promise_all = require '../promise-all'
     field_merger = require '../field_merger'
     pkg = require '../package.json'
+    debug = (require 'debug') "#{pkg.name}:routes-carrierid"

@@ -5,10 +5,10 @@
 
         @call.once 'CHANNEL_HANGUP_COMPLETE'
         .then (res) =>
-          @logger.info "CDR: Channel Hangup Complete"
+          debug "CDR: Channel Hangup Complete"
           data = res.body
 
-          @logger.info "CDR: Channel Hangup Complete", billmsec: data.variable_billmsec
+          debug "CDR: Channel Hangup Complete", billmsec: data.variable_billmsec
           @statistics.add 'duration', data.variable_mduration
           @statistics.add 'billable', data.variable_billmsec
           @statistics.add 'progresss', data.variable_progressmsec
@@ -38,3 +38,4 @@ variable_answermsec: # answer
 variable_waitmsec: # wait = answer?
 variable_progress_mediamsec: # 0
 variable_flow_billmsec: # total duration
+    debug = (require 'debug') "#{pkg.name}:cdr"

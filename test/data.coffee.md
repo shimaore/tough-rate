@@ -138,8 +138,6 @@ The steps to placing outbound call(s) are:
     pkg = require '../package.json'
     GatewayManager = require '../gateway_manager'
     Router = require 'useful-wind/router'
-    logger = require 'winston'
-    logger.transports.Console.level = 'error'
     Promise = require 'bluebird'
 
     class FreeSwitchError extends Error
@@ -157,7 +155,6 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
 
       ruleset_of = (x) ->
         if not dataset.rulesets[x]?
-          logger "Unknown ruleset #{x}."
           throw "Unknown ruleset #{x}"
         response =
           ruleset: dataset.rulesets[x]
@@ -201,7 +198,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           doc.should.have.property 'views'
           doc.views.should.have.property 'gateways'
       .then ->
-        gm = new GatewayManager provisioning, 'phone.local', logger
+        gm = new GatewayManager provisioning, 'phone.local'
         gm.set 'progress_timeout', 4
         gm.init()
 
@@ -217,7 +214,6 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
         ctx.once ?= ->
           then: ->
         ready.then ->
-          logger.info "Building router."
           us =
             gateway_manager: gm
             options: {
@@ -239,10 +235,8 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           router.use '../middleware/flatten'
           router.use '../middleware/cdr'
           router.use '../middleware/call-handler'
-          logger.info "Sending one_call to router."
           router.route ctx
         .catch (exception) ->
-          logger "Exception setting up one_call", exception
           throw exception
         null
 
@@ -288,7 +282,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           ready.then ->
             provisioning.put _id:'number:1234',inbound_uri:'sip:foo@bar'
           .then ->
-            router = new ToughRateRouter logger
+            router = new Router()
             us = options: {provisioning,ruleset_of,sip_domain_name}
             router.use (require '../middleware/local-number').call us, router
             router.use (require '../middleware/ruleset').call us, router
@@ -308,7 +302,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           ready.then ->
             provisioning.put _id:'number:1244',inbound_uri:'sip:foo@bar'
           .then ->
-            router = new ToughRateRouter logger
+            router = new Router()
             us = options: {provisioning,ruleset_of,sip_domain_name}
             router.use (require '../middleware/use-ccnq-to-e164').call us, router
             router.use (require '../middleware/local-number').call us, router
@@ -329,7 +323,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           ready.then ->
             provisioning.put _id:'number:1432',inbound_uri:'sip:foo@bar',account:'foo_bar'
           .then ->
-            router = new ToughRateRouter logger
+            router = new Router()
             us = options: {provisioning,ruleset_of,sip_domain_name}
             router.use (require '../middleware/local-number').call us, router
             router.use (require '../middleware/ruleset').call us, router
@@ -350,7 +344,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           ready.then ->
             provisioning.put _id:'number:3213',registrant_host:'foo',registrant_password:'badabing'
           .then ->
-            router = new ToughRateRouter logger
+            router = new Router()
             us = options: {provisioning,ruleset_of,default_outbound_route:'registrant'}
             router.use (require '../middleware/ruleset').call us, router
             router.use (require '../middleware/routes-registrant').call us, router
@@ -369,7 +363,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           ready.then ->
             provisioning.put _id:'number:3243',registrant_host:'foo:5080'
           .then ->
-            router = new ToughRateRouter logger
+            router = new Router()
             us = options: {provisioning,ruleset_of,default_outbound_route:'registrant'}
             router.use (require '../middleware/ruleset').call us, router
             router.use (require '../middleware/routes-registrant').call us, router
@@ -386,7 +380,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           ready.then ->
             provisioning.put _id:'number:3253',registrant_host:['foo:5080']
           .then ->
-            router = new ToughRateRouter logger
+            router = new Router()
             us = options: {provisioning,ruleset_of,default_outbound_route:'registrant'}
             router.use (require '../middleware/ruleset').call us, router
             router.use (require '../middleware/routes-registrant').call us, router
@@ -401,7 +395,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
 
         it 'should route numbers using routes', ->
           ready.then ->
-            router = new ToughRateRouter logger
+            router = new Router()
             us =
               gateway_manager: gm
               options: {provisioning,ruleset_of,default_outbound_route:'default'}
@@ -422,7 +416,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
         it 'should report an error when no route is found', (done) ->
           ready.then ->
 
-            router = new ToughRateRouter logger
+            router = new Router()
             us =
               gateway_manager: gm
               options: {provisioning,ruleset_of,default_outbound_route:'default'}
@@ -438,7 +432,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
 
         it 'should route emergency numbers', ->
           ready.then ->
-            router = new ToughRateRouter logger
+            router = new Router()
             us =
               gateway_manager: gm
               options: {provisioning,ruleset_of,default_outbound_route:'default'}
@@ -460,7 +454,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
 
         it 'should route emergency numbers with multiple destinations', ->
           ready.then ->
-            router = new ToughRateRouter logger
+            router = new Router()
             us =
               gateway_manager: gm
               options: {provisioning,ruleset_of,default_outbound_route:'default'}

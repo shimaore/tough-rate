@@ -7,7 +7,6 @@ This is based on the calling number.
     @include = (ctx) ->
 
         ctx[k] ?= v for own k,v of {
-          logger: @cfg.logger
           statistics: @cfg.statistics
           res:
             cause: null
@@ -100,3 +99,4 @@ Toolbox
     pkg = require './package.json'
     debug = (require 'debug') "#{pkg.name}:router"
     assert = require 'assert'
+    debug = (require 'debug') "#{pkg.name}:setup"

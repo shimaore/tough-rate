@@ -13,7 +13,7 @@ Default `gwid` router plugin
 
       middleware = ->
         if @finalized()
-          @logger.info 'Routes GwID: already finalized.'
+          debug 'Routes GwID: already finalized.'
           return
         promise_all @res.gateways, (x) ->
           Promise.resolve()
@@ -37,3 +37,4 @@ Default `gwid` router plugin
     Promise = require 'bluebird'
     promise_all = require '../promise-all'
     pkg = require '../package.json'
+    debug = (require 'debug') "#{pkg.name}:routes-gwid"

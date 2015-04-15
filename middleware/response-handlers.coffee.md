@@ -9,14 +9,14 @@
 Helper to report a gateway as faulty to the gateway manager.
 
         mark_gateway_as_faulty = (gateway) =>
-          @logger.info "Asking the gateway manager to mark gateway #{JSON.stringify gateway} as faulty."
+          debug "Asking the gateway manager to mark gateway #{JSON.stringify gateway} as faulty."
           if gateway.name?
             gateway_manager.mark_gateway_as_faulty gateway.name
 
 Helper to report a gateway as suspicious to the gateway manager.
 
         mark_gateway_as_suspicious = (gateway) =>
-          @logger.info "Asking the router to mark gateway #{JSON.stringify gateway} as suspicious."
+          debug "Asking the router to mark gateway #{JSON.stringify gateway} as suspicious."
           if gateway.name?
             gateway_manager.mark_gateway_as_suspicious gateway.name
 
@@ -34,3 +34,4 @@ Toolbox
 
     assert = require 'assert'
     pkg = require '../package.json'
+    debug = (require 'debug') "#{pkg.name}:response-handlers"

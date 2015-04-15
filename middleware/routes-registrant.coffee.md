@@ -14,7 +14,7 @@ This plugin provides `registrant_host` as a gateway.
 
     update = (entry,ref) ->
       unless entry.source_registrant? and entry.source_registrant is true
-        @logger.info "Routes Registrant: entry is not source_registrant, skipping", entry
+        debug "Routes Registrant: entry is not source_registrant, skipping", entry
         return entry
 
       ref
@@ -27,10 +27,10 @@ This plugin provides `registrant_host` as a gateway.
         else
           address = source_doc.registrant_host
           unless address?
-            @logger.error 'No registrant_host for source in a route that requires registrant.', source_doc
+            debug 'No registrant_host for source in a route that requires registrant.', source_doc
             return result
 
-          @logger.info "Routes Registrant: mapping registrant", source_doc
+          debug "Routes Registrant: mapping registrant", source_doc
           if 'string' isnt typeof address
             address = address[0]
           address = "#{address}:#{default_port}" unless address.match /:/
@@ -43,24 +43,24 @@ This plugin provides `registrant_host` as a gateway.
         result
 
     build_ref = (provisioning) ->
-      @logger.info "Routes Registrant build_ref locating #{@source}."
+      debug "Routes Registrant build_ref locating #{@source}."
       provisioning.get "number:#{@source}"
 
     plugin = ->
-      ref_builder = @cfg.ref_builder ? build_ref
+      ref_builder = @session.ref_builder ? build_ref
       provisioning = @cfg.options.provisioning
       assert provisioning?, 'Missing provisioning'
 
       middleware = ->
         if @finalized()
-          @logger.info 'Routes Registrant: already finalized.'
+          debug 'Routes Registrant: already finalized.'
           return
         ref = ref_builder.call this, provisioning
         promise_all @res.gateways, (x) => update.call this, x, ref
         .then (gws) =>
           @res.gateways = gws
         .catch (error) =>
-          @logger.error "Routes Registrant: #{error}"
+          debug "Routes Registrant: #{error}"
 
       middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
       middleware.call this
@@ -76,3 +76,4 @@ Toolbox
     assert = require 'assert'
     promise_all = require '../promise-all'
     pkg = require '../package.json'
+    debug = (require 'debug') "#{pkg.name}:routes-registrant"

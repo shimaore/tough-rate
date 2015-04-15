@@ -12,16 +12,16 @@ Since this code rewrites the destination before resolving gateways, it must be c
       middleware = ->
 
         if not @res.rule?
-          @logger.error 'Emergency middleware: no rule is present. (ignored)'
+          debug 'Emergency middleware: no rule is present. (ignored)'
           return
         if not @res.ruleset_database?
-          @logger.error 'Emergency middleware: no ruleset_database is present. (ignored)'
+          debug 'Emergency middleware: no ruleset_database is present. (ignored)'
           return
 
 Then, see whether the destination number is an emergency number, and process it.
 
         if not @res.rule.emergency
-          @logger.info 'Emergency middleware: not an emergency rule.'
+          debug 'Emergency middleware: not an emergency rule.'
           return
 
         emergency_ref = @req.header 'X-CCNQ3-Routing'
@@ -33,16 +33,16 @@ Then, see whether the destination number is an emergency number, and process it.
 
         provisioning.get "emergency:#{emergency_key}"
         .catch (error) =>
-          @logger.error "Emergency record emergency:#{emergency_key}", error
+          debug "Emergency record emergency:#{emergency_key}", error
           throw error
         .then (doc) =>
           if not doc.destination?
-            @logger.error "Emergency middleware: record for `#{emergency_key} has no `destination`."
+            debug "Emergency middleware: record for `#{emergency_key} has no `destination`."
             throw new EmergencyMiddlewareError "Record for `#{emergency_key} has no `destination`."
 
 The `destination` field in a `emergency` record historically is the target, destination number, not a reference to a `destination` record.
 
-          @logger.info "Emergency middleware: routing call for `#{emergency_key}` to `#{doc.destination}`."
+          debug "Emergency middleware: routing call for `#{emergency_key}` to `#{doc.destination}`."
 
           destinations = doc.destination
           if typeof destinations is 'string'
@@ -83,3 +83,4 @@ Toolbox
     assert = require 'assert'
     pkg = require '../package.json'
     Promise = require 'bluebird'
+    debug = (require 'debug') "#{pkg.name}:emergency"

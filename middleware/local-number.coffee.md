@@ -9,7 +9,7 @@ Local number middleware
       middleware = ->
         return if @finalized()
 
-        @logger.info "Checking whether #{@destination} is local."
+        debug "Checking whether #{@destination} is local."
         provisioning.get "number:#{@destination}"
         .then (doc) =>
           return if doc.disabled
@@ -24,7 +24,7 @@ Local number middleware
               }
           null
         .catch (error) =>
-          @logger.info "Checking whether #{@destination} is local: #{error}"
+          debug "Checking whether #{@destination} is local: #{error}"
 
       middleware.info = "#{pkg.name} #{pkg.version} #{module.filename} for #{domain}"
       middleware.call this
@@ -34,3 +34,4 @@ Toolbox
     assert = require 'assert'
     url = require 'url'
     pkg = require '../package.json'
+    debug = (require 'debug') "#{pkg.name}:local-number"

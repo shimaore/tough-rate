@@ -4,7 +4,7 @@ Flatten the gateways
     module.exports = ->
       middleware = ->
 
-        @logger.info "Gateways before ops", JSON.stringify @res.gateways
+        debug "Gateways before ops", JSON.stringify @res.gateways
 
 We must flatten the list so that CallHandler can use it.
 
@@ -27,9 +27,9 @@ We must flatten the list so that CallHandler can use it.
               rule:@res.rule
             }
 
-        @logger.info "Gateways after ops", JSON.stringify @res.gateways
+        debug "Gateways after ops", JSON.stringify @res.gateways
         @res.gateways = flatten @res.gateways
-        @logger.info "Gateways after flatten", JSON.stringify @res.gateways
+        debug "Gateways after flatten", JSON.stringify @res.gateways
 
       middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
       middleware.call this
@@ -46,3 +46,4 @@ Toolbox
     Promise = require 'bluebird'
     {isArray} = require 'util'
     pkg = require '../package.json'
+    debug = (require 'debug') "#{pkg.name}:flatten"

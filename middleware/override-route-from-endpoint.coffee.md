@@ -20,10 +20,11 @@ This is a dedicated bit of code that should be inserted before `ruleset` to forc
             @clear()
             @attempt doc.global_route
         .catch (error) =>
-          @logger.error "Override-route-from-endpoint: #{error}"
+          debug "Override-route-from-endpoint: #{error}"
 
 
       middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
       middleware.call this
 
     pkg = require '../package.json'
+    debug = (require 'debug') "#{pkg.name}:override-route-from-endpoint"
