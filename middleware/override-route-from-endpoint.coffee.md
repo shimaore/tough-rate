@@ -4,7 +4,7 @@ Override route based on original (client-side) endpoint
 This is a dedicated bit of code that should be inserted before `ruleset` to force a specific route based on the originating endpoint.
 
     module.exports = ->
-      provisioning = @options.provisioning
+      provisioning = @cfg.options.provisioning
       assert provisioning, 'Missing `provisioning`'
 
       middleware = ->
@@ -24,6 +24,6 @@ This is a dedicated bit of code that should be inserted before `ruleset` to forc
 
 
       middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
-      return middleware
+      middleware.call this
 
     pkg = require '../package.json'

@@ -6,7 +6,7 @@ Emergency Middleware
 Since this code rewrites the destination before resolving gateways, it must be called early on (i.e. after the rule is located but before the gateways are processed).
 
     module.exports = ->
-      provisioning = @options.provisioning
+      provisioning = @cfg.options.provisioning
       assert provisioning, 'Missing `provisioning`.'
 
       middleware = ->
@@ -76,7 +76,7 @@ If multiple destination numbers are present, we cannot afford to try all combina
           @attr emergency: true
 
       middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
-      return middleware
+      middleware.call this
 
 Toolbox
 

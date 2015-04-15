@@ -32,7 +32,7 @@ We must flatten the list so that CallHandler can use it.
         @logger.info "Gateways after flatten", JSON.stringify @res.gateways
 
       middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
-      return middleware
+      middleware.call this
 
 Toolbox
 -------

@@ -47,8 +47,8 @@ This plugin provides `registrant_host` as a gateway.
       provisioning.get "number:#{@source}"
 
     plugin = ->
-      ref_builder = @ref_builder ? build_ref
-      provisioning = @options.provisioning
+      ref_builder = @cfg.ref_builder ? build_ref
+      provisioning = @cfg.options.provisioning
       assert provisioning?, 'Missing provisioning'
 
       middleware = ->
@@ -63,7 +63,7 @@ This plugin provides `registrant_host` as a gateway.
           @logger.error "Routes Registrant: #{error}"
 
       middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
-      return middleware
+      middleware.call this
 
     plugin.title = 'Registrant router plugin'
     plugin.description = "A router plugin that injects the source's `registrant_host` as a gateway."

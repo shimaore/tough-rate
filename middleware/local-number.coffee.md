@@ -2,9 +2,9 @@ Local number middleware
 =======================
 
     module.exports = () ->
-      provisioning = @options.provisioning
+      provisioning = @cfg.options.provisioning
       assert provisioning, 'Missing `provisioning`.'
-      domain = @options.sip_domain_name
+      domain = @cfg.options.sip_domain_name
 
       middleware = ->
         return if @finalized()
@@ -27,7 +27,7 @@ Local number middleware
           @logger.info "Checking whether #{@destination} is local: #{error}"
 
       middleware.info = "#{pkg.name} #{pkg.version} #{module.filename} for #{domain}"
-      return middleware
+      middleware.call this
 
 Toolbox
 

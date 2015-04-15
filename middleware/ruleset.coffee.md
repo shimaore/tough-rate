@@ -6,9 +6,9 @@ Ruleset Loader
     class CCNQBaseMiddlewareError extends Error
 
     module.exports = ->
-      provisioning = @options.provisioning
-      ruleset_of = @options.ruleset_of
-      default_outbound_route = @options.default_outbound_route
+      provisioning = @cfg.options.provisioning
+      ruleset_of = @cfg.options.ruleset_of
+      default_outbound_route = @cfg.options.default_outbound_route
       assert provisioning, 'Missing provisioning'
       assert ruleset_of, 'Missing ruleset_of'
 
@@ -75,7 +75,7 @@ Route based on the route selected by the source, or using a default route.
           @statistics.emit 'report', {error:error.toString(),when:'ruleset-middleware'}
 
       middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
-      return middleware
+      middleware.call this
 
     assert = require 'assert'
     pkg = require '../package.json'

@@ -25,6 +25,7 @@
     "caring-band": "^1.4.0",
     "coffeescript-helpers": "^2.0.0",
     "esl": "^3.0.0",
+    "useful-wind": "^1.0.0",
     "winston": "^0.9.0"
   },
   "directories": {

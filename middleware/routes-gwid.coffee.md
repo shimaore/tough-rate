@@ -8,7 +8,7 @@ Default `gwid` router plugin
       gateway_manager.resolve_gateway entry.gwid
 
     plugin = ->
-      gateway_manager = @gateway_manager
+      gateway_manager = @cfg.gateway_manager
       assert gateway_manager?, 'Missing gateway manager.'
 
       middleware = ->
@@ -27,7 +27,7 @@ Default `gwid` router plugin
           @res.gateways = gws
 
       middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
-      return middleware
+      middleware.call this
 
     plugin.title = 'Default `gwid` router plugin'
     plugin.description = "Injects the gateway described by the `gwid` into the list of gateways."

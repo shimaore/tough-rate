@@ -6,7 +6,7 @@ This middleware is called normally at the end of the stack to process the gatewa
     class CallHandlerMiddlewareError extends Error
 
     module.exports = ->
-      profile = @options.profile
+      profile = @cfg.options.profile
       assert profile?, 'middleware Call Handler: `profile` is required.'
 
 Middleware
@@ -211,7 +211,7 @@ Plugin
 ------
 
       middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
-      return middleware
+      middleware.call this
 
 Field Mapping
 =============

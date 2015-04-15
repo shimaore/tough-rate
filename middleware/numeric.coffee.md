@@ -11,6 +11,6 @@
           return
 
       middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
-      return middleware
+      middleware.call this
 
     pkg = require '../package.json'

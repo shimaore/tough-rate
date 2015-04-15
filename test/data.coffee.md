@@ -137,7 +137,7 @@ The steps to placing outbound call(s) are:
     PouchDB = (require 'pouchdb').defaults db: require 'memdown'
     pkg = require '../package.json'
     GatewayManager = require '../gateway_manager'
-    ToughRateRouter = require '../router'
+    Router = require 'useful-wind/router'
     logger = require 'winston'
     logger.transports.Console.level = 'error'
     Promise = require 'bluebird'
@@ -218,7 +218,6 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           then: ->
         ready.then ->
           logger.info "Building router."
-          router = new ToughRateRouter logger
           us =
             gateway_manager: gm
             options: {
@@ -227,17 +226,19 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
               default_outbound_route: outbound_route
               profile: 'something-egress'
             }
-          router.use (require '../middleware/numeric').call us, router
-          router.use (require '../middleware/response-handlers').call us, router
-          router.use (require '../middleware/local-number').call us, router
-          router.use (require '../middleware/ruleset').call us, router
-          router.use (require '../middleware/emergency').call us, router
-          router.use (require '../middleware/routes-gwid').call us, router
-          router.use (require '../middleware/routes-carrierid').call us, router
-          router.use (require '../middleware/routes-registrant').call us, router
-          router.use (require '../middleware/flatten').call us, router
-          router.use (require '../middleware/cdr').call us, router
-          router.use (require '../middleware/call-handler').call us, router
+          router = new Router us
+          router.use '../middleware/setup'
+          router.use '../middleware/numeric'
+          router.use '../middleware/response-handlers'
+          router.use '../middleware/local-number'
+          router.use '../middleware/ruleset'
+          router.use '../middleware/emergency'
+          router.use '../middleware/routes-gwid'
+          router.use '../middleware/routes-carrierid'
+          router.use '../middleware/routes-registrant'
+          router.use '../middleware/flatten'
+          router.use '../middleware/cdr'
+          router.use '../middleware/call-handler'
           logger.info "Sending one_call to router."
           router.route ctx
         .catch (exception) ->

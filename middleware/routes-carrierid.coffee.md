@@ -32,8 +32,8 @@ Middleware definition
 ---------------------
 
     plugin = ->
-      gateway_manager = @gateway_manager
-      host = @options.host
+      gateway_manager = @cfg.gateway_manager
+      host = @cfg.options.host
       assert gateway_manager?, 'Missing gateway manager.'
 
       middleware = ->
@@ -52,7 +52,7 @@ Middleware definition
           @res.gateways = gws
 
       middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
-      return middleware
+      middleware.call this
 
     plugin.title = 'Default `carrierid` plugin'
     plugin.description = "Injects the gateways described by the `carrierid` into the router's list of gateways."

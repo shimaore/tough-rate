@@ -1,5 +1,5 @@
     module.exports = ->
-      cdr_base = @options.cdr_base
+      cdr_base = @cfg.options.cdr_base
 
       middleware = ->
 
@@ -27,7 +27,7 @@ Compatibility layer for CCNQ3 -- remove once the LCR generates its own CDRs.
         null
 
       middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
-      return middleware
+      middleware.call this
 
     pkg = require '../package.json'
 

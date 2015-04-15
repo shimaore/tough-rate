@@ -4,36 +4,11 @@ ToughRate Least Cost Router
 We first need to determine which routing table we should use, though.
 This is based on the calling number.
 
-    module.exports = class ToughRateRouter
+    @include = (ctx) ->
 
-      constructor: (@logger,@statistics) ->
-        @logger ?= require 'winston'
-        if not @statistics?
-          CaringBand = require 'caring-band'
-          @statistics = new CaringBand()
-        @logger.info "ToughRateRouter #{pkg.name} #{pkg.version}: ready."
-        @middlewares = []
-
-      use: (middleware) ->
-        assert middleware.info?, "ToughRateRouter #{pkg.name} #{pkg.version}: middleware #{middleware} should have info."
-        @middlewares.push middleware
-
-      route: (call) ->
-
-        source = call.data['Channel-Caller-ID-Number']
-        destination = call.data['Channel-Destination-Number']
-
-        ctx = {
-          logger: @logger
-          statistics: @statistics
-          router: this
-          call
-          data: call.data
-          source
-          destination
-          req:
-            header: (name) ->
-              call.data["variable_sip_h_#{name}"]
+        ctx[k] ?= v for own k,v of {
+          logger: @cfg.logger
+          statistics: @cfg.statistics
           res:
             cause: null
             destination: destination # aka final_destination
@@ -55,7 +30,7 @@ Manipulate the gateways list.
 
           finalize: (callback) ->
             if ctx.finalized()
-              ctx.logger.error "ToughRateRouter #{pkg.name} #{pkg.version}: `finalize` called when the route-set is already finalized"
+              debug "ToughRateRouter #{pkg.name} #{pkg.version}: `finalize` called when the route-set is already finalized"
               return
             ctx.res.finalized = true
             callback?()
@@ -71,12 +46,12 @@ Manipulate the gateways list.
               ctx.res.gateways = []
           attempt: (gateway) ->
             if ctx.finalized()
-              ctx.logger.error "ToughRateRouter #{pkg.name} #{pkg.version}: `attempt` called when the route-set is already finalized", gateway
+              debug "ToughRateRouter #{pkg.name} #{pkg.version}: `attempt` called when the route-set is already finalized", gateway
               return
             ctx.res.gateways.push gateway
           clear: ->
             if ctx.finalized()
-              ctx.logger.error "ToughRateRouter #{pkg.name} #{pkg.version}: `clear` called when the route-set is already finalized", gateway
+              debug "ToughRateRouter #{pkg.name} #{pkg.version}: `clear` called when the route-set is already finalized", gateway
               return
             ctx.res.gateways = []
 
@@ -118,30 +93,10 @@ Manipulate the gateways list.
 
         }
 
-        it = Promise.resolve()
-        it = it.bind ctx
-        for middleware in @middlewares
-          do (middleware) =>
-            it = it.then ->
-              middleware.call ctx, ctx
-            .catch (error) =>
-              @logger.error "ToughRateRouter #{pkg.name} #{pkg.version}: middleware #{middleware.info} failure", error.toString()
-              null
-        it
-        .catch (error) =>
-          @logger.error "ToughRateRouter #{pkg.name} #{pkg.version}: middleware failure", error.toString()
-          null
-
-Instrument for testing.
-
-        .then ->
-          @logger.info "ToughRateRouter #{pkg.name} #{pkg.version}: completed."
-          ctx
-
 Toolbox
 -------
 
     {EventEmitter} = require 'events'
     pkg = require './package.json'
-    Promise = require 'bluebird'
+    debug = (require 'debug') "#{pkg.name}:router"
     assert = require 'assert'

@@ -1,5 +1,5 @@
     module.exports = ->
-      gateway_manager = @gateway_manager
+      gateway_manager = @cfg.gateway_manager
       assert gateway_manager, 'Missing gateway_manager'
 
       middleware = ->
@@ -28,7 +28,7 @@ Default call post-processing.
         @on 'NORMAL_TEMPORARY_FAILURE', mark_gateway_as_suspicious # 503
 
       middleware.info = "#{pkg.name} #{pkg.version} #{module.filename}"
-      return middleware
+      middleware.call this
 
 Toolbox
 
