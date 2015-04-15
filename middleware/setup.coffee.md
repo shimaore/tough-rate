@@ -4,13 +4,14 @@ ToughRate Least Cost Router
 We first need to determine which routing table we should use, though.
 This is based on the calling number.
 
+    @name = 'setup'
     @include = (ctx) ->
 
-        ctx[k] ?= v for own k,v of {
+        ctx[k] = v for own k,v of {
           statistics: @cfg.statistics
           res:
             cause: null
-            destination: destination # aka final_destination
+            destination: @destination # aka final_destination
             finalized: false
 
 `gateways` is an array that either contains gateways, or arrays of gateways
@@ -96,7 +97,7 @@ Toolbox
 -------
 
     {EventEmitter} = require 'events'
-    pkg = require './package.json'
+    pkg = require '../package.json'
     debug = (require 'debug') "#{pkg.name}:router"
     assert = require 'assert'
     debug = (require 'debug') "#{pkg.name}:setup"
