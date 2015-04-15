@@ -1,37 +1,20 @@
-The middleware is used with a Sinatra/ZappaJS type of API. Compare with ExpressJS middleware.
-
-Module
-======
-
-Each module is inserted as follows:
-
-    call_server = new CallServer ...
-    module.call call_server, router
-
-See the CallServer source for parameters available at that time, such as:
-
-    @gateway_manager
-    @options.provisioning
-    @options.ruleset_of
-    ...
-
-The module must return a middleware function.
+The middleware is based on the `useful-wind` project, with extensions provided by the `setup` middleware.
 
 Middleware
 ==========
 
-The following fields are available as input:
+The following fields are available as input (provided by `useful-wind`):
 
     @data         Data provided by FreeSwitch
     @source       The originating number (caller)
     @destination  The (original) destination number (callee)
     @req.header() Get extra SIP headers (`variable_sip_h`)
 
-The following attributes are also available:
+The following attributes are also available (provided by `useful-wind`):
 
     @call         The current `esl` `FreeSwitchResponse` object.
 
-The following operations are available to modify the responses:
+The following operations are available to modify the responses (provided by the `setup` middleware):
 
     @redirect     Set the final destination number
 

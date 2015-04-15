@@ -10,6 +10,36 @@ This middleware is called normally at the end of the stack to process the gatewa
       profile = @cfg.options.profile
       assert profile?, 'middleware Call Handler: `profile` is required.'
 
+Attempt Call
+------------
+
+Convert fields found in the record into fields for FreeSwitch `bridge` command.
+Returns an `esl` promise that completes when the call gets connected.
+
+      attempt = (destination,gateway) ->
+
+        debug "CallHandler: attempt", {destination,gateway}
+
+        leg_options = {}
+
+        for g,l of field_mapping when gateway[g]?
+          leg_options[l] = gateway[g]
+
+        if gateway.headers?
+          for h of gateway.headers
+            leg_options["sip_h_#{h}"] = gateway.headers[h]
+
+FIXME: build a more resistant list.
+
+        leg_options_text = ("#{k}=#{v}" for k,v of leg_options).join ','
+
+Sometimes we'll be provided with a pre-built URI (emergency calls, loopback calls). In other cases we build the URI from the destination number and the gateway's address.
+
+        uri = gateway.uri ? "sip:#{destination}@#{gateway.address}"
+
+        debug "CallHandler: attempt -- bridge [#{leg_options_text}]sofia/#{profile}/#{uri}"
+        @call.command 'bridge', "[#{leg_options_text}]sofia/#{profile}/#{uri}"
+
 Middleware
 ----------
 
@@ -175,37 +205,6 @@ However we do not propagate errors, since it would mean interrupting the call se
         null
 
       return it
-
-Attempt Call
-------------
-
-Convert fields found in the record into fields for FreeSwitch `bridge` command.
-Returns an `esl` promise that completes when the call gets connected, or 
-
-    attempt = (destination,gateway) ->
-
-      debug "CallHandler: attempt", {destination,gateway}
-
-      leg_options = {}
-
-      for g,l of field_mapping when gateway[g]?
-        leg_options[l] = gateway[g]
-
-      if gateway.headers?
-        for h of gateway.headers
-          leg_options["sip_h_#{h}"] = gateway.headers[h]
-
-FIXME: build a more resistant list.
-
-      leg_options_text = ("#{k}=#{v}" for k,v of leg_options).join ','
-
-Sometimes we'll be provided with a pre-built URI (emergency calls, loopback calls). In other cases we build the URI from the destination number and the gateway's address.
-
-      uri = gateway.uri ? "sip:#{destination}@#{gateway.address}"
-
-      debug "CallHandler: attempt -- bridge [#{leg_options_text}]sofia/#{profile}/#{uri}"
-      @call.command 'bridge', "[#{leg_options_text}]sofia/#{profile}/#{uri}"
-
 
 Field Mapping
 =============

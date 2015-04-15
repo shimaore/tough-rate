@@ -30,7 +30,7 @@ Manipulate the gateways list.
 
         finalize: (callback) ->
           if ctx.finalized()
-            debug "ToughRateRouter #{pkg.name} #{pkg.version}: `finalize` called when the route-set is already finalized"
+            debug "`finalize` called when the route-set is already finalized"
             return
           ctx.res.finalized = true
           callback?()
@@ -46,12 +46,12 @@ Manipulate the gateways list.
             ctx.res.gateways = []
         attempt: (gateway) ->
           if ctx.finalized()
-            debug "ToughRateRouter #{pkg.name} #{pkg.version}: `attempt` called when the route-set is already finalized", gateway
+            debug "`attempt` called when the route-set is already finalized", gateway
             return
           ctx.res.gateways.push gateway
         clear: ->
           if ctx.finalized()
-            debug "ToughRateRouter #{pkg.name} #{pkg.version}: `clear` called when the route-set is already finalized", gateway
+            debug "`clear` called when the route-set is already finalized", gateway
             return
           ctx.res.gateways = []
 
@@ -98,6 +98,5 @@ Toolbox
 
     {EventEmitter} = require 'events'
     pkg = require '../package.json'
-    debug = (require 'debug') "#{pkg.name}:router"
     assert = require 'assert'
     debug = (require 'debug') "#{pkg.name}:setup"

@@ -5,7 +5,7 @@
     describe 'call-handler', ->
 
       module = require '../middleware/call-handler'
-      mw = module
+      mw = module.include
 
       it 'should call respond', (done) ->
         mw.call
@@ -13,8 +13,6 @@
             options: profile:'default'
           res:
             response:'604'
-          logger:
-            info: ->
           statistics:
             add: ->
             emit: ->

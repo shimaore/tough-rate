@@ -3,6 +3,7 @@ CallServer
 
 TODO: add Node.js clustering
 
+    UsefulWindCallServer = require 'useful-wind/call_server'
     module.exports = class CallServer extends UsefulWindCallServer
       constructor: (@port,@options) ->
         # `host` is not required (carrier-id will simply not sort using it if it's not present).
@@ -19,18 +20,20 @@ TODO: add Node.js clustering
         .then =>
           super {@options,@gateway_manager,@statistics}
           assert @cfg?
-          @router.use './middleware/setup'
+          debug "Loading setup"
+          @router.use require './middleware/setup'
           modules = @options.use ? included_middlewares
           @use module for module in modules
           @listen @port
         .catch (error) =>
           debug "CallServer runtime error: #{error}"
 
-      use: (module, router = @router) ->
+      use: (module) ->
         if module in included_middlewares
           module = "./middleware/#{module}"
 
-        router.use module
+        debug "Loading #{module}"
+        @router.use require module
 
     included_middlewares = [
       'numeric'
