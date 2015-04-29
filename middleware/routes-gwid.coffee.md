@@ -8,9 +8,10 @@ Default `gwid` router plugin
       gateway_manager.resolve_gateway entry.gwid
 
     @name = 'routes-gwid'
+    @init = ->
+      assert @cfg.gateway_manager?, 'Missing gateway manager.'
     @include = ->
       gateway_manager = @cfg.gateway_manager
-      assert gateway_manager?, 'Missing gateway manager.'
 
       if @finalized()
         debug 'Routes GwID: already finalized.'

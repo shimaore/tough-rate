@@ -47,10 +47,11 @@ This plugin provides `registrant_host` as a gateway.
       provisioning.get "number:#{@source}"
 
     @name = 'routes-registrant'
+    @init = ->
+      assert @cfg.provisioning?, 'Missing `provisioning`.'
     @include = ->
       ref_builder = @session.ref_builder ? build_ref
-      provisioning = @cfg.options.provisioning
-      assert provisioning?, 'Missing provisioning'
+      provisioning = @cfg.provisioning
 
       if @finalized()
         debug 'Routes Registrant: already finalized.'

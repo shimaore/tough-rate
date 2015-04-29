@@ -2,26 +2,30 @@ Local number middleware
 =======================
 
     @name = 'local-number'
+    @init = ->
+      assert @cfg.provisioning?, 'Missing `provisioning`.'
     @include = () ->
-      provisioning = @cfg.options.provisioning
-      assert provisioning, 'Missing `provisioning`.'
-      domain = @cfg.options.sip_domain_name
+      provisioning = @cfg.provisioning
 
       return if @finalized()
 
       debug "Checking whether #{@destination} is local."
       provisioning.get "number:#{@destination}"
       .then (doc) =>
-        return if doc.disabled
+        if doc.disabled
+          debug "#{doc._id} is local but is disabled."
+          return
+        if not doc.account?
+          debug "#{doc._id} is local but has no account."
+          return
 
         gw = @sendto doc.inbound_uri
-        if domain? and doc.account?
-          gw.headers =
-            'P-Charge-Info': url.format {
-              protocol:'sip'
-              auth: doc.account
-              hostname: domain
-            }
+        gw.headers =
+          'P-Charge-Info': url.format {
+            protocol:'sip:'
+            auth: doc.account
+            hostname: @cfg.sip_domain_name ? @cfg.host ? 'local'
+          }
         null
       .catch (error) =>
         debug "Checking whether #{@destination} is local: #{error}"

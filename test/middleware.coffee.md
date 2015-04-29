@@ -10,7 +10,7 @@
       it 'should call respond', (done) ->
         mw.call
           cfg:
-            options: profile:'default'
+            profile:'default'
           res:
             response:'604'
           statistics:

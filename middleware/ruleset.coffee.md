@@ -6,12 +6,13 @@ Ruleset Loader
     class CCNQBaseMiddlewareError extends Error
 
     @name = 'ruleset'
+    @init = ->
+      assert @cfg.provisioning?, 'Missing `provisioning`.'
+      assert @cfg.ruleset_of?, 'Missing `ruleset_of`.'
     @include = ->
-      provisioning = @cfg.options.provisioning
-      ruleset_of = @cfg.options.ruleset_of
-      default_outbound_route = @cfg.options.default_outbound_route
-      assert provisioning, 'Missing provisioning'
-      assert ruleset_of, 'Missing ruleset_of'
+      provisioning = @cfg.provisioning
+      ruleset_of = @cfg.ruleset_of
+      default_outbound_route = @cfg.default_outbound_route
 
 We first need to determine which routing table we should use, though.
 This is based on the calling number.

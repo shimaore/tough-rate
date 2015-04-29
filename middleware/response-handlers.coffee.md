@@ -1,7 +1,8 @@
     @name = 'response-handlers'
+    @init = ->
+      assert @cfg.gateway_manager?, 'Missing `gateway_manager`.'
     @include = ->
       gateway_manager = @cfg.gateway_manager
-      assert gateway_manager, 'Missing gateway_manager'
 
       gateway_to_id = (gateway) ->
 

@@ -6,9 +6,10 @@ This middleware is called normally at the end of the stack to process the gatewa
     class CallHandlerMiddlewareError extends Error
 
     @name = 'call-handler'
+    @init = ->
+      assert @cfg.profile?, 'Missing `profile`.'
     @include = ->
-      profile = @cfg.options.profile
-      assert profile?, 'middleware Call Handler: `profile` is required.'
+      profile = @cfg.profile
 
 Attempt Call
 ------------

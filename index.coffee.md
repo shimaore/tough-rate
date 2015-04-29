@@ -1,5 +1,3 @@
-    @GatewayManager = require './gateway_manager'
-    @CallServer = require './call_server'
     pkg = require './package.json'
 
     {p_fun} = require 'coffeescript-helpers'

@@ -4,9 +4,10 @@ Override route based on original (client-side) endpoint
 This is a dedicated bit of code that should be inserted before `ruleset` to force a specific route based on the originating endpoint.
 
     @name = 'override-route-from-endpoint'
+    @init = ->
+      assert @cfg.provisioning?, 'Missing `provisioning`'
     @include = ->
-      provisioning = @cfg.options.provisioning
-      assert provisioning, 'Missing `provisioning`'
+      provisioning = @cfg.provisioning
 
       return if @finalized()
 

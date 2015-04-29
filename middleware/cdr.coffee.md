@@ -1,6 +1,5 @@
     @name = 'cdr'
     @include = ->
-      cdr_base = @cfg.options.cdr_base
 
       @call.once 'CHANNEL_HANGUP_COMPLETE'
       .then (res) =>

@@ -32,10 +32,11 @@ Middleware definition
 ---------------------
 
     @name = 'routes-carrierid'
+    @init = ->
+      assert @cfg.gateway_manager?, 'Missing `gateway_manager`.'
     @include = ->
       gateway_manager = @cfg.gateway_manager
-      host = @cfg.options.host
-      assert gateway_manager?, 'Missing gateway manager.'
+      host = @cfg.host
 
       if @finalized()
         debug "Routes CarrierID: already finalized."

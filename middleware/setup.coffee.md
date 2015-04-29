@@ -51,7 +51,7 @@ Manipulate the gateways list.
           ctx.res.gateways.push gateway
         clear: ->
           if ctx.finalized()
-            debug "`clear` called when the route-set is already finalized", gateway
+            debug "`clear` called when the route-set is already finalized"
             return
           ctx.res.gateways = []
 
@@ -93,10 +93,27 @@ Manipulate the gateways list.
 
       }
 
-Toolbox
--------
-
     {EventEmitter} = require 'events'
     pkg = require '../package.json'
-    assert = require 'assert'
     debug = (require 'debug') "#{pkg.name}:setup"
+
+Init
+----
+
+    @init = ->
+
+      @cfg.statistics ?= new CaringBand()
+
+      unless @cfg.gateway_manager?
+        assert @cfg.provisioning?, 'Missing `provisioning`.'
+        assert @cfg.sip_domain_name?, 'Missing `sip_domain_name`.'
+        @cfg.gateway_manager = new GatewayManager @cfg.provisioning, @cfg.sip_domain_name
+
+        @cfg.gateway_manager.init()
+        .catch (error) =>
+          debug "CallServer startup error: Gateway Manager failed: #{error}, bailing out."
+          throw error
+
+    assert = require 'assert'
+    GatewayManager = require '../gateway_manager'
+    CaringBand = require 'caring-band'

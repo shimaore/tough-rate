@@ -6,9 +6,10 @@ Emergency Middleware
 Since this code rewrites the destination before resolving gateways, it must be called early on (i.e. after the rule is located but before the gateways are processed).
 
     @name = 'emergency'
+    @init = ->
+      assert @cfg.provisioning?, 'Missing `provisioning`.'
     @include = ->
-      provisioning = @cfg.options.provisioning
-      assert provisioning, 'Missing `provisioning`.'
+      provisioning = @cfg.provisioning
 
       if not @res.rule?
         debug 'Emergency middleware: no rule is present. (ignored)'

@@ -131,12 +131,30 @@ Server (Unit Under Test)
         options =
           provisioning: provisioning
           profile: 'test-sender'
+          host: 'example.net'
           ruleset_of: ruleset_of
           sip_domain_name: sip_domain_name
+          use: [
+            'setup'
+            'numeric'
+            'response-handlers'
+            'local-number'
+            'ruleset'
+            'emergency'
+            'routes-gwid'
+            'routes-carrierid'
+            'routes-registrant'
+            'flatten'
+            'cdr'
+            'call-handler'
+            'use-ccnq-to-e164'
+          ].map (m) ->
+            require "../middleware/#{m}"
 
         console.log 'Declaring Server'
-        CallServer = require '../call_server'
-        new CallServer 7002, options
+        CallServer = require 'useful-wind/call_server'
+        s = new CallServer options
+        s.listen 7002
 
 Test
 ====
