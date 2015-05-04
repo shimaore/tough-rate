@@ -4,3 +4,4 @@ test/log/
 *.js
 *.js.map
 local/
+log/
