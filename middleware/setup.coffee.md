@@ -114,6 +114,11 @@ Init
           debug "CallServer startup error: Gateway Manager failed: #{error}, bailing out."
           throw error
 
+        .then ->
+          if @cfg.default?
+            @cfg.gateway_manager.set @cfg.default
+          null
+
     assert = require 'assert'
     GatewayManager = require '../gateway_manager'
     CaringBand = require 'caring-band'
