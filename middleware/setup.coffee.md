@@ -114,7 +114,7 @@ Init
           debug "CallServer startup error: Gateway Manager failed: #{error}, bailing out."
           throw error
 
-        .then ->
+        .then =>
           if @cfg.default?
             @cfg.gateway_manager.set @cfg.default
           null
