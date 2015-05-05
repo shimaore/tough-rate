@@ -53,7 +53,10 @@ Middleware
         destination: @destination
 
       send_response = (response) =>
-        return @call.command 'respond', response
+        @call
+        .command 'respond', response
+        .catch (error) ->
+          debug "send_response(#{response}): #{error}"
 
       debug "CallHandler: starting."
 
@@ -64,7 +67,8 @@ Middleware
           call: @call.uuid
           source: @source
           destination: @destination
-        return send_response @res.response
+        send_response @res.response
+        return
 
 The route-set might not be modified anymore.
 
