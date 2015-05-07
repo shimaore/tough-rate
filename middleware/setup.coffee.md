@@ -5,6 +5,8 @@ We first need to determine which routing table we should use, though.
 This is based on the calling number.
 
     @name = 'setup'
+    @web = ->
+      @cfg.versions[pkg.name] = pkg.version
     @include = (ctx) ->
 
       ctx[k] = v for own k,v of {
@@ -126,3 +128,4 @@ Create the gateway-manager.
     assert = require 'assert'
     GatewayManager = require '../gateway_manager'
     CaringBand = require 'caring-band'
+    pkg = require '../package.json'
