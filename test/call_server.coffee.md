@@ -42,14 +42,16 @@ Setup
       console.log "Docker DNS is at #{DNS}"
       exec "docker run -p 127.0.0.1:8022:8022 --dns=#{DNS} -d --name #{p} #{p}"
     .catch (error) ->
-      console.log "Failed to locate Docker DNS"
+      console.error "Failed to locate Docker DNS"
       throw error
     .then -> start_server()
     .then (s) -> server = s
     .catch (error) ->
-      console.log "Start server failed"
+      console.error "Start server failed"
       throw error
-    .delay 17000
+    .then ->
+      console.log 'Waiting...'
+    .delay 16000
 
 Server (Unit Under Test)
 ========================
@@ -114,7 +116,7 @@ Server (Unit Under Test)
           }
         ]
       .catch (error) ->
-        console.log "bulkDocs failed"
+        console.error "bulkDocs failed"
         throw error
       .then ->
         console.log 'Inserting Gateway Manager Couch'
@@ -155,6 +157,7 @@ Server (Unit Under Test)
         CallServer = require 'useful-wind/call_server'
         s = new CallServer options
         s.listen 7002
+        s
 
 Test
 ====
@@ -229,5 +232,5 @@ Test
         .then -> exec "docker rm #{p}"
         .then -> exec "docker rmi #{p}"
         .catch (error) ->
-          console.log "`after` failed (ignored): #{error}"
+          console.error "`after` failed (ignored): #{error}"
           true
