@@ -8,6 +8,16 @@ This middleware is called normally at the end of the stack to process the gatewa
     @name = 'call-handler'
     @init = ->
       assert @cfg.profile?, 'Missing `profile`.'
+    @notify = ->
+      @cfg.statistics.on 'call', (data) =>
+        @socket.emit 'call',
+          host: cfg.host
+          data: data
+      @cfg.statistics.on 'report', (data) =>
+        @socket.emit 'report',
+          host: cfg.host
+          data: data
+
     @include = ->
       profile = @cfg.profile
 
