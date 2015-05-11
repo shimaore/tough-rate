@@ -18,7 +18,7 @@
     "esl": "^3.0.1",
     "memdown": "^1.0.0",
     "mocha": "^2.2.4",
-    "pouchdb": "^3.4.0",
+    "pouchdb": "^3.5.0",
     "should": "^6.0.1",
     "useful-wind": "^7.0.0"
   },
