@@ -7,13 +7,24 @@
         data = res.body
 
         debug "CDR: Channel Hangup Complete", billmsec: data.variable_billmsec
-        @statistics.add 'duration', data.variable_mduration
-        @statistics.add 'billable', data.variable_billmsec
-        @statistics.add 'progresss', data.variable_progressmsec
-        @statistics.add 'answer', data.variable_answermsec
-        @statistics.add 'wait', data.variable_waitmsec
-        @statistics.add 'progress_media', data.variable_progress_mediamsec
-        @statistics.add 'flow_bill', data.variable_flow_billmsec
+        data =
+          duration:       data.variable_mduration
+          billable:       data.variable_billmsec
+          progresss:      data.variable_progressmsec
+          answer:         data.variable_answermsec
+          wait:           data.variable_waitmsec
+          progress_media: data.variable_progress_mediamsec
+          flow_bill:      data.variable_flow_billmsec
+
+        for own k,v of data
+          @statistics.add k, v
+
+        @statistics.emit 'call',
+          state: 'end'
+          call: @call.uuid
+          source: @source
+          destination: @destination
+          data: data
 
 Compatibility layer for CCNQ3 -- remove once the LCR generates its own CDRs.
 
