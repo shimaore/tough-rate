@@ -689,7 +689,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
         it 'should emit call events', (done) ->
           ctx =
             data:
-              'Channel-Destination-Number': '331234'
+              'Channel-Destination-Number': '331244'
               'Channel-Caller-ID-Number': '2348'
             command: (c,v) ->
               if c in ['set','export']
@@ -700,7 +700,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
 
           statistics.on 'call', (data) ->
             console.dir data
-            if data.state is 'call-attempt' and data.source is '2348'
+            if data.state is 'call-attempt' and data.source is '2348' and data.destination is '331244'
               done()
 
           one_call ctx, 'default'
