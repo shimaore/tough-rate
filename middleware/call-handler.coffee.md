@@ -11,11 +11,11 @@ This middleware is called normally at the end of the stack to process the gatewa
     @notify = ->
       @cfg.statistics.on 'call', (data) =>
         @socket.emit 'call',
-          host: cfg.host
+          host: @cfg.host
           data: data
       @cfg.statistics.on 'report', (data) =>
         @socket.emit 'report',
-          host: cfg.host
+          host: @cfg.host
           data: data
 
     @include = ->
