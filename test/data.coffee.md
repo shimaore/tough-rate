@@ -686,6 +686,26 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           one_call ctx, 'default'
           null
 
+        it 'should emit call events', (done) ->
+          ctx =
+            data:
+              'Channel-Destination-Number': '331234'
+              'Channel-Caller-ID-Number': '2348'
+            command: (c,v) ->
+              if c in ['set','export']
+                return Promise.resolve().bind this
+              Promise.resolve
+                body:
+                  variable_last_bridge_hangup_cause: 'NORMAL_CALL_CLEARING'
+
+          statistics.on 'call', (data) ->
+            console.dir data
+            if data.state is 'call-attempt'
+              done()
+
+          one_call ctx, 'default'
+          null
+
         it 'should report errors', (done) ->
           ctx =
             data:
