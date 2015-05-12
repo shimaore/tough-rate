@@ -12,6 +12,7 @@
   "author": "Stéphane Alnet <stephane@shimaore.net> (http://stephane.shimaore.net/)",
   "license": "Unlicense",
   "devDependencies": {
+    "caring-band": "^1.4.0",
     "chai": "^2.3.0",
     "chai-as-promised": "^5.0.0",
     "coffee-script": "^1.9.2",
@@ -24,7 +25,6 @@
   },
   "dependencies": {
     "bluebird": "^2.9.25",
-    "caring-band": "^1.4.0",
     "coffeescript-helpers": "^2.0.0",
     "debug": "^2.1.3"
   },

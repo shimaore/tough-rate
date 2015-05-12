@@ -140,6 +140,8 @@ The steps to placing outbound call(s) are:
     Router = require 'useful-wind/router'
     Promise = require 'bluebird'
     serialize = require 'useful-wind/serialize'
+    CaringBand = require 'caring-band'
+    statistics = new CaringBand()
 
     class FreeSwitchError extends Error
       constructor:(@res,@args) ->
@@ -222,6 +224,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             sip_domain_name
             default_outbound_route: outbound_route
             profile: 'something-egress'
+            statistics
           }
           use = [
             '../middleware/setup'
@@ -239,9 +242,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           ].map (m) -> require m
           router.use m for m in use
           cfg.use = use
-          serialize cfg, 'server_pre'
-          .then ->
-            serialize cfg, 'init'
+          serialize cfg, 'init'
           .then ->
             router.route ctx
         .catch (exception) ->
@@ -290,7 +291,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           ready.then ->
             provisioning.put _id:'number:1234',inbound_uri:'sip:foo@bar'
           .then ->
-            cfg = {provisioning,ruleset_of,sip_domain_name}
+            cfg = {provisioning,ruleset_of,sip_domain_name,statistics}
             router = new Router cfg
             cfg.use = [
               '../middleware/setup'
@@ -299,9 +300,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
               '../middleware/flatten'
             ].map (m) -> require m
             router.use m for m in cfg.use
-            serialize cfg, 'server_pre'
-            .then ->
-              serialize cfg, 'init'
+            serialize cfg, 'init'
             .then ->
               router.route call_ '3213', '1234'
           .then (ctx) ->
@@ -315,7 +314,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           ready.then ->
             provisioning.put _id:'number:1244',inbound_uri:'sip:foo@bar', account:'boo'
           .then ->
-            router = new Router cfg = {provisioning,ruleset_of,sip_domain_name}
+            router = new Router cfg = {provisioning,ruleset_of,sip_domain_name,statistics}
             use = [
               '../middleware/setup'
               '../middleware/use-ccnq-to-e164'
@@ -325,9 +324,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             ].map (m) -> require m
             router.use m for m in use
             cfg.use = use
-            serialize cfg, 'server_pre'
-            .then ->
-              serialize cfg, 'init'
+            serialize cfg, 'init'
             .then ->
               router.route call_ '3213', 'abcd', null, '1244'
           .then (ctx) ->
@@ -345,7 +342,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           ready.then ->
             provisioning.put _id:'number:1432',inbound_uri:'sip:foo@bar',account:'foo_bar'
           .then ->
-            router = new Router cfg = {provisioning,ruleset_of,sip_domain_name}
+            router = new Router cfg = {provisioning,ruleset_of,sip_domain_name,statistics}
             use = [
               '../middleware/setup'
               '../middleware/local-number'
@@ -354,9 +351,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             ].map (m) -> require m
             router.use m for m in use
             cfg.use = use
-            serialize cfg, 'server_pre'
-            .then ->
-              serialize cfg, 'init'
+            serialize cfg, 'init'
             .then ->
               router.route call_ '3216', '1432'
           .then (ctx) ->
@@ -374,7 +369,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           ready.then ->
             provisioning.put _id:'number:3213',registrant_host:'foo',registrant_password:'badabing'
           .then ->
-            router = new Router cfg = {provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name}
+            router = new Router cfg = {provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name,statistics}
             use = [
               '../middleware/setup'
               '../middleware/ruleset'
@@ -383,9 +378,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             ].map (m) -> require m
             router.use m for m in use
             cfg.use = use
-            serialize cfg, 'server_pre'
-            .then ->
-              serialize cfg, 'init'
+            serialize cfg, 'init'
             .then ->
               router.route call_ '3213', '331234'
           .then (ctx) ->
@@ -401,7 +394,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           ready.then ->
             provisioning.put _id:'number:3243',registrant_host:'foo:5080'
           .then ->
-            router = new Router cfg = {provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name}
+            router = new Router cfg = {provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name,statistics}
             use = [
               '../middleware/setup'
               '../middleware/ruleset'
@@ -410,9 +403,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             ].map (m) -> require m
             router.use m for m in use
             cfg.use = use
-            serialize cfg, 'server_pre'
-            .then ->
-              serialize cfg, 'init'
+            serialize cfg, 'init'
             .then ->
               router.route call_ '3243', '331234'
           .then (ctx) ->
@@ -426,7 +417,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           ready.then ->
             provisioning.put _id:'number:3253',registrant_host:['foo:5080']
           .then ->
-            router = new Router cfg = {provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name}
+            router = new Router cfg = {provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name,statistics}
             use = [
               '../middleware/setup'
               '../middleware/ruleset'
@@ -435,9 +426,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             ].map (m) -> require m
             router.use m for m in use
             cfg.use = use
-            serialize cfg, 'server_pre'
-            .then ->
-              serialize cfg, 'init'
+            serialize cfg, 'init'
             .then ->
               router.route call_ '3253', '331234'
           .then (ctx) ->
@@ -454,6 +443,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
               provisioning
               ruleset_of
               default_outbound_route:'default'
+              statistics
             }
             use = [
               '../middleware/setup'
@@ -464,9 +454,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             ].map (m) -> require m
             router.use m for m in use
             cfg.use = use
-            serialize cfg, 'server_pre'
-            .then ->
-              serialize cfg, 'init'
+            serialize cfg, 'init'
             .then ->
               router.route call_ '336718', '331234'
           .then (ctx) ->
@@ -486,6 +474,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
               provisioning
               ruleset_of
               default_outbound_route:'default'
+              statistics
             }
             use = [
               '../middleware/setup'
@@ -496,9 +485,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             ].map (m) -> require m
             router.use m for m in use
             cfg.use = use
-            serialize cfg, 'server_pre'
-            .then ->
-              serialize cfg, 'init'
+            serialize cfg, 'init'
             .then ->
               router.route call_ '336718', '347766'
           .then (ctx) ->
@@ -515,6 +502,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
               provisioning
               ruleset_of
               default_outbound_route:'default'
+              statistics
             }
             use = [
               '../middleware/setup'
@@ -526,9 +514,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             ].map (m) -> require m
             router.use m for m in use
             cfg.use = use
-            serialize cfg, 'server_pre'
-            .then ->
-              serialize cfg, 'init'
+            serialize cfg, 'init'
             .then ->
               router.route call_ '336718', '330112', 'brest'
           .then (ctx) ->
@@ -548,6 +534,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
               provisioning
               ruleset_of
               default_outbound_route:'default'
+              statistics
             }
             use = [
               '../middleware/setup'
@@ -559,9 +546,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             ].map (m) -> require m
             router.use m for m in use
             cfg.use = use
-            serialize cfg, 'server_pre'
-            .then ->
-              serialize cfg, 'init'
+            serialize cfg, 'init'
             .then ->
               router.route call_ '336718', '330112', 'paris'
           .then (ctx) ->

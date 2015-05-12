@@ -125,5 +125,4 @@ Create the gateway-manager.
 
     assert = require 'assert'
     GatewayManager = require '../gateway_manager'
-    CaringBand = require 'caring-band'
     pkg = require '../package.json'

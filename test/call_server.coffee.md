@@ -8,6 +8,7 @@ Live test with FreeSwitch
     Promise = require 'bluebird'
     real_exec = Promise.promisify (require 'child_process').exec
     pkg = require '../package.json'
+    CaringBand = require 'caring-band'
 
 Parameters for docker.io image
 ==============================
@@ -136,6 +137,7 @@ Server (Unit Under Test)
           host: 'example.net'
           ruleset_of: ruleset_of
           sip_domain_name: sip_domain_name
+          statistics: new CaringBand()
           use: [
             'setup'
             'numeric'
@@ -152,10 +154,6 @@ Server (Unit Under Test)
             'use-ccnq-to-e164'
           ].map (m) ->
             require "../middleware/#{m}"
-
-        # FIXME instead of doing this, use thinkable-ducks instead of useful-wind
-        for m in options.use when m.server_pre?
-          m.server_pre.call cfg:options
 
         console.log 'Declaring Server'
         CallServer = require 'useful-wind/call_server'
