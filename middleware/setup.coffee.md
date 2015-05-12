@@ -102,10 +102,6 @@ Manipulate the gateways list.
 Init
 ----
 
-    @server_pre = ->
-
-      @cfg.statistics ?= new CaringBand()
-
     @init = ->
 
       return if @cfg.gateway_manager?
