@@ -239,7 +239,9 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           ].map (m) -> require m
           router.use m for m in use
           cfg.use = use
-          serialize cfg, 'init'
+          serialize cfg, 'server_pre'
+          .then ->
+            serialize cfg, 'init'
           .then ->
             router.route ctx
         .catch (exception) ->
@@ -297,7 +299,9 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
               '../middleware/flatten'
             ].map (m) -> require m
             router.use m for m in cfg.use
-            serialize cfg, 'init'
+            serialize cfg, 'server_pre'
+            .then ->
+              serialize cfg, 'init'
             .then ->
               router.route call_ '3213', '1234'
           .then (ctx) ->
@@ -321,7 +325,9 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             ].map (m) -> require m
             router.use m for m in use
             cfg.use = use
-            serialize cfg, 'init'
+            serialize cfg, 'server_pre'
+            .then ->
+              serialize cfg, 'init'
             .then ->
               router.route call_ '3213', 'abcd', null, '1244'
           .then (ctx) ->
@@ -348,7 +354,9 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             ].map (m) -> require m
             router.use m for m in use
             cfg.use = use
-            serialize cfg, 'init'
+            serialize cfg, 'server_pre'
+            .then ->
+              serialize cfg, 'init'
             .then ->
               router.route call_ '3216', '1432'
           .then (ctx) ->
@@ -375,7 +383,9 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             ].map (m) -> require m
             router.use m for m in use
             cfg.use = use
-            serialize cfg, 'init'
+            serialize cfg, 'server_pre'
+            .then ->
+              serialize cfg, 'init'
             .then ->
               router.route call_ '3213', '331234'
           .then (ctx) ->
@@ -400,7 +410,9 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             ].map (m) -> require m
             router.use m for m in use
             cfg.use = use
-            serialize cfg, 'init'
+            serialize cfg, 'server_pre'
+            .then ->
+              serialize cfg, 'init'
             .then ->
               router.route call_ '3243', '331234'
           .then (ctx) ->
@@ -423,7 +435,9 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             ].map (m) -> require m
             router.use m for m in use
             cfg.use = use
-            serialize cfg, 'init'
+            serialize cfg, 'server_pre'
+            .then ->
+              serialize cfg, 'init'
             .then ->
               router.route call_ '3253', '331234'
           .then (ctx) ->
@@ -450,7 +464,9 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             ].map (m) -> require m
             router.use m for m in use
             cfg.use = use
-            serialize cfg, 'init'
+            serialize cfg, 'server_pre'
+            .then ->
+              serialize cfg, 'init'
             .then ->
               router.route call_ '336718', '331234'
           .then (ctx) ->
@@ -480,7 +496,9 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             ].map (m) -> require m
             router.use m for m in use
             cfg.use = use
-            serialize cfg, 'init'
+            serialize cfg, 'server_pre'
+            .then ->
+              serialize cfg, 'init'
             .then ->
               router.route call_ '336718', '347766'
           .then (ctx) ->
@@ -508,7 +526,9 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             ].map (m) -> require m
             router.use m for m in use
             cfg.use = use
-            serialize cfg, 'init'
+            serialize cfg, 'server_pre'
+            .then ->
+              serialize cfg, 'init'
             .then ->
               router.route call_ '336718', '330112', 'brest'
           .then (ctx) ->
@@ -539,7 +559,9 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             ].map (m) -> require m
             router.use m for m in use
             cfg.use = use
-            serialize cfg, 'init'
+            serialize cfg, 'server_pre'
+            .then ->
+              serialize cfg, 'init'
             .then ->
               router.route call_ '336718', '330112', 'paris'
           .then (ctx) ->

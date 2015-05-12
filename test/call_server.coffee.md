@@ -153,6 +153,10 @@ Server (Unit Under Test)
           ].map (m) ->
             require "../middleware/#{m}"
 
+        # FIXME instead of doing this, use thinkable-ducks instead of useful-wind
+        for m in options.use when m.server_pre?
+          m.server_pre.call cfg:options
+
         console.log 'Declaring Server'
         CallServer = require 'useful-wind/call_server'
         s = new CallServer options
