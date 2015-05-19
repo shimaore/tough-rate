@@ -1,6 +1,7 @@
     @name = 'use-ccnq-to-e164'
     @include = ->
-      debug "Forcing #{@data.variable_ccnq_to_e164}"
+      debug "Forcing #{@data.variable_ccnq_from_e164} -> #{@data.variable_ccnq_to_e164}"
+      @source      = @data.variable_ccnq_from_e164
       @destination = @data.variable_ccnq_to_e164
       return
 
