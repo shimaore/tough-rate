@@ -77,6 +77,7 @@ Middleware
           call: @call.uuid
           source: @source
           destination: @destination
+          response: @res.response
         send_response @res.response
         return
 
