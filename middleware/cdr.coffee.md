@@ -18,6 +18,10 @@
 
         for own k,v of data
           @statistics.add k, v
+          @statistics.add ["#{k}-gw",@session.gateway?.gwid], v
+          @statistics.add ["#{k}-gw",@session.gateway?.gwid,@rule?.prefix], v
+          @statistics.add ["#{k}-carrier",@session.gateway?.carrierid], v
+          @statistics.add ["#{k}-carrier",@session.gateway?.carrierid,@rule?.prefix], v
 
         @statistics.emit 'call',
           state: 'end'

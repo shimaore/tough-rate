@@ -142,6 +142,8 @@ Call attempt.
               destination: @destination
 
             destination = gateway.destination_number ? @res.destination
+            @session.gateway = gateway
+            @session.destination = destination
             attempt.call this, destination, gateway
             .then (res) =>
               data = res.body
