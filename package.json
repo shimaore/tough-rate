@@ -27,7 +27,7 @@
     "bluebird": "^2.9.25",
     "coffeescript-helpers": "^2.0.0",
     "debug": "^2.1.3",
-    "nimble-direction": "^1.0.3"
+    "nimble-direction": "^1.0.4"
   },
   "directories": {
     "test": "test"
