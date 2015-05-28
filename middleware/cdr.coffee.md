@@ -10,7 +10,7 @@
         data =
           duration:       data.variable_mduration
           billable:       data.variable_billmsec
-          progresss:      data.variable_progressmsec
+          progress:       data.variable_progressmsec
           answer:         data.variable_answermsec
           wait:           data.variable_waitmsec
           progress_media: data.variable_progress_mediamsec
