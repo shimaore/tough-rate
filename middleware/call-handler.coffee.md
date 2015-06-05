@@ -135,6 +135,8 @@ Call attempt.
             debug "CallHandler: handling (next) gateway", gateway
             @statistics.add 'call-attempts'
             @statistics.add ['call-attempts',@rule?.prefix]
+            @statistics.add ['call-attempts',gateway.gwid]
+            @statistics.add ['call-attempts',gateway.carrierid]
             @statistics.emit 'call',
               state: 'call-attempt'
               call: @call.uuid
