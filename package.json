@@ -13,7 +13,7 @@
   "license": "Unlicense",
   "devDependencies": {
     "caring-band": "^1.4.0",
-    "chai": "^3.0.0",
+    "chai": "^2.3.0",
     "chai-as-promised": "^5.0.0",
     "coffee-script": "^1.9.3",
     "esl": "^3.0.1",
