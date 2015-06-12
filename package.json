@@ -26,6 +26,7 @@
   "dependencies": {
     "bluebird": "^2.9.27",
     "coffeescript-helpers": "^2.1.0",
+    "cuddly": "^1.1.1",
     "debug": "^2.2.0",
     "nimble-direction": "^2.0.2"
   },

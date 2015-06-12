@@ -34,7 +34,7 @@ Route based on the route selected by the source, or using a default route.
         unless route?
           @respond '485'
           debug 'RuleSet Middleware: No route available', {source}
-          @statistics.emit 'report', {error:'missing-route', source}
+          cuddly.dev 'missing-route', {source}
           throw new CCNQBaseMiddlewareError "No route available for #{source}"
 
         route = "#{route}"
@@ -46,7 +46,7 @@ Route based on the route selected by the source, or using a default route.
         unless ruleset? and ruleset_database?
           @respond '500'
           debug 'No ruleset available', {source,route:@res.route,ruleset,ruleset_database}
-          @statistics.emit 'report', {error:'missing-ruleset',source,route:@res.route,ruleset,ruleset_database}
+          cuddly.dev 'missing-ruleset', {source,route:@res.route,ruleset,ruleset_database}
           throw new CCNQBaseMiddlewareError "Route `#{@res.route}` for `#{source}` has no ruleset or no database."
 
         @res.ruleset = ruleset
@@ -57,7 +57,7 @@ Route based on the route selected by the source, or using a default route.
         unless rule?
           @respond '485'
           debug 'No route available', {source,destination:@res.destination,ruleset:@res.ruleset}
-          @statistics.emit 'report', {error:'missing-rule',source,destination:@res.destination,ruleset:@res.ruleset}
+          cuddly.dev 'missing-rule', {source,destination:@res.destination,ruleset:@res.ruleset}
           throw new CCNQBaseMiddlewareError "No rule available towards #{@res.destination}"
 
         if rule.gwlist?
@@ -65,15 +65,16 @@ Route based on the route selected by the source, or using a default route.
           delete rule.gwlist
         else
           debug 'Missing gwlist', rule
-          @statistics.emit 'report', {error:'missing-gwlist',rule}
+          cuddly.dev 'missing-gwlist', {rule}
 
         @res.rule = rule
         @attr rule.attrs
 
       .catch (error) =>
         debug "Ruleset middleware failed: #{error}"
-        @statistics.emit 'report', {error:error.toString(),when:'ruleset-middleware'}
+        cuddly.ops "ruleset-middleware: #{error}"
 
     assert = require 'assert'
     pkg = require '../package.json'
     debug = (require 'debug') "#{pkg.name}:ruleset"
+    cuddly = (require 'cuddly') "#{pkg.name}:ruleset"
