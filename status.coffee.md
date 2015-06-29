@@ -13,7 +13,9 @@ Stays in faulty state for at least `faulty_timeout` and downgrades to suspicious
 
     second = 1000
 
-    module.exports = class Status
+    {EventEmitter} = require 'events'
+
+    module.exports = class Status extends EventEmitter
       constructor: ->
         @state = 'active'
         @_timer = null
@@ -25,6 +27,8 @@ Stays in faulty state for at least `faulty_timeout` and downgrades to suspicious
         @_timer = null
         clearInterval @_interval if @_interval?
         @_interval = null
+        @emit 'stop'
+        return
 
       mark_as_faulty: ->
 
@@ -46,6 +50,8 @@ Once the timeout has expired, downgrade to suspicious state.
 Reset the timer.
 
         @_timer = setTimeout clear, @faulty_timeout
+
+        @emit 'faulty'
         return
 
       mark_as_suspicious: ->
@@ -57,6 +63,7 @@ Count how many times we got those.
 Do not downgrade.
 
         return if @state is 'faulty'
+
         @state = 'suspicious'
 
 Upgrade to faulty if we reached the limit.
@@ -76,6 +83,7 @@ Downgrade from suspicious only if none was reported since.
             @state = 'active'
             clearInterval @_interval
             @_interval = null
+            @emit 'active'
 
 Reset the error counter for the next run.
 
@@ -85,6 +93,8 @@ Make sure only one interval timer is set.
 
         if not @_interval?
           @_interval = setInterval test, @suspicious_timeout
+
+        @emit 'suspicious'
         return
 
       faulty_timeout: 15*second
