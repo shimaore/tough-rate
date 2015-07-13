@@ -19,7 +19,7 @@ Parameters for docker.io image
     t = 'live'
     p = "#{IMG}-#{t}"
     DNS = null
-    domain_name = "#{p}.local.localhost.docker-local"
+    domain_name = '127.0.0.1'
     domain = "#{domain_name}:5062"
     exec = (cmd) ->
       console.log cmd
@@ -36,15 +36,8 @@ Setup
     .catch -> true
     .then -> exec "docker rm #{p}"
     .catch -> true
-    .then -> exec "dig +short docker-dns.local.localhost.docker-local @172.17.42.1 | egrep '^[0-9.]+$'"
-    .then (dns) ->
-      # console.dir dns
-      DNS = dns[0].toString().replace '\n', ''
-      console.log "Docker DNS is at #{DNS}"
-      exec "docker run -p 127.0.0.1:8022:8022 --dns=#{DNS} -d --name #{p} #{p}"
-    .catch (error) ->
-      console.error "Failed to locate Docker DNS"
-      throw error
+    .then ->
+      exec "docker run --net=host -d --name #{p} #{p}"
     .then -> start_server()
     .then (s) -> server = s
     .catch (error) ->
@@ -227,6 +220,7 @@ Test
           t.should.eventually.equal true
 
       after ->
+        console.log "Stopping..."
         ready
         .then -> server?.stop()
         .then -> exec "docker logs #{p} > #{p}.log"
@@ -234,5 +228,6 @@ Test
         .then -> exec "docker rm #{p}"
         .then -> exec "docker rmi #{p}"
         .catch (error) ->
-          console.error "`after` failed (ignored): #{error}"
+          console.log "`after` failed (ignored): #{error}"
           true
+        null

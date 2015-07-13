@@ -28,7 +28,7 @@
     <configuration name="event_socket.conf" description="Socket Client">
       <settings>
         <param name="nat-map" value="false"/>
-        <param name="listen-ip" value="0.0.0.0"/>
+        <param name="listen-ip" value="127.0.0.1"/>
         <param name="listen-port" value="8022"/>
         <param name="password" value="ClueCon"/>
       </settings>
@@ -72,7 +72,7 @@
       <extension name="lcr">
         <condition field="destination_number" expression="^\d+$">
           <action application="set" data="socket_resume=true"/>
-          <action application="socket" data="172.17.42.1:7002 async full"/>
+          <action application="socket" data="127.0.0.1:7002 async full"/>
           <action application="respond" data="500 socket failure"/>
         </condition>
       </extension>
