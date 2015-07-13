@@ -5,6 +5,8 @@ Emergency Middleware
 
 Since this code rewrites the destination before resolving gateways, it must be called early on (i.e. after the rule is located but before the gateways are processed).
 
+    class EmergencyMiddlewareError extends Error
+
     @name = 'emergency'
     @init = ->
       assert @cfg.provisioning?, 'Missing `provisioning`.'
@@ -24,20 +26,37 @@ Then, see whether the destination number is an emergency number, and process it.
         debug 'Emergency middleware: not an emergency rule.'
         return
 
-      emergency_ref = @req.header 'X-CCNQ3-Routing'
+      emergency_key = null
 
-      if emergency_ref?
-        emergency_key = [@res.destination,emergency_ref].join '#'
-      else
-        emergency_key = @res.destination
+      Promise.resolve true
+      .then =>
+        emergency_ref = @req.header 'X-CCNQ3-Routing'
+        if emergency_ref?
+          return emergency_ref
 
-      provisioning.get "emergency:#{emergency_key}"
+        location_ref = @req.header 'X-CCNQ3-Location'
+        if location_ref?
+          provisioning.get "location:#{location_ref}"
+          .then (doc) ->
+            emergency_ref = doc.routing_data
+        else
+          null
+      .then (emergency_ref) =>
+
+        if emergency_ref?
+          emergency_key = [@res.destination,emergency_ref].join '#'
+        else
+          emergency_key = @res.destination
+
+        provisioning.get "emergency:#{emergency_key}"
       .catch (error) =>
-        debug "Emergency record emergency:#{emergency_key}", error
+        debug "Emergency record emergency:#{emergency_key} #{error}"
+        cuddly.ops "Emergency record emergency:#{emergency_key} #{error}"
         throw error
       .then (doc) =>
         if not doc.destination?
           debug "Emergency middleware: record for `#{emergency_key} has no `destination`."
+          cuddly.dev "Emergency middleware: record for `#{emergency_key} has no `destination`."
           throw new EmergencyMiddlewareError "Record for `#{emergency_key} has no `destination`."
 
 The `destination` field in a `emergency` record historically is the target, destination number, not a reference to a `destination` record.
@@ -81,3 +100,4 @@ Toolbox
     pkg = require '../package.json'
     Promise = require 'bluebird'
     debug = (require 'debug') "#{pkg.name}:emergency"
+    cuddly = (require 'cuddly') "#{pkg.name}:emergency"
