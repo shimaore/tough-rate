@@ -13,7 +13,7 @@ The design document that must be installed on the master databases in order for 
       'gateway'
       'host'
       # 'list'
-      # 'location'
+      'location'
       'number'
       'ruleset'
     ]
