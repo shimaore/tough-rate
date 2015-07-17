@@ -45,7 +45,7 @@ Sometimes we'll be provided with a pre-built URI (emergency calls, loopback call
         uri = gateway.uri ? "sip:#{destination}@#{gateway.address}"
 
         debug "CallHandler: attempt -- bridge [#{leg_options_text}]sofia/#{profile}/#{uri}"
-        @call.command 'bridge', "[#{leg_options_text}]sofia/#{profile}/#{uri}"
+        @action 'bridge', "[#{leg_options_text}]sofia/#{profile}/#{uri}"
 
 Middleware
 ----------
@@ -95,20 +95,20 @@ The `it` promise will return either a gateway, `false` if no gateway was found, 
           it = it.then ->
             if value is null
               debug "CallHandler: unset #{name}"
-              @call.command 'unset', name
+              @action 'unset', name
             else
               debug "CallHandler: set #{name} to value #{value}"
-              @call.command 'set', "#{name}=#{value}"
+              @action 'set', "#{name}=#{value}"
 
       for own name,value of @res.export
         do (name,value) ->
           it = it.then ->
             if value is null
               debug "CallHandler: export #{name}"
-              @call.command 'export', name
+              @action 'export', name
             else
               debug "CallHandler: export #{name} with value #{value}"
-              @call.command 'export', "#{name}=#{value}"
+              @action 'export', "#{name}=#{value}"
 
 If there are gateways, attempt to call through them in the order listed.
 
