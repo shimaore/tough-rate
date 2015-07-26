@@ -58,7 +58,8 @@ Middleware
         source: @source
         destination: @destination
 
-      send_response = (response) =>
+      send_response = @session?.alternate_response
+      send_response ?= (response) =>
         @call
         .command 'respond', response
         .catch (error) ->
