@@ -44,8 +44,10 @@ Setup
       console.error "Start server failed"
       throw error
     .then ->
-      console.log 'Waiting...'
+      console.log 'Start server OK, waiting...'
     .delay 16000
+    .then ->
+      null
 
 Server (Unit Under Test)
 ========================
@@ -205,7 +207,7 @@ Test
 
     describe 'Live Tests', ->
       before ->
-        @timeout 18000
+        @timeout 20000
         ready
 
       describe 'FreeSwitch', ->
