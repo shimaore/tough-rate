@@ -36,12 +36,15 @@ Then, see whether the destination number is an emergency number, and process it.
 
         location_ref = @req.header 'X-CCNQ3-Location'
         if location_ref?
+          debug "Locating", {location_ref}
           provisioning.get "location:#{location_ref}"
           .then (doc) ->
             emergency_ref = doc.routing_data
         else
+          debug "Neither Routing nor Location info"
           null
       .then (emergency_ref) =>
+        debug "Using", {emergency_ref}
 
         if emergency_ref?
           emergency_key = [@res.destination,emergency_ref].join '#'
