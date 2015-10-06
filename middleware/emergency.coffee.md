@@ -9,9 +9,9 @@ Since this code rewrites the destination before resolving gateways, it must be c
 
     @name = 'emergency'
     @init = ->
-      assert @cfg.provisioning?, 'Missing `provisioning`.'
+      assert @cfg.prov?, 'Missing `prov`.'
     @include = ->
-      provisioning = @cfg.provisioning
+      provisioning = @cfg.prov
 
       if not @res.rule?
         debug 'Emergency middleware: no rule is present. (ignored)'

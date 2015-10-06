@@ -3,9 +3,9 @@ Local number middleware
 
     @name = 'local-number'
     @init = ->
-      assert @cfg.provisioning?, 'Missing `provisioning`.'
+      assert @cfg.prov?, 'Missing `prov`.'
     @include = () ->
-      provisioning = @cfg.provisioning
+      provisioning = @cfg.prov
 
       return if @finalized()
 

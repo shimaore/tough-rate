@@ -127,7 +127,7 @@ Server (Unit Under Test)
             ruleset_database: new PouchDB doc.database
 
         options =
-          provisioning: provisioning
+          prov: provisioning
           profile: 'test-sender'
           host: 'example.net'
           ruleset_of: ruleset_of

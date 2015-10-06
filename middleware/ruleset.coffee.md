@@ -7,10 +7,10 @@ Ruleset Loader
 
     @name = 'ruleset'
     @init = ->
-      assert @cfg.provisioning?, 'Missing `provisioning`.'
+      assert @cfg.prov?, 'Missing `prov`.'
       assert @cfg.ruleset_of?, 'Missing `ruleset_of`.'
     @include = ->
-      provisioning = @cfg.provisioning
+      provisioning = @cfg.prov
       ruleset_of = @cfg.ruleset_of
       default_outbound_route = @cfg.default_outbound_route
 

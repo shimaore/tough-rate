@@ -108,10 +108,10 @@ Init
 
 Create the gateway-manager.
 
-      assert @cfg.provisioning?, 'Missing `provisioning`.'
+      assert @cfg.prov?, 'Missing `prov`.'
       assert @cfg.sip_domain_name?, 'Missing `sip_domain_name`.'
 
-      @cfg.gateway_manager = new GatewayManager @cfg.provisioning, @cfg.sip_domain_name
+      @cfg.gateway_manager = new GatewayManager @cfg.prov, @cfg.sip_domain_name
 
       @cfg.gateway_manager.init()
       .catch (error) =>

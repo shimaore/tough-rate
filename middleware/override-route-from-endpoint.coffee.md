@@ -5,9 +5,9 @@ This is a dedicated bit of code that should be inserted before `ruleset` to forc
 
     @name = 'override-route-from-endpoint'
     @init = ->
-      assert @cfg.provisioning?, 'Missing `provisioning`'
+      assert @cfg.prov?, 'Missing `prov`'
     @include = ->
-      provisioning = @cfg.provisioning
+      provisioning = @cfg.prov
 
       return if @finalized()
 

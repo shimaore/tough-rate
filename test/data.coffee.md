@@ -219,7 +219,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
         ready.then ->
           router = new Router cfg = {
             gateway_manager: gm
-            provisioning
+            prov: provisioning
             ruleset_of
             sip_domain_name
             default_outbound_route: outbound_route
@@ -291,7 +291,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           ready.then ->
             provisioning.put _id:'number:1234',inbound_uri:'sip:foo@bar'
           .then ->
-            cfg = {provisioning,ruleset_of,sip_domain_name,statistics}
+            cfg = {prov:provisioning,ruleset_of,sip_domain_name,statistics}
             router = new Router cfg
             cfg.use = [
               '../middleware/setup'
@@ -314,7 +314,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           ready.then ->
             provisioning.put _id:'number:1244',inbound_uri:'sip:foo@bar', account:'boo'
           .then ->
-            router = new Router cfg = {provisioning,ruleset_of,sip_domain_name,statistics}
+            router = new Router cfg = {prov:provisioning,ruleset_of,sip_domain_name,statistics}
             use = [
               '../middleware/setup'
               '../middleware/use-ccnq-to-e164'
@@ -342,7 +342,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           ready.then ->
             provisioning.put _id:'number:1432',inbound_uri:'sip:foo@bar',account:'foo_bar'
           .then ->
-            router = new Router cfg = {provisioning,ruleset_of,sip_domain_name,statistics}
+            router = new Router cfg = {prov:provisioning,ruleset_of,sip_domain_name,statistics}
             use = [
               '../middleware/setup'
               '../middleware/local-number'
@@ -369,7 +369,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           ready.then ->
             provisioning.put _id:'number:3213',registrant_host:'foo',registrant_password:'badabing'
           .then ->
-            router = new Router cfg = {provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name,statistics}
+            router = new Router cfg = {prov:provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name,statistics}
             use = [
               '../middleware/setup'
               '../middleware/ruleset'
@@ -394,7 +394,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           ready.then ->
             provisioning.put _id:'number:3243',registrant_host:'foo:5080'
           .then ->
-            router = new Router cfg = {provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name,statistics}
+            router = new Router cfg = {prov:provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name,statistics}
             use = [
               '../middleware/setup'
               '../middleware/ruleset'
@@ -417,7 +417,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           ready.then ->
             provisioning.put _id:'number:3253',registrant_host:['foo:5080']
           .then ->
-            router = new Router cfg = {provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name,statistics}
+            router = new Router cfg = {prov:provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name,statistics}
             use = [
               '../middleware/setup'
               '../middleware/ruleset'
@@ -440,7 +440,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           ready.then ->
             router = new Router cfg = {
               gateway_manager: gm
-              provisioning
+              prov:provisioning
               ruleset_of
               default_outbound_route:'default'
               statistics
@@ -471,7 +471,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
 
             router = new Router cfg = {
               gateway_manager: gm
-              provisioning
+              prov:provisioning
               ruleset_of
               default_outbound_route:'default'
               statistics
@@ -499,7 +499,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           ready.then ->
             router = new Router cfg = {
               gateway_manager: gm
-              provisioning
+              prov:provisioning
               ruleset_of
               default_outbound_route:'default'
               statistics
@@ -531,7 +531,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           ready.then ->
             router = new Router cfg = {
               gateway_manager: gm
-              provisioning
+              prov:provisioning
               ruleset_of
               default_outbound_route:'default'
               statistics
