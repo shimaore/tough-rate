@@ -7,7 +7,7 @@ This middleware is called normally at the end of the stack to process the gatewa
 
     @name = 'call-handler'
     @init = ->
-      assert @cfg.profile?, 'Missing `profile`.'
+      debug 'Missing `profile`.' unless @cfg.profile?
     @notify = ->
       @cfg.statistics.on 'call', (data) =>
         @socket.emit 'call',
@@ -15,7 +15,6 @@ This middleware is called normally at the end of the stack to process the gatewa
           data: data
 
     @include = ->
-      profile = @cfg.profile
 
 Attempt Call
 ------------
@@ -43,6 +42,7 @@ FIXME: build a more resistant list.
 Sometimes we'll be provided with a pre-built URI (emergency calls, loopback calls). In other cases we build the URI from the destination number and the gateway's address.
 
         uri = gateway.uri ? "sip:#{destination}@#{gateway.address}"
+        profile = gateway.profile ? @cfg.profile
 
         debug "CallHandler: attempt -- bridge [#{leg_options_text}]sofia/#{profile}/#{uri}"
         @action 'bridge', "[#{leg_options_text}]sofia/#{profile}/#{uri}"

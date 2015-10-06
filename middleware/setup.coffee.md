@@ -38,9 +38,9 @@ Manipulate the gateways list.
           callback?()
         finalized: ->
           ctx.res.finalized
-        sendto: (uri) ->
+        sendto: (uri,profile = null) ->
           ctx.finalize ->
-            ctx.res.gateways = [{uri}]
+            ctx.res.gateways = [{uri,profile}]
             ctx.res.gateways[0]
         respond: (v) ->
           ctx.finalize ->
