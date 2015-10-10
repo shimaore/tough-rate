@@ -45,8 +45,9 @@ Setup
       throw error
     .then ->
       console.log 'Start server OK, waiting...'
-    .delay 16000
+    .delay 10000
     .then ->
+      console.log 'Start server OK, done.'
       null
 
 Server (Unit Under Test)
@@ -206,12 +207,11 @@ Test
           reject exception
 
     describe 'Live Tests', ->
-      before ->
-        @timeout 20000
-        ready
 
       describe 'FreeSwitch', ->
-        @timeout 5000
+        @timeout 21000
+        before ->
+          ready
         it 'should process a regular call', ->
           t = ready.then test1
           t.should.be.fulfilled
