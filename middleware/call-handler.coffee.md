@@ -82,14 +82,15 @@ The route-set might not be modified anymore.
 
       @finalize() unless @finalized()
 
-      @set
-        continue_on_fail: true
-        hangup_after_bridge: false
-
 The `it` promise will return either a gateway, `false` if no gateway was found, or null if no gateway was successful.
 
       it = Promise.resolve()
       it = it.bind this
+
+      it.then ->
+        @set
+          continue_on_fail: true
+          hangup_after_bridge: false
 
       for own name,value of @res.set
         do (name,value) ->
