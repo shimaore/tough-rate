@@ -163,7 +163,10 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           ruleset: dataset.rulesets[x]
           ruleset_database: new PouchDB dataset.rulesets[x].database
 
-      ready = PouchDB.destroy 'provisioning'
+      ready = Promise.resolve true
+      .then ->
+        new PouchDB 'provisioning'
+        .destroy()
       .then ->
         provisioning = new PouchDB 'provisioning'
         records = []
@@ -174,7 +177,8 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
         provisioning.bulkDocs records
 
       ready = ready.then ->
-        PouchDB.destroy dataset.rulesets.default.database
+        new PouchDB dataset.rulesets.default.database
+        .destroy()
       .then ->
         default_ruleset = new PouchDB dataset.rulesets.default.database
         rules = []
@@ -182,7 +186,8 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
         default_ruleset.bulkDocs rules
 
       ready = ready.then ->
-        PouchDB.destroy dataset.rulesets.registrant.database
+        new PouchDB dataset.rulesets.registrant.database
+        .destroy()
       .then ->
         the_ruleset = new PouchDB dataset.rulesets.registrant.database
         rules = []
