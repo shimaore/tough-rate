@@ -94,6 +94,7 @@ Manipulate the gateways list.
             handler.apply this, arguments
 
       }
+      return
 
     {EventEmitter} = require 'events'
     pkg = require '../package.json'

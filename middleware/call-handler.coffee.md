@@ -220,6 +220,15 @@ However we do not propagate errors, since it would mean interrupting the call se
           @statistics.add 'route'
           @winner = winner
           @attr @winner.attrs
+
+Release leaking fields
+
+          @res.ruleset = null
+          @res.ruleset_database = null
+
+Hangup the call
+
+          @action 'hangup'
         null
 
       return it
