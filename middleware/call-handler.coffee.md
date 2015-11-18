@@ -226,9 +226,6 @@ Release leaking fields
           @res.ruleset = null
           @res.ruleset_database = null
 
-Hangup the call
-
-          @action 'hangup'
         null
 
       return it
