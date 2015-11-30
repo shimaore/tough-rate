@@ -92,7 +92,7 @@ The `it` promise will return either a gateway, `false` if no gateway was found, 
           continue_on_fail: true
           hangup_after_bridge: false
 
-      @res.set.sip_wait_for_aleg_ack ?= true
+      @res.export.sip_wait_for_aleg_ack ?= true
 
       for own name,value of @res.set
         do (name,value) ->
