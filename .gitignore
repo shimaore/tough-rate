@@ -5,3 +5,4 @@ test/log/
 *.js.map
 local/
 log/
+test/live/freeswitch.xml

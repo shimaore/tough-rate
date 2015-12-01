@@ -9,6 +9,7 @@ Live test with FreeSwitch
     real_exec = Promise.promisify (require 'child_process').exec
     pkg = require '../package.json'
     CaringBand = require 'caring-band'
+    fs = Promise.promisifyAll require 'fs'
 
 Parameters for docker.io image
 ==============================
@@ -31,6 +32,22 @@ Setup
 =====
 
     ready = Promise.resolve()
+    .then ->
+      cfg =
+        test: yes
+        profiles:
+          sender:
+            sip_port: 5062
+            socket_port: 5701 # Outbound-Socket port
+            context:'lcr'
+          catcher:
+            sip_port: 5064
+            socket_port: 5701
+            context:'answer'
+        acls:
+          default: [ '0.0.0.0/8' ]
+      xml = (require '../conf/freeswitch') cfg
+      fs.writeFileAsync 'test/live/freeswitch.xml', xml, 'utf-8'
     .then -> exec "docker build -t #{p} #{t}/"
     .then -> exec "docker kill #{p}"
     .catch -> true
