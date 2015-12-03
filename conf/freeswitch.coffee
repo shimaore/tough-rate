@@ -81,6 +81,7 @@ module.exports = renderable (cfg) ->
 
             p.name = name
             p.context ?= name
+            p.sip_trace = true if cfg.test
             profile_module.call L, p
 
     section name:'dialplan', ->
@@ -90,3 +91,11 @@ module.exports = renderable (cfg) ->
           extension name:"socket", ->
             condition field:'destination_number', expression:'^.+$', ->
               action application:'socket', data:"127.0.0.1:#{p.socket_port} async full"
+
+      return unless cfg.test
+
+      context name:'answer', ->
+        extension name:'answer', ->
+          condition field:'destination_number', expression:'^\\d+$', ->
+            action application:'answer'
+            action application:'sleep', data:1000
