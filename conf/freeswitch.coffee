@@ -1,12 +1,12 @@
 {renderable} = L = require 'acoustic-line'
+{hostname} = require 'os'
 
 module.exports = renderable (cfg) ->
   {doctype,document,section,configuration,settings,param,modules,module,load,network_lists,list,node,global_settings,profiles,profile,mappings,map,context,extension,condition,action} = L
   name = cfg.name ? 'server'
-  the_profiles = cfg.profiles ?
-    sender:
-      sip_port: 5060
-      socket_port: 5701 # Outbound-Socket port
+
+  the_profiles = cfg.profiles
+
   modules_to_load = [
     'mod_logfile'
     'mod_event_socket'
@@ -24,7 +24,7 @@ module.exports = renderable (cfg) ->
     section name:'configuration', ->
       configuration name:'switch.conf', ->
         settings ->
-          param name:'switchname', value:"freeswitch-#{name}"
+          param name:'switchname', value:"freeswitch-#{name}@#{cfg.host ? hostname()}"
           param name:'core-db-name', value:"/dev/shm/freeswitch/core-#{name}.db"
           param name:'rtp-start-port', value:49152
           param name:'rtp-end-port', value:65534
@@ -90,7 +90,9 @@ module.exports = renderable (cfg) ->
         context name:name, ->
           extension name:"socket", ->
             condition field:'destination_number', expression:'^.+$', ->
+              action application:'multiset', data:"profile=#{name} socket_resume=false"
               action application:'socket', data:"127.0.0.1:#{p.socket_port} async full"
+              action application:'respond', data:'500 socket failure'
 
       return unless cfg.test
 
