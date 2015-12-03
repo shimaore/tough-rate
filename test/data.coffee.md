@@ -765,7 +765,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
               'Channel-Caller-ID-Number': '2348'
               'variable_sip_h_X-CCNQ3-Routing': 'brest'
             command: (c,v) ->
-              if c is 'set'
+              if c is 'set' or c is 'export'
                 return Promise.resolve().bind this
               v.should.equal '[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800]sofia/something-egress/sip:33156@127.0.0.1:5068'
               c.should.equal 'bridge'

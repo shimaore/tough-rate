@@ -37,18 +37,21 @@ Setup
       cfg =
         test: yes
         profiles:
-          sender:
+          'test-sender':
             sip_port: 5062
-            socket_port: 5701 # Outbound-Socket port
-            context:'lcr'
-          catcher:
+            local_ip: '127.0.0.1'
+            socket_port: 7002 # Outbound-Socket port
+            context:'test-sender'
+          'test-catcher':
             sip_port: 5064
-            socket_port: 5701
+            local_ip: '127.0.0.1'
+            socket_port: 7002 # Outbound-Socket port
             context:'answer'
         acls:
-          default: [ '0.0.0.0/8' ]
+          default: [ '127.0.0.0/8' ]
       xml = (require '../conf/freeswitch') cfg
-      fs.writeFileAsync 'test/live/freeswitch.xml', xml, 'utf-8'
+      fs.writeFileAsync 'live/freeswitch.xml', xml, 'utf-8'
+    .catch (error) -> debug "write: #{error} in #{process.cwd()}"
     .then -> exec "docker build -t #{p} #{t}/"
     .then -> exec "docker kill #{p}"
     .catch -> true
@@ -147,7 +150,7 @@ Server (Unit Under Test)
 
         options =
           prov: provisioning
-          profile: 'test-sender'
+          profile: 'tough-rate-test-sender'
           host: 'example.net'
           ruleset_of: ruleset_of
           sip_domain_name: sip_domain_name
@@ -186,7 +189,9 @@ Test
             source = '1234'
             destination = '33142'
             debug 'originate'
-            @api "originate {origination_caller_id_number=#{source}}sofia/test-sender/sip:#{destination}@#{domain} &park"
+            @api "originate {origination_caller_id_number=#{source}}sofia/tough-rate-test-sender/sip:#{destination}@#{domain} &park"
+            .then ->
+              Promise.delay 700
             .then ->
               debug 'client.end'
               client.end()
@@ -200,7 +205,7 @@ Test
             client.end()
             reject new Error 'test error'
           debug 'client.connect'
-          client.connect 8022, '127.0.0.1'
+          client.connect 5702, '127.0.0.1'
           debug 'connecting'
           client
         catch exception
@@ -213,7 +218,7 @@ Test
           client = FS.client ->
             source = '1235'
             destination = '330112'
-            @api "originate [origination_caller_id_number=#{source},sip_h_X-CCNQ3-Routing=brest]sofia/test-sender/sip:#{destination}@#{domain} &park"
+            @api "originate [origination_caller_id_number=#{source},sip_h_X-CCNQ3-Routing=brest]sofia/tough-rate-test-sender/sip:#{destination}@#{domain} &park"
             .then ->
               client.end()
               resolve true
@@ -224,7 +229,7 @@ Test
             console.dir 'test2.on error':data
             client.end()
             reject new Error 'test error'
-          client.connect 8022, '127.0.0.1'
+          client.connect 5702, '127.0.0.1'
           client
         catch exception
           reject exception
