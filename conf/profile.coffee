@@ -7,18 +7,18 @@ module.exports = renderable (o) ->
       param name:'user-agent-string', value:"tough-rate-#{o.name}-#{o.sip_port}"
       param name:'username', value:"tough-rate-#{o.name}"
       param name:'debug', value:2
-      param name:'sip-trace', value:false
+      param name:'sip-trace', value:o.sip_trace
 
       param name:'sip-port', value:o.sip_port
       param name:'bind-params', value:'transport=udp' # tcp
 
-      param name:'sip-ip', value:'0.0.0.0'
+      param name:'sip-ip', value:o.local_ip
       param name:'ext-sip-ip', value:o.local_ip
 
-      param name:'rtp-ip', value:'0.0.0.0'
+      param name:'rtp-ip', value:o.local_ip
       param name:'ext-rtp-ip', value:o.local_ip
 
-      param name:'apply-inbound-acl', value:'default'
+      param name:'apply-inbound-acl', value:o.acl
 
       param name:'dialplan', value:'XML'
       param name:'context', value:o.context
@@ -37,8 +37,8 @@ module.exports = renderable (o) ->
       param name:'inbound-codec-negotiation', value:'scrooge'
       param name:'inbound-late-negotiation', value:true
 
-      param name:'inbound-codec-prefs', value:o.inbound_codec ? 'PCMA,PCMU'
-      param name:'outbound-codec-prefs', value:o.outbound_codec ? 'PCMA,PCMU'
+      param name:'inbound-codec-prefs', value:o.inbound_codec
+      param name:'outbound-codec-prefs', value:o.outbound_codec
       param name:'renegotiate-codec-on-reinvite', value:true
       param name:'inbound-bypass-media', value:true
       param name:'inbound-proxy-media', value:false
