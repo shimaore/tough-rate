@@ -80,13 +80,13 @@ module.exports = renderable (cfg) ->
             p.sip_trace ?= false
 
             p.name = name
-            p.context ?= "context-#{name}"
+            p.context ?= name
             profile_module.call L, p
 
     section name:'dialplan', ->
 
       for name, p of the_profiles
-        context name:"context-#{name}", ->
+        context name:name, ->
           extension name:"socket", ->
             condition field:'destination_number', expression:'^.+$', ->
               action application:'socket', data:"127.0.0.1:#{p.socket_port} async full"

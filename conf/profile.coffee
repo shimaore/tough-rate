@@ -1,11 +1,12 @@
 {renderable} = require 'acoustic-line'
+pkg = require '../package'
 
 module.exports = renderable (o) ->
   {profile,settings,param} = this
-  profile name:"tough-rate-#{o.name}", ->
+  profile name:"#{pkg.name}-#{o.name}", ->
     settings ->
-      param name:'user-agent-string', value:"tough-rate-#{o.name}-#{o.sip_port}"
-      param name:'username', value:"tough-rate-#{o.name}"
+      param name:'user-agent-string', value:"#{pkg.name}-#{o.name}-#{o.sip_port}"
+      param name:'username', value:"#{pkg.name}-#{o.name}"
       param name:'debug', value:2
       param name:'sip-trace', value:o.sip_trace
 
