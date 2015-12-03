@@ -8,6 +8,7 @@ Live test with FreeSwitch
     Promise = require 'bluebird'
     real_exec = Promise.promisify (require 'child_process').exec
     pkg = require '../package.json'
+    debug = (require 'debug') "#{pkg.name}:test:call_server"
     CaringBand = require 'caring-band'
     fs = Promise.promisifyAll require 'fs'
 
@@ -23,7 +24,7 @@ Parameters for docker.io image
     domain_name = '127.0.0.1'
     domain = "#{domain_name}:5062"
     exec = (cmd) ->
-      console.log cmd
+      debug cmd
       real_exec cmd
 
     server = null
@@ -58,13 +59,13 @@ Setup
     .then -> start_server()
     .then (s) -> server = s
     .catch (error) ->
-      console.error "Start server failed"
+      debug "Start server failed: #{error}"
       throw error
     .then ->
-      console.log 'Start server OK, waiting...'
+      debug 'Start server OK, waiting...'
     .delay 10000
     .then ->
-      console.log 'Start server OK, done.'
+      debug 'Start server OK, done.'
       null
 
 Server (Unit Under Test)
@@ -184,18 +185,23 @@ Test
           client = FS.client ->
             source = '1234'
             destination = '33142'
+            debug 'originate'
             @api "originate {origination_caller_id_number=#{source}}sofia/test-sender/sip:#{destination}@#{domain} &park"
             .then ->
+              debug 'client.end'
               client.end()
               resolve true
             .catch (exception) ->
+              debug "Error: #{exception}"
               client.end()
               reject exception
           client.on 'error', (data) ->
-            console.dir 'test.on error':data
+            debug "test.on error #{data}"
             client.end()
             reject new Error 'test error'
+          debug 'client.connect'
           client.connect 8022, '127.0.0.1'
+          debug 'connecting'
           client
         catch exception
           reject exception

@@ -3,6 +3,9 @@ The steps to placing outbound call(s) are:
 - from that rule's gwlist, build a single list of unique gateways we will attempt in order
 - place the calls
 
+    pkg = require '../package'
+    debug = (require 'debug') "#{pkg.name}:test:data"
+
     sip_domain_name = 'phone.local'
     dataset_1 =
       gateways:
