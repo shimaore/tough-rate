@@ -14,22 +14,22 @@
   "devDependencies": {
     "caring-band": "^1.4.2",
     "chai": "^3.4.1",
-    "chai-as-promised": "^5.1.0",
+    "chai-as-promised": "^5.2.0",
     "coffee-script": "^1.10.0",
-    "esl": "^4.3.0",
+    "esl": "^5.1.0",
     "memdown": "^1.1.0",
-    "mocha": "^2.3.3",
+    "mocha": "^2.3.4",
     "pouchdb": "^5.1.0",
-    "should": "^7.1.1",
-    "useful-wind": "^7.1.4"
+    "should": "^8.0.2",
+    "useful-wind": "^7.1.5"
   },
   "dependencies": {
-    "acoustic-line": "^1.5.0",
-    "bluebird": "^3.0.5",
+    "acoustic-line": "^1.7.0",
+    "bluebird": "^3.1.1",
     "coffeescript-helpers": "^2.1.1",
     "cuddly": "^1.1.4",
     "debug": "^2.2.0",
-    "nimble-direction": "^4.0.0"
+    "nimble-direction": "^4.0.4"
   },
   "directories": {
     "test": "test"
