@@ -23,6 +23,8 @@ Route based on the route selected by the source, or using a default route.
 
       source = @source
 
+* doc.global_number.outbound_route (number) Route used for Least Cost Routing (LCR).
+
       provisioning.get "number:#{source}"
       .then (doc) =>
         debug "RuleSet Middleware: number:#{source} :", doc

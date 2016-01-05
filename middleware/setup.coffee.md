@@ -112,6 +112,8 @@ Create the gateway-manager.
       assert @cfg.prov?, 'Missing `prov`.'
       assert @cfg.sip_domain_name?, 'Missing `sip_domain_name`.'
 
+* cfg.gateway_manager In pkg:tough-rate, the object that manages gateways and carrier records.
+
       @cfg.gateway_manager = new GatewayManager @cfg.prov, @cfg.sip_domain_name
 
       @cfg.gateway_manager.init()

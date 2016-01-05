@@ -32,6 +32,8 @@
 
 Compatibility layer for CCNQ3 -- remove once the LCR generates its own CDRs.
 
+* hdr:X-CCNQ3-Attrs JSON-encoded attributes, set in LCR so that they show up in CDRs as doc.CDR.variables.ccnq_attrs.
+
       attrs = {}
       for own k,v of @res.attrs when v?
         attrs[k] = v

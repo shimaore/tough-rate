@@ -69,9 +69,10 @@ module.exports = renderable (cfg) ->
         profiles ->
           profile_module = cfg.profile_module ? require './profile'
           for name, p of the_profiles
-            p.timer_t1 ?= 250
-            p.timer_t4 ?= 5000
-            p.timer_t2 ?= 4000
+            # Timer values see http://tools.ietf.org/html/rfc3261#page-265
+            p.timer_t1 ?= 250  # 500ms in RFC3261; works well in practice
+            p.timer_t4 ?= 5000 # RFC3261 section 17.1.2.2
+            p.timer_t2 ?= 4000 # RFC3261 section 17.1.2.2
             p.timer_t1x64 ?= 64*p.timer_t1
             p.local_ip ?= 'auto'
             p.inbound_codec ?= 'PCMA'

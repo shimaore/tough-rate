@@ -28,6 +28,12 @@ Then, see whether the destination number is an emergency number, and process it.
 
       emergency_key = null
 
+* hdr:X-CCNQ3-Routing Emergency Reference. (Obsolete CCNQ3 header.) Key into doc.emergency.
+* hdr:X-CCNQ3-Location Emergency location, gets translation into an Emergency Reference (doc.emergency) via doc.location records.
+* doc.location Translation of Emergency Locations into Emergency References
+* doc.location._id `location:<location-reference>`
+* doc.location.routing_data (string) Emergency Reference for this location. Concatenated with the emergency called number to form the key into doc.emergency.
+
       Promise.resolve true
       .then =>
         emergency_ref = @req.header 'X-CCNQ3-Routing'
@@ -50,6 +56,10 @@ Then, see whether the destination number is an emergency number, and process it.
           emergency_key = [@res.destination,emergency_ref].join '#'
         else
           emergency_key = @res.destination
+
+* doc.emergency Emergency Reference document. Translates an Emergency Reference into a called number.
+* doc.emergency._id `emergency:<number>#<emergency-reference>` where `number` is the emergency called number (typically a special number such a `330112` to handle national routing), and `emergency-reference` is doc.location.routing_data.
+* doc.emergency.destination Translated emergency number.
 
         provisioning.get "emergency:#{emergency_key}"
       .catch (error) =>
@@ -93,6 +103,8 @@ If multiple destination numbers are present, we cannot afford to try all combina
           .then (gateways) =>
             @res.gateways = gateways
             @res.rule = {}
+
+* hdr.X-CCNQ3-Attrs.emergency True if the called number is a translated emergency number.
 
       .then =>
         @attr emergency: true

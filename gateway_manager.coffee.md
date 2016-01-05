@@ -35,6 +35,9 @@ The gateway manager provides services to the call handler.
           for own k,v of name
             @default_parameters[k] = v
 
+* doc.carrier Parameters of an egress carrier.
+* doc.carrier._id `carrier:<sip-domain-name>`
+
       init: ->
         Promise.resolve()
         .then =>
@@ -106,6 +109,8 @@ The gateway manager provides services to the call handler.
             do (row) => @_merge_gateway_row row
         .catch (error) ->
           debug "GatewayManager reevaluate_gateways: #{error}"
+
+* doc.carrier.carrierid
 
       _merge_carrier_row: (row) ->
         debug "GatewayManager merge-carrier-row #{JSON.stringify row}"
@@ -234,8 +239,17 @@ The following fields are optional:
           map: p_fun (doc) ->
             return unless doc.type?
 
+* doc.gateway.sip_domain_name
+* doc.gateway.carrierid
+
             if doc.type is 'gateway'
               return emit [doc.sip_domain_name, doc.carrierid], doc
+
+* doc.host.sip_profiles[]
+* doc.host.sip_profiles[].egress_sip_ip
+* doc.host.sip_profiles[].ingress_sip_ip
+* doc.host.sip_profiles[].egress_sip_port
+* doc.host.sip_profiles[].ingress_sip_port
 
             if doc.type is 'host' and doc.sip_profiles?
               for name, rec of doc.sip_profiles
@@ -243,6 +257,14 @@ The following fields are optional:
                   # for now we only generate for egress gateways
                   ip = rec.egress_sip_ip ? rec.ingress_sip_ip
                   port = rec.egress_sip_port ? rec.ingress_sip_port+10000
+
+* doc.host.sip_profiles[].egress.gwid
+* doc.host.sip_profiles[].egress_gwid Used if doc.host.sip_profiles[].egress.gwid is not defined. (CCNQ3 convention.)
+* doc.host.sip_profiles[].egress.address
+* doc.host.sip_profiles[].egress.host
+* doc.host.host
+* doc.host.sip_domain_name
+* doc.host.sip_profiles[].egress.carrierid
 
                   egress = {}
                   egress[k] = v for own k,v of rec.egress
