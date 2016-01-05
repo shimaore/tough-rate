@@ -6,3 +6,4 @@ test/log/
 local/
 log/
 test/live/freeswitch.xml
+test/live/

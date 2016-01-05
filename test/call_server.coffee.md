@@ -16,6 +16,7 @@ Parameters for docker.io image
 ==============================
 
     process.chdir (require 'path').dirname __filename
+    pwd = process.cwd()
 
     IMG = "#{pkg.name}-test"
     t = 'live'
@@ -52,13 +53,14 @@ Setup
       xml = (require '../conf/freeswitch') cfg
       fs.writeFileAsync 'live/freeswitch.xml', xml, 'utf-8'
     .catch (error) -> debug "write: #{error} in #{process.cwd()}"
-    .then -> exec "docker build -t #{p} #{t}/"
     .then -> exec "docker kill #{p}"
     .catch -> true
     .then -> exec "docker rm #{p}"
     .catch -> true
     .then ->
-      exec "docker run --net=host -d --name #{p} #{p}"
+      exec """
+        docker run --net=host -d --name #{p} -v "#{pwd}/live:/opt/freeswitch/etc/freeswitch" shimaore/freeswitch:2.1.2 /opt/freeswitch/bin/freeswitch -nf -nosql -nonat -nonatmap -nocal -nort -c
+      """
     .then -> start_server()
     .then (s) -> server = s
     .catch (error) ->
@@ -256,7 +258,6 @@ Test
         .then -> exec "docker logs #{p} > #{p}.log"
         .then -> exec "docker kill #{p}"
         .then -> exec "docker rm #{p}"
-        .then -> exec "docker rmi #{p}"
         .catch (error) ->
           console.log "`after` failed (ignored): #{error}"
           true
