@@ -118,8 +118,7 @@ Create the gateway-manager.
 
       @cfg.gateway_manager.init()
       .catch (error) =>
-        debug "CallServer startup error: Gateway Manager failed: #{error}, bailing out."
-        throw error
+        debug "CallServer startup error: Gateway Manager failed: #{error}"
 
       .then =>
         if @cfg.default?
