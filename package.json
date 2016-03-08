@@ -13,23 +13,23 @@
   "license": "Unlicense",
   "devDependencies": {
     "caring-band": "^1.4.2",
-    "chai": "^3.4.1",
+    "chai": "^3.5.0",
     "chai-as-promised": "^5.2.0",
     "coffee-script": "^1.10.0",
-    "esl": "^5.1.0",
-    "memdown": "^1.1.0",
-    "mocha": "^2.3.4",
-    "pouchdb": "^5.1.0",
-    "should": "^8.0.2",
-    "useful-wind": "^7.1.5"
+    "esl": "^5.2.1",
+    "memdown": "^1.1.2",
+    "mocha": "^2.4.5",
+    "pouchdb": "^5.3.0",
+    "should": "^8.2.2",
+    "useful-wind": "^7.1.9"
   },
   "dependencies": {
-    "acoustic-line": "^1.7.0",
-    "bluebird": "^3.1.1",
-    "coffeescript-helpers": "^2.1.1",
-    "cuddly": "^1.1.4",
+    "acoustic-line": "^1.8.0",
+    "bluebird": "^3.3.4",
+    "coffeescript-helpers": "^2.2.0",
+    "cuddly": "^1.1.5",
     "debug": "^2.2.0",
-    "nimble-direction": "^4.0.4"
+    "nimble-direction": "^4.1.2"
   },
   "directories": {
     "test": "test"
