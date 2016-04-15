@@ -4,6 +4,10 @@ Default `carrierid` router plugin
 Replace all carrierid entries with matching definitions.
 
     update = (gateway_manager,host,entry) ->
+
+* doc.rule.gwlist[].carrierid (string) name of the destination doc.carrier
+* doc.carrier ignore
+
       return entry unless entry.carrierid?
       gateway_manager.resolve_carrier entry.carrierid
       .then (gateways) =>

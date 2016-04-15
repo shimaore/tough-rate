@@ -62,6 +62,8 @@ Route based on the route selected by the source, or using a default route.
           cuddly.dev 'missing-rule', {source,destination:@res.destination,ruleset:@res.ruleset}
           throw new CCNQBaseMiddlewareError "No rule available towards #{@res.destination}"
 
+* doc.rule.gwlist (array) List of gateways/carriers for this destination.
+
         if rule.gwlist?
           @res.gateways = rule.gwlist
           delete rule.gwlist
@@ -70,6 +72,9 @@ Route based on the route selected by the source, or using a default route.
           cuddly.dev 'missing-gwlist', {rule}
 
         @res.rule = rule
+
+* doc.rule.attrs (object) Extra attributes for this rule.
+
         @attr rule.attrs
 
       .catch (error) =>

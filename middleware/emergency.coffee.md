@@ -22,14 +22,16 @@ Since this code rewrites the destination before resolving gateways, it must be c
 
 Then, see whether the destination number is an emergency number, and process it.
 
+* doc.rule.emergency (boolean) true if the rule is a route for an emergency number. See doc.location and doc.emergency for more information.
+
       if not @res.rule.emergency
         debug 'Emergency middleware: not an emergency rule.'
         return
 
       emergency_key = null
 
-* hdr:X-CCNQ3-Routing Emergency Reference. (Obsolete CCNQ3 header.) Key into doc.emergency.
-* hdr:X-CCNQ3-Location Emergency location, gets translation into an Emergency Reference (doc.emergency) via doc.location records.
+* hdr.X-CCNQ3-Routing Emergency Reference. (Obsolete CCNQ3 header.) Key into doc.emergency.
+* hdr.X-CCNQ3-Location Emergency location, gets translation into an Emergency Reference (doc.emergency) via doc.location records.
 * doc.location Translation of Emergency Locations into Emergency References
 * doc.location._id `location:<location-reference>`
 * doc.location.routing_data (string) Emergency Reference for this location. Concatenated with the emergency called number to form the key into doc.emergency.
