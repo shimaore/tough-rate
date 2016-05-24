@@ -21,6 +21,7 @@ module.exports = renderable (o) ->
       param name:'enable-3pcc', value:false
 
       param name:'inbound-use-callid-as-uuid', value:true
+      param name:'outbound-use-uuid-as-callid', value:false
 
       param name:'dialplan', value:"inline:'socket:127.0.0.1:#{o.socket_port} async full'"
       param name:'context', value:o.context
@@ -35,6 +36,7 @@ module.exports = renderable (o) ->
       param name:'timer-T4', value:o.timer_t4
 
       # Auth
+      param name:'log-auth-failures', value:true
       param name:'accept-blind-auth', value:true
       param name:'auth-calls', value:false
       param name:'auth-all-packets', value:false
@@ -80,7 +82,6 @@ module.exports = renderable (o) ->
 
       param name:'use-rtp-timer', value:true
       param name:'rtp-timer-name', value:'soft'
-
 
       # Codec
       param name:'inbound-codec-prefs', value:o.inbound_codec
