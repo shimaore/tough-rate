@@ -155,13 +155,14 @@ Server (Unit Under Test)
 
         options =
           prov: provisioning
-          profile: 'tough-rate-test-sender'
+          profile: 'huge-play-test-sender'
           host: 'example.net'
           ruleset_of: ruleset_of
           sip_domain_name: sip_domain_name
           statistics: new CaringBand()
           use: [
             'setup'
+            '../test/catcher'
             'numeric'
             'response-handlers'
             'local-number'
@@ -188,55 +189,67 @@ Test
 
     test1 = ->
       new Promise (resolve,reject) ->
-        setTimeout reject, 4000
+        setTimeout ->
+          reject new Error 'test1 timed out'
+        , 6000
         try
           client = FS.client ->
             source = '1234'
             destination = '33142'
-            debug 'originate'
-            @api "originate {origination_caller_id_number=#{source}}sofia/tough-rate-test-sender/sip:#{destination}@#{domain} &park"
+            debug 'test1: originate'
+            @api "originate {origination_caller_id_number=#{source}}sofia/huge-play-test-sender/sip:#{destination}@#{domain} &park"
             .then ->
+              debug 'test1: delay'
               Promise.delay 700
             .then ->
-              debug 'client.end'
+              debug 'test1: client.end'
               client.end()
               resolve true
             .catch (exception) ->
-              debug "Error: #{exception}"
+              debug "test1 Error: #{exception}"
               client.end()
               reject exception
           client.on 'error', (data) ->
-            debug "test.on error #{data}"
+            debug 'test1.on error', data
             client.end()
-            reject new Error 'test error'
-          debug 'client.connect'
+            reject new Error "test1 error #{data}"
+          debug 'test1 client.connect'
           client.connect 5702, '127.0.0.1'
-          debug 'connecting'
+          debug 'test1 connecting'
           client
         catch exception
+          debug 'test1 caught', exception
           reject exception
 
     test2 = ->
       new Promise (resolve,reject) ->
-        setTimeout reject, 4000
+        setTimeout ->
+          reject new Error 'test2 timed out'
+        , 6000
         try
           client = FS.client ->
             source = '1235'
             destination = '330112'
-            @api "originate [origination_caller_id_number=#{source},sip_h_X-CCNQ3-Routing=brest]sofia/tough-rate-test-sender/sip:#{destination}@#{domain} &park"
+            debug 'test2: originate'
+            @api "originate [origination_caller_id_number=#{source},sip_h_X-CCNQ3-Routing=brest]sofia/huge-play-test-sender/sip:#{destination}@#{domain} &park"
             .then ->
+              debug 'test2: client.end()'
               client.end()
               resolve true
             .catch (exception) ->
+              debug 'test2: exception'
               client.end()
               reject exception
           client.on 'error', (data) ->
-            console.dir 'test2.on error':data
+            debug 'test2.on error', data
             client.end()
-            reject new Error 'test error'
+            reject new Error "test2 error: #{data}"
+          debug 'test2 connect'
           client.connect 5702, '127.0.0.1'
+          debug 'test2 connecting'
           client
         catch exception
+          debug 'test2 caught', exception
           reject exception
 
     describe 'Live Tests', ->
