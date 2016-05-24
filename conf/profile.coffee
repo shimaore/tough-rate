@@ -62,10 +62,11 @@ module.exports = renderable (o) ->
       param name:'rtp-timeout-sec', value:300
       param name:'rtp-hold-timeout-sec', value:1800
 
-      param name:'enable-soa', value:false
-      param name:'inbound-bypass-media', value:true
-      # Enter the dialplan without the codec having been negotiated.
-      param name:'inbound-late-negotiation', value:true
+      if true
+          param name:'enable-soa', value:false
+          param name:'inbound-bypass-media', value:true
+          # Enter the dialplan without the codec having been negotiated.
+          param name:'inbound-late-negotiation', value:true
 
       # Only enable proxy-media on a call-by-call-basis
       param name:'inbound-proxy-media', value:false
@@ -94,6 +95,7 @@ module.exports = renderable (o) ->
       param name:'pass-rfc2833', value:true
 
       # NAT
-      param name:'aggressive-nat-detection', value:false
+      if true
+          param name:'aggressive-nat-detection', value:false
       param name:'stun-enabled', value:false
       param name:'stun-auto-disable', value:true
