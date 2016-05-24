@@ -17,7 +17,7 @@ module.exports = renderable (o) ->
       param name:'bind-params', value:'transport=udp' # tcp
 
       param name:'apply-inbound-acl', value:o.acl
-      param name:'disable-transfer', value:true
+      param name:'disable-transfer', value:o.disable_transfer
       param name:'enable-3pcc', value:false
 
       param name:'inbound-use-callid-as-uuid', value:true
@@ -25,7 +25,7 @@ module.exports = renderable (o) ->
 
       param name:'dialplan', value:"inline:'socket:127.0.0.1:#{o.socket_port} async full'"
       param name:'context', value:o.context
-      param name:'max-proceeding', value:2000
+      param name:'max-proceeding', value:3000
 
       param name:'forward-unsolicited-mwi-notify', value: false
       param name:'sip-options-respond-503-on-busy', value:false
