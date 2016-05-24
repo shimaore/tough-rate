@@ -15,7 +15,6 @@ Live test with FreeSwitch
 Parameters for docker.io image
 ==============================
 
-    process.chdir (require 'path').dirname __filename
     pwd = process.cwd()
 
     IMG = "#{pkg.name}-test"
@@ -35,6 +34,10 @@ Setup
 
     ready = Promise.resolve()
     .then ->
+      fs.mkdirAsync 'test/live'
+    .catch (error) ->
+      debug "mkdir #{error.stack ? error}"
+    .then ->
       cfg =
         test: yes
         profiles:
@@ -51,7 +54,7 @@ Setup
         acls:
           default: [ '127.0.0.0/8' ]
       xml = (require '../conf/freeswitch') cfg
-      fs.writeFileAsync 'live/freeswitch.xml', xml, 'utf-8'
+      fs.writeFileAsync 'test/live/freeswitch.xml', xml, 'utf-8'
     .catch (error) -> debug "write: #{error} in #{process.cwd()}"
     .then -> exec "docker kill #{p}"
     .catch -> true
@@ -59,7 +62,7 @@ Setup
     .catch -> true
     .then ->
       exec """
-        docker run --net=host -d --name #{p} -v "#{pwd}/live:/opt/freeswitch/etc/freeswitch" shimaore/freeswitch:2.1.2 /opt/freeswitch/bin/freeswitch -nf -nosql -nonat -nonatmap -nocal -nort -c
+        docker run --net=host -d --name #{p} -v "#{pwd}/test/live:/opt/freeswitch/etc/freeswitch" shimaore/freeswitch:3.0.1 /opt/freeswitch/bin/freeswitch -nf -nosql -nonat -nonatmap -nocal -nort -c
       """
     .then -> start_server()
     .then (s) -> server = s
