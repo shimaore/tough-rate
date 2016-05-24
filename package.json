@@ -18,18 +18,19 @@
     "coffee-script": "^1.10.0",
     "esl": "^5.2.2",
     "memdown": "^1.1.2",
-    "mocha": "^2.4.5",
-    "pouchdb": "^5.3.1",
-    "should": "^8.3.1",
-    "useful-wind": "^7.1.9"
+    "mocha": "^2.5.2",
+    "pouchdb": "^5.3.2",
+    "should": "^8.4.0"
   },
   "dependencies": {
     "acoustic-line": "^1.8.0",
-    "bluebird": "^3.3.5",
+    "bluebird": "^3.4.0",
     "coffeescript-helpers": "^2.2.0",
     "cuddly": "^1.1.5",
     "debug": "^2.2.0",
-    "nimble-direction": "^4.1.2"
+    "huge-play": "^11.3.1",
+    "nimble-direction": "^4.1.2",
+    "useful-wind": "^7.2.1"
   },
   "directories": {
     "test": "test"
