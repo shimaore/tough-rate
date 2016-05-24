@@ -15,7 +15,6 @@ module.exports = renderable (cfg) ->
     'mod_commands'
     'mod_dptools'
     'mod_loopback'
-    'mod_dialplan_xml'
     'mod_sofia'
   ]
   if cfg.modules?
@@ -73,7 +72,7 @@ module.exports = renderable (cfg) ->
           param name:'debug-presence', value:0
         profiles ->
           # cfg.profile_module (Node.js module) module to use to build Sofia profiles (default: tough-rate's)
-          profile_module = cfg.profile_module ? require './profile'
+          profile_module = cfg.profile_module ? require 'huge-play/conf/profile'
           for name, p of the_profiles
             # cfg.profiles[].timer_t1 (integer) SIP timer T1 for FreeSwitch (default: 250)
             # cfg.profiles[].timer_t1x64 (integer) SIP timer T1*64 for FreeSwitch (default: 64*timer_t1)
@@ -86,6 +85,7 @@ module.exports = renderable (cfg) ->
             p.timer_t1x64 ?= 64*p.timer_t1
             # cfg.profiles[].local_ip (string) local binding IP for SIP for FreeSwitch. Defaults to `auto`.
             p.local_ip ?= 'auto'
+
             # cfg.profiles[].inbound_codec (string) inbound codec list (default: `PCMA`)
             # cfg.profiles[].outbound_codec (string) outbound codec list (default: `PCMA`)
             # cfg.profiles[].acl (string) SIP port ACL name. Default: `default`
@@ -93,26 +93,9 @@ module.exports = renderable (cfg) ->
             p.outbound_codec ?= 'PCMA'
             p.acl ?= 'default'
             p.sip_trace ?= false
+            p.disable_transfer = true
+            p.media = false
 
             p.name = name
             p.context ?= name
-            p.sip_trace = true if cfg.test
             profile_module.call L, p
-
-    section name:'dialplan', ->
-
-      for name, p of the_profiles
-        context name:name, ->
-          extension name:"socket", ->
-            condition field:'destination_number', expression:'^.+$', ->
-              action application:'multiset', data:"profile=#{name} socket_resume=false"
-              action application:'socket', data:"127.0.0.1:#{p.socket_port} async full"
-              action application:'respond', data:'500 socket failure'
-
-      return unless cfg.test
-
-      context name:'answer', ->
-        extension name:'answer', ->
-          condition field:'destination_number', expression:'^\\d+$', ->
-            action application:'answer'
-            action application:'sleep', data:1000
