@@ -24,8 +24,7 @@ The following operations are available to modify the responses (provided by the 
     @res.respond      Respond with a (numeric) error code; the route-set is cleared and finalised.
     @res.finalized()  Indicates whether the route-set has been finalized.
 
-
-    @on           How to handle specific error codes (upon call attempts); the callback receives the gateway description.
+    @on               How to handle specific error codes (upon call attempts); the callback receives the gateway description.
 
     @res.attr         Add value to attributes (recorded in CDRs)
 
