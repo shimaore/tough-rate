@@ -11,17 +11,19 @@
         mw.call
           cfg:
             profile:'default'
+          session: {}
           res:
-            response:'604'
+            finalized: -> true
+            gateways: []
           statistics:
             add: ->
             emit: ->
-          call:
-            command: (command,arg) ->
-              command.should.eql 'respond'
-              arg.should.eql '604'
-              done()
-              Promise.resolve()
+          export: ->
+          set: ->
+          respond: (arg) ->
+            arg.should.eql '604'
+            done()
+            Promise.resolve()
 
     describe.skip 'response-handlers', ->
 

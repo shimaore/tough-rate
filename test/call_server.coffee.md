@@ -161,22 +161,23 @@ Server (Unit Under Test)
           sip_domain_name: sip_domain_name
           statistics: new CaringBand()
           use: [
-            'setup'
+            'huge-play/middleware/setup'
+            '../middleware/setup'
             '../test/catcher'
-            'numeric'
-            'response-handlers'
-            'local-number'
-            'ruleset'
-            'emergency'
-            'routes-gwid'
-            'routes-carrierid'
-            'routes-registrant'
-            'flatten'
-            'cdr'
-            'call-handler'
-            'use-ccnq-to-e164'
+            '../middleware/numeric'
+            '../middleware/response-handlers'
+            '../middleware/local-number'
+            '../middleware/ruleset'
+            '../middleware/emergency'
+            '../middleware/routes-gwid'
+            '../middleware/routes-carrierid'
+            '../middleware/routes-registrant'
+            '../middleware/flatten'
+            '../middleware/cdr'
+            '../middleware/call-handler'
+            '../middleware/use-ccnq-to-e164'
           ].map (m) ->
-            require "../middleware/#{m}"
+            require m
 
         console.log 'Declaring Server'
         CallServer = require 'useful-wind/call_server'
