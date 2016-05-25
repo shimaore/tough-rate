@@ -5,6 +5,9 @@ Local number middleware
     @init = ->
       assert @cfg.prov?, 'Missing `prov`.'
     @include = () ->
+
+      return unless @session.direction is 'lcr'
+
       provisioning = @cfg.prov
 
       return if @res.finalized()

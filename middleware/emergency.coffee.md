@@ -11,6 +11,9 @@ Since this code rewrites the destination before resolving gateways, it must be c
     @init = ->
       assert @cfg.prov?, 'Missing `prov`.'
     @include = ->
+
+      return unless @session.direction is 'lcr'
+
       provisioning = @cfg.prov
 
       if not @res.rule?

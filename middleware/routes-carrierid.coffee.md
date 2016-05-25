@@ -39,6 +39,9 @@ Middleware definition
     @init = ->
       assert @cfg.gateway_manager?, 'Missing `gateway_manager`.'
     @include = ->
+
+      return unless @session.direction is 'lcr'
+
       gateway_manager = @cfg.gateway_manager
       host = @cfg.host
 

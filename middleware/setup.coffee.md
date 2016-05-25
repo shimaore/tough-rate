@@ -9,6 +9,8 @@ This is based on the calling number.
       @cfg.versions[pkg.name] = pkg.version
     @include = (ctx) ->
 
+      return unless @session.direction is 'lcr'
+
       ctx[k] = v for own k,v of {
         statistics: @cfg.statistics
         res:

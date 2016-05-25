@@ -7,6 +7,9 @@ This is a dedicated bit of code that should be inserted before `ruleset` to forc
     @init = ->
       assert @cfg.prov?, 'Missing `prov`'
     @include = ->
+
+      return unless @session.direction is 'lcr'
+
       provisioning = @cfg.prov
 
       return if @res.finalized()

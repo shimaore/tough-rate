@@ -15,6 +15,9 @@ Default `gwid` router plugin
     @init = ->
       assert @cfg.gateway_manager?, 'Missing gateway manager.'
     @include = ->
+
+      return unless @session.direction is 'lcr'
+
       gateway_manager = @cfg.gateway_manager
 
       if @res.finalized()

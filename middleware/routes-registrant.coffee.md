@@ -50,6 +50,9 @@ This plugin provides `registrant_host` as a gateway.
     @init = ->
       assert @cfg.prov?, 'Missing `prov`.'
     @include = ->
+
+      return unless @session.direction is 'lcr'
+
       ref_builder = @session.ref_builder ? build_ref
       provisioning = @cfg.prov
 

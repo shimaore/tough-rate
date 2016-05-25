@@ -1,5 +1,8 @@
     @name = 'numeric'
     @include = ->
+
+      return unless @session.direction is 'lcr'
+
       unless @source? and @source.match /^\d+$/
         debug 'Missing or invalid source', @data
         @res.respond '484'

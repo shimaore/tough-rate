@@ -3,6 +3,8 @@
     @name = 'cdr'
     @include = seem ->
 
+      return unless @session.direction is 'lcr'
+
       @call.once 'CHANNEL_HANGUP_COMPLETE'
       .then (res) =>
         debug "CDR: Channel Hangup Complete"

@@ -4,6 +4,8 @@ Flatten the gateways
     @name = 'flatten'
     @include = ->
 
+      return unless @session.direction is 'lcr'
+
       debug "Gateways before ops", JSON.stringify @res.gateways
 
 We must flatten the list so that CallHandler can use it.
