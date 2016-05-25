@@ -11,7 +11,8 @@
         mw.call
           cfg:
             profile:'default'
-          session: {}
+          session:
+            direction: 'lcr'
           res:
             finalized: -> true
             gateways: []

@@ -236,6 +236,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           }
           use = [
             'huge-play/middleware/setup'
+            './standalone'
             '../middleware/setup'
             '../middleware/numeric'
             '../middleware/response-handlers'
@@ -304,6 +305,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             router = new Router cfg
             cfg.use = [
               'huge-play/middleware/setup'
+              './standalone'
               '../middleware/setup'
               '../middleware/local-number'
               '../middleware/ruleset'
@@ -327,6 +329,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             router = new Router cfg = {prov:provisioning,ruleset_of,sip_domain_name,statistics}
             use = [
               'huge-play/middleware/setup'
+              './standalone'
               '../middleware/setup'
               '../middleware/use-ccnq-to-e164'
               '../middleware/local-number'
@@ -356,6 +359,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             router = new Router cfg = {prov:provisioning,ruleset_of,sip_domain_name,statistics}
             use = [
               'huge-play/middleware/setup'
+              './standalone'
               '../middleware/setup'
               '../middleware/local-number'
               '../middleware/ruleset'
@@ -384,6 +388,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             router = new Router cfg = {prov:provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name,statistics}
             use = [
               'huge-play/middleware/setup'
+              './standalone'
               '../middleware/setup'
               '../middleware/ruleset'
               '../middleware/routes-registrant'
@@ -410,6 +415,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             router = new Router cfg = {prov:provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name,statistics}
             use = [
               'huge-play/middleware/setup'
+              './standalone'
               '../middleware/setup'
               '../middleware/ruleset'
               '../middleware/routes-registrant'
@@ -434,6 +440,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             router = new Router cfg = {prov:provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name,statistics}
             use = [
               'huge-play/middleware/setup'
+              './standalone'
               '../middleware/setup'
               '../middleware/ruleset'
               '../middleware/routes-registrant'
@@ -462,6 +469,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             }
             use = [
               'huge-play/middleware/setup'
+              './standalone'
               '../middleware/setup'
               '../middleware/ruleset'
               '../middleware/routes-gwid'
@@ -494,6 +502,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             }
             use = [
               'huge-play/middleware/setup'
+              './standalone'
               '../middleware/setup'
               '../middleware/ruleset'
               '../middleware/routes-gwid'
@@ -523,6 +532,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             }
             use = [
               'huge-play/middleware/setup'
+              './standalone'
               '../middleware/setup'
               '../middleware/ruleset'
               '../middleware/emergency'
@@ -556,6 +566,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             }
             use = [
               'huge-play/middleware/setup'
+              './standalone'
               '../middleware/setup'
               '../middleware/ruleset'
               '../middleware/emergency'

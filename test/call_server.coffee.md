@@ -162,8 +162,9 @@ Server (Unit Under Test)
           statistics: new CaringBand()
           use: [
             'huge-play/middleware/setup'
+            './catcher'
+            './standalone'
             '../middleware/setup'
-            '../test/catcher'
             '../middleware/numeric'
             '../middleware/response-handlers'
             '../middleware/local-number'
