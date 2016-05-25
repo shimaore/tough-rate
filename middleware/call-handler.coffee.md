@@ -7,7 +7,8 @@ This middleware is called normally at the end of the stack to process the gatewa
 
     class CallHandlerMiddlewareError extends Error
 
-    @name = 'tough-rate:middleware:call-handler'
+    pkg = require '../package.json'
+    @name = "#{pkg.name}:middleware:call-handler"
     @init = ->
       debug 'Missing `profile`.' unless @cfg.profile?
     @notify = ->
@@ -129,7 +130,7 @@ On successful connection we also get `variable_originate_disposition=SUCCESS, va
           @statistics.add ['cause-carrier',cause,gateway.carrierid]
           @statistics.add ['cause-carrier',cause,gateway.carrierid,@rule?.prefix]
 
-          if cause in ['NORMAL_CALL_CLEARING', 'SUCCESS']
+          if cause in ['NORMAL_CALL_CLEARING', 'NORMAL_CLEARING', 'SUCCESS']
 
             debug "CallHandler: successful call: #{cause} when routing #{destination} through #{JSON.stringify gateway}."
             @statistics.add 'connected-calls'
@@ -195,6 +196,5 @@ Toolbox
 
     Promise = require 'bluebird'
     assert = require 'assert'
-    pkg = require '../package.json'
-    debug = (require 'debug') "#{pkg.name}:call-handler"
-    cuddly = (require 'cuddly') "#{pkg.name}:call-handler"
+    debug = (require 'debug') @name
+    cuddly = (require 'cuddly') @name
