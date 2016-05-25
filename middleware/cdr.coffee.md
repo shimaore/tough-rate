@@ -1,5 +1,7 @@
+    seem = require 'seem'
+
     @name = 'cdr'
-    @include = ->
+    @include = seem ->
 
       @call.once 'CHANNEL_HANGUP_COMPLETE'
       .then (res) =>
@@ -39,7 +41,7 @@ Compatibility layer for CCNQ3 -- remove once the LCR generates its own CDRs.
       attrs = {}
       for own k,v of @res.attrs when v?
         attrs[k] = v
-      @set 'sip_h_X-CCNQ3-Attrs', JSON.stringify attrs
+      yield @set 'sip_h_X-CCNQ3-Attrs', JSON.stringify attrs
 
       null
 

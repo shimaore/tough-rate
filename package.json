@@ -30,6 +30,7 @@
     "debug": "^2.2.0",
     "huge-play": "^11.3.1",
     "nimble-direction": "^4.1.2",
+    "seem": "^1.1.1",
     "useful-wind": "^7.2.1"
   },
   "directories": {
