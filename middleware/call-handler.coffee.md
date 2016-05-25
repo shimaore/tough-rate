@@ -3,6 +3,8 @@ Call Handling Middleware
 
 This middleware is called normally at the end of the stack to process the gateway list and handle responses.
 
+    seem = require 'seem'
+
     class CallHandlerMiddlewareError extends Error
 
     @name = 'call-handler'
@@ -14,7 +16,7 @@ This middleware is called normally at the end of the stack to process the gatewa
           host: @cfg.host
           data: data
 
-    @include = ->
+    @include = seem ->
 
 Attempt Call
 ------------
@@ -59,140 +61,111 @@ The route-set might not be modified anymore.
 Do not process further if we already responded.
 
       if @session.call_failed?
-        debug "Already responded", @res.__response
+        debug "Already responded", @session.first_response_was
         return
 
 The `it` promise will return either a gateway, `false` if no gateway was found, or null if no gateway was successful.
 
-      it = Promise.resolve()
-      it = it.bind this
-
-      it.then ->
-        @set
-          continue_on_fail: true
-          hangup_after_bridge: false
+      yield @set
+        continue_on_fail: true
+        hangup_after_bridge: false
 
       @session.sip_wait_for_aleg_ack ?= true
-      @export sip_wait_for_aleg_ack: @session.sip_wait_for_aleg_ack
-      @set sip_wait_for_aleg_ack: @session.sip_wait_for_aleg_ack
+      yield @export sip_wait_for_aleg_ack: @session.sip_wait_for_aleg_ack
+      yield @set sip_wait_for_aleg_ack: @session.sip_wait_for_aleg_ack
 
 If there are gateways, attempt to call through them in the order listed.
 
-      it = it.then ->
-        null
+      winner = null
 
-      for gateway in @res.gateways
-        do (gateway) ->
-
-Should return the winning gateway iff the call was successful and no further attempts should be made.
-
-          it = it.then (winner) ->
-
-If a winner was already found simply return it.
-
-            return winner if winner?
+      for gateway in @res.gateways when not winner?
 
 Call attempt.
 
-            debug "CallHandler: handling (next) gateway", gateway
-            @statistics.add 'call-attempts'
-            @statistics.add ['call-attempts',@rule?.prefix]
-            @statistics.add ['call-attempts-gw',gateway.gwid]
-            @statistics.add ['call-attempts-carrier',gateway.carrierid]
-            @statistics.emit 'call',
-              state: 'call-attempt'
-              call: @call.uuid
-              source: @source
-              destination: @destination
+        try
 
-            destination = gateway.destination_number ? @res.destination
-            @session.gateway = gateway
-            @session.destination = destination
-            attempt.call this, destination, gateway
-            .then (res) =>
-              data = res.body
+          debug "CallHandler: handling (next) gateway", gateway
+          @statistics.add 'call-attempts'
+          @statistics.add ['call-attempts',@rule?.prefix]
+          @statistics.add ['call-attempts-gw',gateway.gwid]
+          @statistics.add ['call-attempts-carrier',gateway.carrierid]
+          @report state: 'call-attempt'
 
-              debug "CallHandler: FreeSwitch response: ", res
-              @statistics.add 'call-status'
+          destination = gateway.destination_number ? @res.destination
+          @session.gateway = gateway
+          @session.destination = destination
+          res = yield attempt
+            .call this, destination, gateway
+            .catch (error) ->
+              debug "attempt error: #{error.stack ? error}"
+              body: {}
+          data = res.body
+
+          debug "CallHandler: FreeSwitch response: ", res
+          @statistics.add 'call-status'
 
 On CANCEL we get `variable_originate_disposition=ORIGINATOR_CANCEL` instead of a proper `last_bridge_hangup_cause`.
 On successful connection we also get `variable_originate_disposition=SUCCESS, variable_DIALSTATUS=SUCCESS`.
 
-              @res.cause = cause = data?.variable_last_bridge_hangup_cause ? data?.variable_originate_disposition
+          @res.cause = cause = data?.variable_last_bridge_hangup_cause ? data?.variable_originate_disposition
 
-              unless cause?
-                debug "CallHandler: Unable to parse reply '#{res}'", res
-                throw new CallHandlerMiddlewareError "Unable to parse reply"
+          unless cause?
+            debug "CallHandler: Unable to parse reply '#{res}'", res
+            continue
 
-              thus = Promise.resolve()
-              .then =>
-                @response_handlers.emit cause, gateway
-                @response_handlers.emit 'call-completed', gateway
-                cause
-              .catch (error) =>
-                debug "CallHandler: Response handler(s) for #{cause} failed.", error.toString()
-                cause
+          try
+            @response_handlers.emit cause, gateway
+            @response_handlers.emit 'call-completed', gateway
+          catch error
+            debug "CallHandler: Response handler(s) for #{cause} failed: #{error.stack ? error}"
 
-            .then (cause) =>
+          @statistics.add ['cause',cause]
+          @statistics.add ['cause-gw',cause,gateway.gwid]
+          @statistics.add ['cause-gw',cause,gateway.gwid,@rule?.prefix]
+          @statistics.add ['cause-carrier',cause,gateway.carrierid]
+          @statistics.add ['cause-carrier',cause,gateway.carrierid,@rule?.prefix]
 
-              @statistics.add ['cause',cause]
-              @statistics.add ['cause-gw',cause,gateway.gwid]
-              @statistics.add ['cause-gw',cause,gateway.gwid,@rule?.prefix]
-              @statistics.add ['cause-carrier',cause,gateway.carrierid]
-              @statistics.add ['cause-carrier',cause,gateway.carrierid,@rule?.prefix]
+          if cause in ['NORMAL_CALL_CLEARING', 'SUCCESS']
 
-              if cause in ['NORMAL_CALL_CLEARING', 'SUCCESS']
+            debug "CallHandler: successful call: #{cause} when routing #{destination} through #{JSON.stringify gateway}."
+            @statistics.add 'connected-calls'
+            @statistics.add ['connected-calls-gw',gateway.gwid]
+            @statistics.add ['connected-calls-carrier',gateway.carrierid]
+            winner = gateway # Winner
 
-                debug "CallHandler: successful call: #{cause} when routing #{destination} through #{JSON.stringify gateway}."
-                @statistics.add 'connected-calls'
-                @statistics.add ['connected-calls-gw',gateway.gwid]
-                @statistics.add ['connected-calls-carrier',gateway.carrierid]
-                return gateway # Winner
+          else
 
-              else
-
-                debug "CallHandler: call failed: #{cause} when routing #{destination} through #{JSON.stringify gateway}."
-                @statistics.add 'failed-attempts'
-                @statistics.add ['failed-attempts-gw',gateway.gwid]
-                @statistics.add ['failed-attempts-gw',gateway.gwid,cause]
-                @statistics.add ['failed-attempts-carrier',gateway.carrierid]
-                @statistics.add ['failed-attempts-carrier',gateway.carrierid,cause]
-                return null # No winner yet
+            debug "CallHandler: call failed: #{cause} when routing #{destination} through #{JSON.stringify gateway}."
+            @statistics.add 'failed-attempts'
+            @statistics.add ['failed-attempts-gw',gateway.gwid]
+            @statistics.add ['failed-attempts-gw',gateway.gwid,cause]
+            @statistics.add ['failed-attempts-carrier',gateway.carrierid]
+            @statistics.add ['failed-attempts-carrier',gateway.carrierid,cause]
+            # No winner yet
 
 However we do not propagate errors, since it would mean interrupting the call sequence. Since we didn't find any winner, we simply return `null`.
 
-            .catch (error) =>
-              debug 'Internal or FreeSwitch error (ignored, skipping to next gateway): ', error.toString()
-              @statistics.add 'gateway-skip'
-              null
+        catch error
+          debug 'Internal or FreeSwitch error (ignored, skipping to next gateway): ', error.toString()
+          @statistics.add 'gateway-skip'
 
-          return
-
-      it.catch (error) ->
-        debug "CallHandler: Caught internal error", error.toString()
-        @statistics.add 'internal-error'
-        @respond '500'
-        null
-
-      .then (winner) ->
-        if not winner?
-          debug "CallHandler: No Route."
-          @statistics.add 'no-route'
-          @respond '604'
-        else
-          debug "CallHandler: the winning gateway was: #{JSON.stringify winner}"
-          @statistics.add 'route'
-          @winner = winner
-          @res.attr @winner.attrs
+      if not winner?
+        debug "CallHandler: No Route."
+        @statistics.add 'no-route'
+        yield @respond '604'
+      else
+        debug "CallHandler: the winning gateway was: #{JSON.stringify winner}"
+        @statistics.add 'route'
+        @winner = winner
+        @res.attr @winner.attrs
 
 Release leaking fields
 
-          @res.ruleset = null
-          @res.ruleset_database = null
+      @res.ruleset = null
+      @res.ruleset_database = null
 
-        null
+      return
 
-      return it
 
 Field Mapping
 =============

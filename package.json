@@ -28,7 +28,7 @@
     "coffeescript-helpers": "^2.2.0",
     "cuddly": "^1.1.5",
     "debug": "^2.2.0",
-    "huge-play": "^11.3.1",
+    "huge-play": "^12.1.0",
     "nimble-direction": "^4.1.2",
     "seem": "^1.1.1",
     "useful-wind": "^7.2.1"

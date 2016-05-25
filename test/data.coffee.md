@@ -497,7 +497,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             .then ->
               router.route call_ '336718', '347766'
           .then (ctx) ->
-            ctx.res.response.should.equal '485'
+            ctx.session.first_response_was.should.equal '485'
             done()
           .catch (error) ->
             console.error error
