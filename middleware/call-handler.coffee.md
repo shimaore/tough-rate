@@ -52,29 +52,15 @@ Middleware
 
       @statistics.add ['incoming-calls',@rule?.prefix]
 
-      send_response = @session?.alternate_response
-      send_response ?= (response) =>
-        @call
-        .command 'respond', response
-        .catch (error) ->
-          debug "send_response(#{response}): #{error}"
-
-      debug "CallHandler: starting."
-
-      if @res.response?
-        @statistics.add ['immediate-response',@res.response]
-        @statistics.emit 'call',
-          state: 'immediate-response'
-          call: @call.uuid
-          source: @source
-          destination: @destination
-          response: @res.response
-        send_response @res.response
-        return
-
 The route-set might not be modified anymore.
 
-      @finalize() unless @finalized()
+      @res.finalize() unless @res.finalized()
+
+Do not process further if we already responded.
+
+      if @session.call_failed?
+        debug "Already responded", @res.__response
+        return
 
 The `it` promise will return either a gateway, `false` if no gateway was found, or null if no gateway was successful.
 
@@ -204,14 +190,14 @@ However we do not propagate errors, since it would mean interrupting the call se
       it.catch (error) ->
         debug "CallHandler: Caught internal error", error.toString()
         @statistics.add 'internal-error'
-        send_response '500'
+        @respond '500'
         null
 
       .then (winner) ->
         if not winner?
           debug "CallHandler: No Route."
           @statistics.add 'no-route'
-          send_response '604'
+          @respond '604'
         else
           debug "CallHandler: the winning gateway was: #{JSON.stringify winner}"
           @statistics.add 'route'
