@@ -46,7 +46,9 @@ FIXME: build a more resistant list.
 Sometimes we'll be provided with a pre-built URI (emergency calls, loopback calls). In other cases we build the URI from the destination number and the gateway's address.
 
         uri = gateway.uri ? "sip:#{destination}@#{gateway.address}"
-        profile = gateway.profile ? @cfg.profile
+        profile = gateway.profile
+        profile ?= @session.sip_profile
+        profile ?= @cfg.profile
 
         debug "CallHandler: attempt -- bridge [#{leg_options_text}]sofia/#{profile}/#{uri}"
         @action 'bridge', "[#{leg_options_text}]sofia/#{profile}/#{uri}"
