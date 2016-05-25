@@ -17,7 +17,7 @@ Default `gwid` router plugin
     @include = ->
       gateway_manager = @cfg.gateway_manager
 
-      if @finalized()
+      if @res.finalized()
         debug 'Routes GwID: already finalized.'
         return
       promise_all @res.gateways, (x) ->

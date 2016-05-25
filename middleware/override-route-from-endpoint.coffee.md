@@ -9,7 +9,7 @@ This is a dedicated bit of code that should be inserted before `ruleset` to forc
     @include = ->
       provisioning = @cfg.prov
 
-      return if @finalized()
+      return if @res.finalized()
 
       endpoint = (@req.header 'X-CCNQ3-Extra')?.match(/^\w+ \S+ \d+ -> \S+ \d+ (\S+)/)?[1]
 
@@ -19,7 +19,7 @@ This is a dedicated bit of code that should be inserted before `ruleset` to forc
       .then (doc) =>
         if doc.global_route?
           @clear()
-          @attempt doc.global_route
+          @res.attempt doc.global_route
       .catch (error) =>
         debug "Override-route-from-endpoint: #{error}"
 

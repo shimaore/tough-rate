@@ -17,7 +17,7 @@ Ruleset Loader
 We first need to determine which routing table we should use, though.
 This is based on the calling number.
 
-      return if @finalized()
+      return if @res.finalized()
 
 Route based on the route selected by the source, or using a default route.
 
@@ -34,7 +34,7 @@ Route based on the route selected by the source, or using a default route.
         route = default_outbound_route
       .then (route) =>
         unless route?
-          @respond '485'
+          @res.respond '485'
           debug 'RuleSet Middleware: No route available', {source}
           cuddly.dev 'missing-route', {source}
           throw new CCNQBaseMiddlewareError "No route available for #{source}"
@@ -46,7 +46,7 @@ Route based on the route selected by the source, or using a default route.
         ruleset_of route
       .then ({ruleset,ruleset_database}) =>
         unless ruleset? and ruleset_database?
-          @respond '500'
+          @res.respond '500'
           debug 'No ruleset available', {source,route:@res.route,ruleset,ruleset_database}
           cuddly.dev 'missing-ruleset', {source,route:@res.route,ruleset,ruleset_database}
           throw new CCNQBaseMiddlewareError "Route `#{@res.route}` for `#{source}` has no ruleset or no database."
@@ -57,7 +57,7 @@ Route based on the route selected by the source, or using a default route.
         find_rule_in @res.destination,ruleset_database
       .then (rule) =>
         unless rule?
-          @respond '485'
+          @res.respond '485'
           debug 'No route available', {source,destination:@res.destination,ruleset:@res.ruleset}
           cuddly.dev 'missing-rule', {source,destination:@res.destination,ruleset:@res.ruleset}
           throw new CCNQBaseMiddlewareError "No rule available towards #{@res.destination}"
@@ -75,7 +75,7 @@ Route based on the route selected by the source, or using a default route.
 
 * doc.rule.attrs (object) Extra attributes for this rule.
 
-        @attr rule.attrs
+        @res.attr rule.attrs
 
       .catch (error) =>
         debug "Ruleset middleware failed: #{error}"

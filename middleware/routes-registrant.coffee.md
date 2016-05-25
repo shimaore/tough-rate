@@ -53,7 +53,7 @@ This plugin provides `registrant_host` as a gateway.
       ref_builder = @session.ref_builder ? build_ref
       provisioning = @cfg.prov
 
-      if @finalized()
+      if @res.finalized()
         debug 'Routes Registrant: already finalized.'
         return
       ref = ref_builder.call this, provisioning

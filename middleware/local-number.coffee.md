@@ -7,7 +7,7 @@ Local number middleware
     @include = () ->
       provisioning = @cfg.prov
 
-      return if @finalized()
+      return if @res.finalized()
 
       debug "Checking whether #{@destination} is local."
       provisioning.get "number:#{@destination}"
@@ -19,7 +19,7 @@ Local number middleware
           debug "#{doc._id} is local but has no account."
           return
 
-        gw = @sendto doc.inbound_uri
+        gw = @res.sendto doc.inbound_uri
         gw.headers =
           'P-Charge-Info': url.format {
             protocol:'sip:'

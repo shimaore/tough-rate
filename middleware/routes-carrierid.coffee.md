@@ -42,7 +42,7 @@ Middleware definition
       gateway_manager = @cfg.gateway_manager
       host = @cfg.host
 
-      if @finalized()
+      if @res.finalized()
         debug "Routes CarrierID: already finalized."
         return
       promise_all @res.gateways, (x) ->

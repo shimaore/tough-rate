@@ -183,7 +183,7 @@ However we do not propagate errors, since it would mean interrupting the call se
           debug "CallHandler: the winning gateway was: #{JSON.stringify winner}"
           @statistics.add 'route'
           @winner = winner
-          @attr @winner.attrs
+          @res.attr @winner.attrs
 
 Release leaking fields
 
