@@ -11,7 +11,7 @@ This is based on the calling number.
 
       return unless @session.direction is 'lcr'
 
-      ctx[k] = v for own k,v of {
+      ctx[k] ?= v for own k,v of {
         statistics: @cfg.statistics
         res:
           cause: null
