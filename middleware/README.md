@@ -19,10 +19,10 @@ The following operations are available to modify the responses (provided by the 
     @redirect     Set the final destination number
 
     @attempt      Add a gateway to the route-set.
-    @finalize     Indicate that no more modifications of the route-set will be allowed.
     @sendto       Set the route-set to a single, final destination URI, and returns that gateway; the route-set is finalized.
     @respond      Respond with a (numeric) error code; the route-set is cleared and finalised.
-    @finalized()  Indicates whether the route-set has been finalized.
+    @res.finalize     Indicate that no more modifications of the route-set will be allowed.
+    @res.finalized()  Indicates whether the route-set has been finalized.
 
 
     @on           How to handle specific error codes (upon call attempts); the callback receives the gateway description.

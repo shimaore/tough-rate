@@ -14,7 +14,7 @@ This is based on the calling number.
         res:
           cause: null
           destination: @destination # aka final_destination
-          finalized: false
+          __finalized: false
 
 `gateways` is an array that either contains gateways, or arrays of gateways
 
@@ -27,14 +27,16 @@ This is based on the calling number.
 
 Manipulate the gateways list.
 
-        finalize: (callback) ->
-          if ctx.finalized()
-            debug "`finalize` called when the route-set is already finalized"
-            return
-          ctx.res.finalized = true
-          callback?()
-        finalized: ->
-          ctx.res.finalized
+          finalize: (callback) ->
+            if ctx.res.finalized()
+              debug "`finalize` called when the route-set is already finalized"
+              return
+            debug 'finalizing'
+            ctx.res.__finalized = true
+            callback?()
+          finalized: ->
+            ctx.res.__finalized
+
         sendto: (uri,profile = null) ->
           ctx.finalize ->
             ctx.res.gateways = [{uri,profile}]
