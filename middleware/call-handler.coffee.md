@@ -72,28 +72,9 @@ The `it` promise will return either a gateway, `false` if no gateway was found, 
           continue_on_fail: true
           hangup_after_bridge: false
 
-      @res.export.sip_wait_for_aleg_ack ?= true
-      @res.set.sip_wait_for_aleg_ack ?= true
-
-      for own name,value of @res.set
-        do (name,value) ->
-          it = it.then ->
-            if value is null
-              debug "CallHandler: unset #{name}"
-              @action 'unset', name
-            else
-              debug "CallHandler: set #{name} to value #{value}"
-              @action 'set', "#{name}=#{value}"
-
-      for own name,value of @res.export
-        do (name,value) ->
-          it = it.then ->
-            if value is null
-              debug "CallHandler: export #{name}"
-              @action 'export', name
-            else
-              debug "CallHandler: export #{name} with value #{value}"
-              @action 'export', "#{name}=#{value}"
+      @session.sip_wait_for_aleg_ack ?= true
+      @export sip_wait_for_aleg_ack: @session.sip_wait_for_aleg_ack
+      @set sip_wait_for_aleg_ack: @session.sip_wait_for_aleg_ack
 
 If there are gateways, attempt to call through them in the order listed.
 
