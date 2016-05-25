@@ -50,13 +50,7 @@ Sometimes we'll be provided with a pre-built URI (emergency calls, loopback call
 Middleware
 ----------
 
-      @statistics.add 'incoming-calls'
       @statistics.add ['incoming-calls',@rule?.prefix]
-      @statistics.emit 'call',
-        state: 'incoming-call'
-        call: @call.uuid
-        source: @source
-        destination: @destination
 
       send_response = @session?.alternate_response
       send_response ?= (response) =>
