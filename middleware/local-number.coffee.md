@@ -1,7 +1,7 @@
 Local number middleware
 =======================
 
-    @name = 'local-number'
+    @name = 'tough-rate:middleware:local-number'
     @init = ->
       assert @cfg.prov?, 'Missing `prov`.'
     @include = () ->

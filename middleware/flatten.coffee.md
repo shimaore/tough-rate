@@ -1,7 +1,7 @@
 Flatten the gateways
 ====================
 
-    @name = 'flatten'
+    @name = 'tough-rate:middleware:flatten'
     @include = ->
 
       return unless @session.direction is 'lcr'

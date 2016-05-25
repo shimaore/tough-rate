@@ -35,7 +35,7 @@ And select only `try` entries where specified.
 Middleware definition
 ---------------------
 
-    @name = 'routes-carrierid'
+    @name = 'tough-rate:middleware:routes-carrierid'
     @init = ->
       assert @cfg.gateway_manager?, 'Missing `gateway_manager`.'
     @include = ->

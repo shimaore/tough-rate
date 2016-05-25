@@ -7,7 +7,7 @@ Since this code rewrites the destination before resolving gateways, it must be c
 
     class EmergencyMiddlewareError extends Error
 
-    @name = 'emergency'
+    @name = 'tough-rate:middleware:emergency'
     @init = ->
       assert @cfg.prov?, 'Missing `prov`.'
     @include = ->

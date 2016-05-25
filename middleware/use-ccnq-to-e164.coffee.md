@@ -1,4 +1,4 @@
-    @name = 'use-ccnq-to-e164'
+    @name = 'tough-rate:middleware:use-ccnq-to-e164'
     @include = ->
 
       return unless @session.direction is 'lcr'

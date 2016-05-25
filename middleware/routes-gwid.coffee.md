@@ -11,7 +11,7 @@ Default `gwid` router plugin
       # TODO Add lookup for gateway-faulty or suspicious, and skip the resolution in that case.
       gateway_manager.resolve_gateway entry.gwid
 
-    @name = 'routes-gwid'
+    @name = 'tough-rate:middleware:routes-gwid'
     @init = ->
       assert @cfg.gateway_manager?, 'Missing gateway manager.'
     @include = ->

@@ -5,7 +5,7 @@ Ruleset Loader
 
     class CCNQBaseMiddlewareError extends Error
 
-    @name = 'ruleset'
+    @name = 'tough-rate:middleware:ruleset'
     @init = ->
       assert @cfg.prov?, 'Missing `prov`.'
       assert @cfg.ruleset_of?, 'Missing `ruleset_of`.'

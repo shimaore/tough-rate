@@ -46,7 +46,7 @@ This plugin provides `registrant_host` as a gateway.
       debug "Routes Registrant build_ref locating #{@source}."
       provisioning.get "number:#{@source}"
 
-    @name = 'routes-registrant'
+    @name = 'tough-rate:middleware:routes-registrant'
     @init = ->
       assert @cfg.prov?, 'Missing `prov`.'
     @include = ->

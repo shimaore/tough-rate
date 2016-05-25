@@ -1,4 +1,4 @@
-    @name = 'response-handlers'
+    @name = 'tough-rate:middleware:response-handlers'
     @init = ->
       assert @cfg.gateway_manager?, 'Missing `gateway_manager`.'
     @include = ->

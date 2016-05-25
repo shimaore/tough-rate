@@ -7,7 +7,7 @@ This middleware is called normally at the end of the stack to process the gatewa
 
     class CallHandlerMiddlewareError extends Error
 
-    @name = 'call-handler'
+    @name = 'tough-rate:middleware:call-handler'
     @init = ->
       debug 'Missing `profile`.' unless @cfg.profile?
     @notify = ->

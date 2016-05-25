@@ -1,6 +1,6 @@
     seem = require 'seem'
 
-    @name = 'cdr'
+    @name = 'tough-rate:middleware:cdr'
     @include = seem ->
 
       return unless @session.direction is 'lcr'

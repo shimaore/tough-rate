@@ -1,4 +1,4 @@
-    @name = 'numeric'
+    @name = 'tough-rate:middleware:numeric'
     @include = ->
 
       return unless @session.direction is 'lcr'

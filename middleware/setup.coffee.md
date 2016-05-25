@@ -4,7 +4,7 @@ ToughRate Least Cost Router
 We first need to determine which routing table we should use, though.
 This is based on the calling number.
 
-    @name = 'setup'
+    @name = 'tough-rate:middleware:setup'
     @web = ->
       @cfg.versions[pkg.name] = pkg.version
     @include = (ctx) ->
