@@ -41,10 +41,12 @@ Manipulate the gateways list.
           ctx.finalize ->
             ctx.res.gateways = [{uri,profile}]
             ctx.res.gateways[0]
-        respond: (v) ->
-          ctx.finalize ->
-            ctx.res.response = v
-            ctx.res.gateways = []
+          respond: (v) ->
+            ctx.res.finalize ->
+              ctx.res.gateways = []
+              ctx.session.call_failed = true
+              ctx.respond v
+
         attempt: (gateway) ->
           if ctx.finalized()
             debug "`attempt` called when the route-set is already finalized", gateway
