@@ -20,7 +20,8 @@
     "memdown": "^1.1.2",
     "mocha": "^2.5.2",
     "pouchdb": "^5.3.2",
-    "should": "^8.4.0"
+    "should": "^8.4.0",
+    "useful-wind": "^7.2.1"
   },
   "dependencies": {
     "acoustic-line": "^1.8.0",
@@ -30,8 +31,7 @@
     "debug": "^2.2.0",
     "huge-play": "^12.1.0",
     "nimble-direction": "^4.1.2",
-    "seem": "^1.1.1",
-    "useful-wind": "^7.2.1"
+    "seem": "^1.1.1"
   },
   "directories": {
     "test": "test"
