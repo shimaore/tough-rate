@@ -19,10 +19,7 @@ This is based on the calling number.
 `gateways` is an array that either contains gateways, or arrays of gateways
 
           gateways: []
-          response: null
           winner: null
-          set: {}
-          export: {}
           attrs: {}
 
         redirect: (destination) ->
@@ -57,21 +54,6 @@ Manipulate the gateways list.
             return
           ctx.res.gateways = []
 
-        set: (name,value) ->
-          return unless name?
-          if 'string' is typeof name
-            ctx.res.set[name] = value
-          else
-            for own n,v of name
-              ctx.res.set[n] = v
-        unset: (name) ->
-          return unless name?
-          if 'string' is typeof name
-            ctx.res.set[name] = null
-          else
-            for own n,v of name
-              ctx.res.set[n] = null
-
         attr: (name,value) ->
           return unless name?
           if 'string' is typeof key
@@ -80,13 +62,6 @@ Manipulate the gateways list.
             for own n,v of name
               ctx.res.attrs[n] = v
 
-        export: (name,value) ->
-          return unless name?
-          if 'string' is typeof name
-            ctx.res.export[name] = value
-          else
-            for own n,v of name
-              ctx.res.export[n] = value
 
         response_handlers: new EventEmitter()
         on: (response,handler) ->

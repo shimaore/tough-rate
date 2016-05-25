@@ -24,9 +24,6 @@ The following operations are available to modify the responses (provided by the 
     @respond      Respond with a (numeric) error code; the route-set is cleared and finalised.
     @finalized()  Indicates whether the route-set has been finalized.
 
-    @set          Set a parameter
-    @unset        Unset a parameter, shortcut for `@set name, null`
-    @export       Export a parameter
 
     @on           How to handle specific error codes (upon call attempts); the callback receives the gateway description.
 
@@ -34,7 +31,6 @@ The following operations are available to modify the responses (provided by the 
 
 The following fields are available to late middleware (i.e. after the call attempts are processed):
 
-    @res.response     The response set by `respond` if any.
     @res.winner       The winning gateway
     @res.gateways     The set (array) of routes to use
     @res.cause        (For late middleware) cause name
