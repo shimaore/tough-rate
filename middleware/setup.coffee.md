@@ -22,8 +22,8 @@ This is based on the calling number.
           winner: null
           attrs: {}
 
-        redirect: (destination) ->
-          ctx.res.destination = destination
+          redirect: (destination) ->
+            ctx.res.destination = destination
 
 Manipulate the gateways list.
 
@@ -37,35 +37,36 @@ Manipulate the gateways list.
           finalized: ->
             ctx.res.__finalized
 
-        sendto: (uri,profile = null) ->
-          ctx.finalize ->
-            ctx.res.gateways = [{uri,profile}]
-            ctx.res.gateways[0]
+          sendto: (uri,profile = null) ->
+            ctx.res.finalize ->
+              ctx.res.gateways = [{uri,profile}]
+              ctx.res.gateways[0]
+
           respond: (v) ->
             ctx.res.finalize ->
               ctx.res.gateways = []
               ctx.session.call_failed = true
               ctx.respond v
 
-        attempt: (gateway) ->
-          if ctx.finalized()
-            debug "`attempt` called when the route-set is already finalized", gateway
-            return
-          ctx.res.gateways.push gateway
-        clear: ->
-          if ctx.finalized()
-            debug "`clear` called when the route-set is already finalized"
-            return
-          ctx.res.gateways = []
+          attempt: (gateway) ->
+            if ctx.res.finalized()
+              debug "`attempt` called when the route-set is already finalized", gateway
+              return
+            ctx.res.gateways.push gateway
 
-        attr: (name,value) ->
-          return unless name?
-          if 'string' is typeof key
-            ctx.res.attrs[name] = value
-          else
-            for own n,v of name
-              ctx.res.attrs[n] = v
+          clear: ->
+            if ctx.res.finalized()
+              debug "`clear` called when the route-set is already finalized"
+              return
+            ctx.res.gateways = []
 
+          attr: (name,value) ->
+            return unless name?
+            if 'string' is typeof key
+              ctx.res.attrs[name] = value
+            else
+              for own n,v of name
+                ctx.res.attrs[n] = v
 
         response_handlers: new EventEmitter()
         on: (response,handler) ->

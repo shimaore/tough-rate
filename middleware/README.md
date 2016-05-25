@@ -16,18 +16,18 @@ The following attributes are also available (provided by `useful-wind`):
 
 The following operations are available to modify the responses (provided by the `setup` middleware):
 
-    @redirect     Set the final destination number
+    @res.redirect     Set the final destination number
 
-    @attempt      Add a gateway to the route-set.
-    @sendto       Set the route-set to a single, final destination URI, and returns that gateway; the route-set is finalized.
+    @res.attempt      Add a gateway to the route-set.
     @res.finalize     Indicate that no more modifications of the route-set will be allowed.
+    @res.sendto       Set the route-set to a single, final destination URI, and returns that gateway; the route-set is finalized.
     @res.respond      Respond with a (numeric) error code; the route-set is cleared and finalised.
     @res.finalized()  Indicates whether the route-set has been finalized.
 
 
     @on           How to handle specific error codes (upon call attempts); the callback receives the gateway description.
 
-    @attr         Add value to attributes (recorded in CDRs)
+    @res.attr         Add value to attributes (recorded in CDRs)
 
 The following fields are available to late middleware (i.e. after the call attempts are processed):
 
