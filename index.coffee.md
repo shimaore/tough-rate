@@ -7,7 +7,6 @@ The design document that must be installed on the master databases in order for 
       'carrier'
       'config'
       # 'domain'
-      'destination'
       'emergency'
       # 'endpoint'
       'gateway'
@@ -15,6 +14,7 @@ The design document that must be installed on the master databases in order for 
       # 'list'
       'location'
       'number'
+      # 'number_domain'
       'ruleset'
     ]
 
