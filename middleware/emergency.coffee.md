@@ -54,6 +54,7 @@ Then, see whether the destination number is an emergency number, and process it.
             emergency_ref = doc.routing_data
         else
           debug "Neither Routing nor Location info"
+          cuddly.dev "Neither Routing nor Location info, call from #{@source} to #{@destination}"
           null
       .then (emergency_ref) =>
         debug "Using", {emergency_ref}
