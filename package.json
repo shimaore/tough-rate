@@ -17,10 +17,10 @@
     "chai-as-promised": "^5.3.0",
     "coffee-script": "^1.10.0",
     "esl": "^5.2.2",
-    "memdown": "^1.1.2",
+    "memdown": "^1.2.0",
     "mocha": "^2.5.3",
     "pouchdb": "^5.3.2",
-    "should": "^8.4.0",
+    "should": "^9.0.0",
     "useful-wind": "^7.2.1"
   },
   "dependencies": {
@@ -29,9 +29,9 @@
     "coffeescript-helpers": "^2.2.0",
     "cuddly": "^1.1.5",
     "debug": "^2.2.0",
-    "huge-play": "^12.1.0",
+    "huge-play": "^12.1.2",
     "nimble-direction": "^4.2.1",
-    "seem": "^1.1.1"
+    "seem": "^1.2.0"
   },
   "directories": {
     "test": "test"
