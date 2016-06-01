@@ -6,6 +6,7 @@
         require '../index'
         require '../promise-all'
         require '../status'
+        require '../middleware/alternate-response'
         require '../middleware/call-handler'
         require '../middleware/cdr'
         require '../middleware/emergency'
