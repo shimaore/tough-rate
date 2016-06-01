@@ -1,7 +1,8 @@
 Flatten the gateways
 ====================
 
-    @name = 'tough-rate:middleware:flatten'
+    pkg = require '../package.json'
+    @name = "#{pkg.name}:middleware:flatten"
     @include = ->
 
       return unless @session.direction is 'lcr'
@@ -45,5 +46,4 @@ Toolbox
     field_merger = require '../field_merger'
     Promise = require 'bluebird'
     {isArray} = require 'util'
-    pkg = require '../package.json'
-    debug = (require 'debug') "#{pkg.name}:flatten"
+    debug = (require 'debug') @name

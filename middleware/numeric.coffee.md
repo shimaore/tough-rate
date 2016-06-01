@@ -1,4 +1,5 @@
-    @name = 'tough-rate:middleware:numeric'
+    pkg = require '../package.json'
+    @name = "#{pkg.name}:middleware:numeric"
     @include = ->
 
       return unless @session.direction is 'lcr'
@@ -13,5 +14,4 @@
         @res.respond '484'
         return
 
-    pkg = require '../package.json'
-    debug = (require 'debug') "#{pkg.name}:numeric"
+    debug = (require 'debug') @name

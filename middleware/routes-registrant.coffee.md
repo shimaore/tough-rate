@@ -46,7 +46,8 @@ This plugin provides `registrant_host` as a gateway.
       debug "Routes Registrant build_ref locating #{@source}."
       provisioning.get "number:#{@source}"
 
-    @name = 'tough-rate:middleware:routes-registrant'
+    pkg = require '../package.json'
+    @name = "#{pkg.name}:middleware:routes-registrant"
     @init = ->
       assert @cfg.prov?, 'Missing `prov`.'
     @include = ->
@@ -71,5 +72,4 @@ Toolbox
 
     assert = require 'assert'
     promise_all = require '../promise-all'
-    pkg = require '../package.json'
-    debug = (require 'debug') "#{pkg.name}:routes-registrant"
+    debug = (require 'debug') @name

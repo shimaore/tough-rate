@@ -1,6 +1,7 @@
     seem = require 'seem'
 
-    @name = 'tough-rate:middleware:cdr'
+    pkg = require '../package.json'
+    @name = "#{pkg.name}:middleware:cdr"
     @include = seem ->
 
       return unless @session.direction is 'lcr'
@@ -47,8 +48,7 @@ Compatibility layer for CCNQ3 -- remove once the LCR generates its own CDRs.
 
       null
 
-    pkg = require '../package.json'
-    debug = (require 'debug') "#{pkg.name}:cdr"
+    debug = (require 'debug') "#{pkg.name}:middleware:cdr"
 
 variable_mduration: # total duration
 variable_billmsec: # billable (connected)

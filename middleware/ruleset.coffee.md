@@ -5,7 +5,8 @@ Ruleset Loader
 
     class CCNQBaseMiddlewareError extends Error
 
-    @name = 'tough-rate:middleware:ruleset'
+    pkg = require '../package.json'
+    @name = "#{pkg.name}:middleware:ruleset"
     @init = ->
       assert @cfg.prov?, 'Missing `prov`.'
       assert @cfg.ruleset_of?, 'Missing `ruleset_of`.'
@@ -85,6 +86,5 @@ Route based on the route selected by the source, or using a default route.
         cuddly.ops "ruleset-middleware: #{error}"
 
     assert = require 'assert'
-    pkg = require '../package.json'
-    debug = (require 'debug') "#{pkg.name}:ruleset"
-    cuddly = (require 'cuddly') "#{pkg.name}:ruleset"
+    debug = (require 'debug') @name
+    cuddly = (require 'cuddly') @name

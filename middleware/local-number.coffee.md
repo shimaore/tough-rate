@@ -1,9 +1,12 @@
 Local number middleware
 =======================
 
-    @name = 'tough-rate:middleware:local-number'
+    pkg = require '../package.json'
+    @name = "#{pkg.name}:middleware:local-number"
+
     @init = ->
       assert @cfg.prov?, 'Missing `prov`.'
+
     @include = () ->
 
       return unless @session.direction is 'lcr'
@@ -37,5 +40,4 @@ Toolbox
 
     assert = require 'assert'
     url = require 'url'
-    pkg = require '../package.json'
-    debug = (require 'debug') "#{pkg.name}:local-number"
+    debug = (require 'debug') @name

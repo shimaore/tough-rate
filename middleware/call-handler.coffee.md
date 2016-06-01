@@ -9,6 +9,7 @@ This middleware is called normally at the end of the stack to process the gatewa
 
     pkg = require '../package.json'
     @name = "#{pkg.name}:middleware:call-handler"
+
     @init = ->
       debug 'Missing `profile`.' unless @cfg.profile?
     @notify = ->

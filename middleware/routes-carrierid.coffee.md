@@ -35,7 +35,8 @@ And select only `try` entries where specified.
 Middleware definition
 ---------------------
 
-    @name = 'tough-rate:middleware:routes-carrierid'
+    pkg = require '../package.json'
+    @name = "#{pkg.name}:middleware:routes-carrierid"
     @init = ->
       assert @cfg.gateway_manager?, 'Missing `gateway_manager`.'
     @include = ->
@@ -66,5 +67,4 @@ Toolbox
     Promise = require 'bluebird'
     promise_all = require '../promise-all'
     field_merger = require '../field_merger'
-    pkg = require '../package.json'
-    debug = (require 'debug') "#{pkg.name}:routes-carrierid"
+    debug = (require 'debug') @name

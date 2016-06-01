@@ -1,4 +1,5 @@
-    @name = 'tough-rate:middleware:response-handlers'
+    pkg = require '../package.json'
+    @name = "#{pkg.name}:middleware:response-handlers"
     @init = ->
       assert @cfg.gateway_manager?, 'Missing `gateway_manager`.'
     @include = ->
@@ -33,5 +34,4 @@ Default call post-processing.
 Toolbox
 
     assert = require 'assert'
-    pkg = require '../package.json'
-    debug = (require 'debug') "#{pkg.name}:response-handlers"
+    debug = (require 'debug') @name

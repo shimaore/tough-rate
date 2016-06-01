@@ -1,4 +1,5 @@
-    @name = 'tough-rate:middleware:use-ccnq-to-e164'
+    pkg = require '../package.json'
+    @name = "#{pkg.name}:middleware:use-ccnq-to-e164"
     @include = ->
 
       return unless @session.direction is 'lcr'
@@ -8,5 +9,4 @@
       @destination = @data.variable_ccnq_to_e164
       return
 
-    pkg = require '../package.json'
-    debug = (require 'debug') "#{pkg.name}:use-ccnq-to-e164"
+    debug = (require 'debug') @name

@@ -3,7 +3,8 @@ Override route based on original (client-side) endpoint
 
 This is a dedicated bit of code that should be inserted before `ruleset` to force a specific route based on the originating endpoint.
 
-    @name = 'tough-rate:middleware:override-route-from-endpoint'
+    pkg = require '../package.json'
+    @name = "#{pkg.name}:middleware:override-route-from-endpoint"
     @init = ->
       assert @cfg.prov?, 'Missing `prov`'
     @include = ->
@@ -26,5 +27,4 @@ This is a dedicated bit of code that should be inserted before `ruleset` to forc
       .catch (error) =>
         debug "Override-route-from-endpoint: #{error}"
 
-    pkg = require '../package.json'
-    debug = (require 'debug') "#{pkg.name}:override-route-from-endpoint"
+    debug = (require 'debug') @name

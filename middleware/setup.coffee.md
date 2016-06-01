@@ -4,7 +4,8 @@ ToughRate Least Cost Router
 We first need to determine which routing table we should use, though.
 This is based on the calling number.
 
-    @name = 'tough-rate:middleware:setup'
+    pkg = require '../package.json'
+    @name = "#{pkg.name}:middleware:setup"
     @web = ->
       @cfg.versions[pkg.name] = pkg.version
     @include = (ctx) ->
@@ -80,7 +81,7 @@ Manipulate the gateways list.
 
     {EventEmitter} = require 'events'
     pkg = require '../package.json'
-    debug = (require 'debug') "#{pkg.name}:setup"
+    debug = (require 'debug') @name
 
 Init
 ----
@@ -109,4 +110,3 @@ Create the gateway-manager.
 
     assert = require 'assert'
     GatewayManager = require '../gateway_manager'
-    pkg = require '../package.json'

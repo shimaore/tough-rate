@@ -7,7 +7,8 @@ Since this code rewrites the destination before resolving gateways, it must be c
 
     class EmergencyMiddlewareError extends Error
 
-    @name = 'tough-rate:middleware:emergency'
+    pkg = require '../package.json'
+    @name = "#{pkg.name}:middleware:emergency"
     @init = ->
       assert @cfg.prov?, 'Missing `prov`.'
     @include = ->
@@ -117,7 +118,6 @@ If multiple destination numbers are present, we cannot afford to try all combina
 Toolbox
 
     assert = require 'assert'
-    pkg = require '../package.json'
     Promise = require 'bluebird'
-    debug = (require 'debug') "#{pkg.name}:emergency"
-    cuddly = (require 'cuddly') "#{pkg.name}:emergency"
+    debug = (require 'debug') @name
+    cuddly = (require 'cuddly') @name

@@ -11,7 +11,8 @@ Default `gwid` router plugin
       # TODO Add lookup for gateway-faulty or suspicious, and skip the resolution in that case.
       gateway_manager.resolve_gateway entry.gwid
 
-    @name = 'tough-rate:middleware:routes-gwid'
+    pkg = require '../package.json'
+    @name = "#{pkg.name}:middleware:routes-gwid"
     @init = ->
       assert @cfg.gateway_manager?, 'Missing gateway manager.'
     @include = ->
@@ -37,5 +38,4 @@ Default `gwid` router plugin
     assert = require 'assert'
     Promise = require 'bluebird'
     promise_all = require '../promise-all'
-    pkg = require '../package.json'
-    debug = (require 'debug') "#{pkg.name}:routes-gwid"
+    debug = (require 'debug') @name
