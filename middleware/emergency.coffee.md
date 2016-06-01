@@ -42,11 +42,11 @@ Then, see whether the destination number is an emergency number, and process it.
 
       Promise.resolve true
       .then =>
-        emergency_ref = @req.header 'X-CCNQ3-Routing'
+        emergency_ref = @session.emergency_ref ? @req.header 'X-CCNQ3-Routing'
         if emergency_ref?
           return emergency_ref
 
-        location_ref = @req.header 'X-CCNQ3-Location'
+        location_ref = @session.emergency_location ? @req.header 'X-CCNQ3-Location'
         if location_ref?
           debug "Locating", {location_ref}
           provisioning.get "location:#{location_ref}"
