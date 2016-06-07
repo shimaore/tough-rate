@@ -46,6 +46,9 @@ Compatibility layer for CCNQ3 -- remove once the LCR generates its own CDRs.
         attrs[k] = v
       yield @set 'sip_h_X-CCNQ3-Attrs', JSON.stringify attrs
 
+      if @res.winner?
+        yield @set 'ccnq_winner', JSON.stringify @res.winner
+
       null
 
     debug = (require 'debug') "#{pkg.name}:middleware:cdr"
