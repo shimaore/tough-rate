@@ -716,6 +716,33 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           one_call ctx, 'default'
           null
 
+        it 'should insert winner data', (done) ->
+          @timeout 6*1000
+          ctx =
+            data:
+              'Channel-Destination-Number': '331234'
+              'Channel-Caller-ID-Number': '2348'
+            command: (c,v) ->
+              if c is 'set' and m = v.match /^ccnq_winner=(.*)$/
+                done()
+              if c in ['set','export']
+                return Promise.resolve().bind this
+              v.should.equal '[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800]sofia/something-egress/sip:331234@127.0.0.1:5068'
+              c.should.equal 'bridge'
+              Promise.resolve
+                body:
+                  variable_last_bridge_hangup_cause: 'NORMAL_CALL_CLEARING'
+            once: (msg) ->
+              if msg is 'CHANNEL_HANGUP_COMPLETE'
+                Promise
+                  .delay 5*1000
+                  .then ->
+                    body:
+                      billmsec: 2000
+
+          one_call ctx, 'default'
+          null
+
         it 'should emit call events', (done) ->
           ctx =
             data:

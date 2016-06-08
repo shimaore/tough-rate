@@ -7,7 +7,15 @@
       return unless @session.direction is 'lcr'
 
       @call.once 'CHANNEL_HANGUP_COMPLETE'
-      .then (res) =>
+      .then seem (res) =>
+
+Export winner data to our local CDR
+
+        if @res.winner?
+          yield @set
+            ccnq_winner: JSON.stringify @res.winner
+            ccnq_carrier: @res.winner.carrierid
+
         debug "CDR: Channel Hangup Complete"
         data = res.body
 
@@ -54,8 +62,6 @@ Export attributes towards the carrier SBC
 Export attributes in our local CDR
 
         ccnq_attrs: json_attrs
-      if @res.winner?
-        yield @set 'ccnq_winner', JSON.stringify @res.winner
 
       null
 
