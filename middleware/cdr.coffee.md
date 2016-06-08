@@ -44,8 +44,16 @@ Compatibility layer for CCNQ3 -- remove once the LCR generates its own CDRs.
       attrs = {}
       for own k,v of @res.attrs when v?
         attrs[k] = v
-      yield @set 'sip_h_X-CCNQ3-Attrs', JSON.stringify attrs
+      json_attrs = JSON.stringify attrs
+      yield @set
 
+Export attributes towards the carrier SBC
+
+        'sip_h_X-CCNQ3-Attrs': json_attrs
+
+Export attributes in our local CDR
+
+        ccnq_attrs: json_attrs
       if @res.winner?
         yield @set 'ccnq_winner', JSON.stringify @res.winner
 
