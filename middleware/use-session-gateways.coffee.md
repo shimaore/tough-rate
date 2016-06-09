@@ -11,6 +11,5 @@
       return unless @session.gateways?
 
       @res.gateways = @session.gateways
-      @res.finalize()
 
       return
