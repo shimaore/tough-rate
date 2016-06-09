@@ -22,3 +22,4 @@
         require '../middleware/ruleset'
         require '../middleware/setup'
         require '../middleware/use-ccnq-to-e164'
+        require '../middleware/use-session-gateways'
