@@ -165,6 +165,11 @@ However we do not propagate errors, since it would mean interrupting the call se
         @res.winner = winner
         @res.attr winner.attrs
 
+        if @res.winner?
+          yield @set
+            ccnq_winner: JSON.stringify @res.winner
+            ccnq_carrier: @res.winner.carrierid
+
 Release leaking fields
 
       @res.ruleset = null

@@ -11,11 +11,6 @@
 
 Export winner data to our local CDR
 
-        if @res.winner?
-          yield @set
-            ccnq_winner: JSON.stringify @res.winner
-            ccnq_carrier: @res.winner.carrierid
-
         debug "CDR: Channel Hangup Complete"
         data = res.body
 
