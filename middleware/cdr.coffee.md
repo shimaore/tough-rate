@@ -7,7 +7,7 @@
       return unless @session.direction is 'lcr'
 
       @call.once 'CHANNEL_HANGUP_COMPLETE'
-      .then seem (res) =>
+      .then (res) =>
 
 Export winner data to our local CDR
 
