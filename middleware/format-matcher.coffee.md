@@ -134,7 +134,7 @@ Available fields, where applicable, are:
 - `fixed`
 - `mobile`
 - `special`
-= `value_added`
+- `value_added`
 
 For `fixed`:
 - `geographic`
