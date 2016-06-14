@@ -18,10 +18,12 @@
 
       it 'should accept US numbers', ->
         is_correct '12123141212'
-          .should.be.true
+          .should.have.property 'name', 'NY'
 
       it 'should reject unwanted US numbers', ->
         is_correct '12125551212'
+          .should.be.false
+        is_correct '11005551212'
           .should.be.false
 
       it 'should ignore numbers it does not know about', ->
