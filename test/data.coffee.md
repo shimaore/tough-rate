@@ -723,7 +723,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
               'Channel-Destination-Number': '331234'
               'Channel-Caller-ID-Number': '2348'
             command: (c,v) ->
-              if c is 'set' and m = v.match /^ccnq_winner=(.*)$/
+              if c is 'set' and m = v.match /^ccnq_carrier=(.*)$/
                 done()
               if c in ['set','export']
                 return Promise.resolve().bind this

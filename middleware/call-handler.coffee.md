@@ -88,6 +88,11 @@ If there are gateways, attempt to call through them in the order listed.
 
 Call attempt.
 
+        yield @set
+          ccnq_gateway_json: JSON.stringify gateway
+          ccnq_gateway: gateway.gwid
+          ccnq_carrier: gateway.carrierid
+
         try
 
           debug "CallHandler: handling (next) gateway", gateway
@@ -164,11 +169,6 @@ However we do not propagate errors, since it would mean interrupting the call se
         @statistics.add 'route'
         @res.winner = winner
         @res.attr winner.attrs
-
-        if @res.winner?
-          yield @set
-            ccnq_winner: JSON.stringify @res.winner
-            ccnq_carrier: @res.winner.carrierid
 
 Release leaking fields
 
