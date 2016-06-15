@@ -27,6 +27,7 @@ The steps to placing outbound call(s) are:
           carrierid:'the_phone_company'
           attrs:
             gateway_name:'gw2'
+          timezone: 'US/Central'
         gw3:
           _id:'gateway:phone.local:gw3'
           type:'gateway'
@@ -60,6 +61,10 @@ The steps to placing outbound call(s) are:
           sip_domain_name: sip_domain_name
           carrierid:'the_phone_company'
           progress_timeout: 20
+          timezone: 'US/Eastern'
+          ratings:
+            '2016-07-28':
+              table: 'cheap'
 
       destinations:
         france:
@@ -269,6 +274,8 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
               doc.should.have.property 0
               doc[0].should.have.property 'progress_timeout'
               doc[0].progress_timeout.should.equal dataset.carriers.the_phone_company.progress_timeout
+              doc[0].should.have.property 'timezone', 'US/Eastern'
+              doc[0].should.have.property 'ratings'
               done()
 
         it 'should have progress_timeout from their carrier: gw2', (done) ->
@@ -281,6 +288,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
               doc[0].should.have.property 'gwid', 'gw2'
               doc[0].should.have.property 'progress_timeout'
               doc[0].progress_timeout.should.equal dataset.carriers.the_phone_company.progress_timeout
+              doc[0].should.have.property 'timezone', 'US/Central'
               done()
 
       describe 'the_phone_company', ->
@@ -292,8 +300,10 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
               info.should.have.length 2
               info.should.have.property 0
               info[0].should.have.property 'gwid', 'gw1'
+              info[0].should.have.property 'timezone', 'US/Eastern'
               info.should.have.property 1
               info[1].should.have.property 'gwid', 'gw2'
+              info[1].should.have.property 'timezone', 'US/Central'
               done()
 
       describe 'The call router', ->

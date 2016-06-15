@@ -143,6 +143,7 @@ On successful connection we also get `variable_originate_disposition=SUCCESS, va
             @statistics.add ['connected-calls-gw',gateway.gwid]
             @statistics.add ['connected-calls-carrier',gateway.carrierid]
             winner = gateway # Winner
+            @session.winner = gateway
 
           else
 
