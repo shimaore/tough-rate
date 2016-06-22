@@ -1,25 +1,33 @@
     describe 'The modules', ->
-      it 'should compile', ->
-        require '../field_merger'
-        require '../find_rule_in'
-        require '../gateway_manager'
-        require '../index'
-        require '../promise-all'
-        require '../status'
-        require '../middleware/alternate-response'
-        require '../middleware/call-handler'
-        require '../middleware/cdr'
-        require '../middleware/emergency'
-        require '../middleware/flatten'
-        require '../middleware/local-number'
-        require '../middleware/numeric'
-        require '../middleware/override-route-from-endpoint'
-        require '../middleware/post-send'
-        require '../middleware/response-handlers'
-        require '../middleware/routes-carrierid'
-        require '../middleware/routes-gwid'
-        require '../middleware/routes-registrant'
-        require '../middleware/ruleset'
-        require '../middleware/setup'
-        require '../middleware/use-ccnq-to-e164'
-        require '../middleware/use-session-gateways'
+      for m in [
+        'field_merger'
+        'find_rule_in'
+        'gateway_manager'
+        'index'
+        'promise-all'
+        'status'
+        'middleware/alternate-response'
+        'middleware/call-handler'
+        'middleware/cdr'
+        'middleware/emergency'
+        'middleware/flatten'
+        'middleware/local-number'
+        'middleware/numeric'
+        'middleware/override-route-from-endpoint'
+        'middleware/post-send'
+        'middleware/response-handlers'
+        'middleware/routes-carrierid'
+        'middleware/routes-gwid'
+        'middleware/routes-registrant'
+        'middleware/ruleset'
+        'middleware/setup'
+        'middleware/use-ccnq-to-e164'
+        'middleware/use-session-gateways'
+      ]
+       do (m) ->
+         it "should load #{m}", ->
+           M = require "../#{m}"
+           if m.match /^middleware/
+             ctx =
+               session: {}
+             M.include.call ctx, ctx
