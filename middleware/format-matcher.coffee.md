@@ -129,7 +129,4 @@ Cannot decide
 Numbering plans
 ===============
 
-    numbering_plans =
-      1: require './f/1'
-      33: require './f/33'
-      41: require './f/41'
+    numbering_plans = require './f/index'
