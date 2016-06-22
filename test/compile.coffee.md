@@ -11,6 +11,7 @@
         'middleware/cdr'
         'middleware/emergency'
         'middleware/flatten'
+        'middleware/format-matcher'
         'middleware/local-number'
         'middleware/numeric'
         'middleware/override-route-from-endpoint'
