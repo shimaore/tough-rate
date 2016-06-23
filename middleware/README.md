@@ -30,7 +30,7 @@ The following operations are available to modify the responses (provided by the 
 
 The following fields are available to late middleware (i.e. after the call attempts are processed):
 
-    @res.winner       The winning gateway
+    @session.winner   The winning gateway
     @res.gateways     The set (array) of routes to use
     @res.cause        (For late middleware) cause name
     @res.destination  The (final) destination
