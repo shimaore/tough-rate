@@ -244,6 +244,7 @@ The following fields are optional:
 * doc.gateway.gwid (string, required) Gateway identifier in the doc.gateway.sip_domain_name
 * doc.gateway.address (string, required) SIP URI domain to be used to route calls to that gateway
 * doc.gateway.carrierid (string, optional) Carrier route this gateway belongs to.
+* doc.gateway.carrier (string, optional) Carrier identifier used for call rating. Default: the `gwid` value.
 
             if doc.type is 'gateway'
               return emit [doc.sip_domain_name, doc.carrierid], doc
@@ -266,6 +267,8 @@ The following fields are optional:
 * doc.host.sip_profiles[].egress_gwid (string, obsolete) Gateway identifier for this profile. Used if doc.host.sip_profiles[].egress.gwid is not defined. (CCNQ3 convention.)
 * doc.host.sip_profiles[].egress.address (string) Destination for egress calls. Default: doc.host.sip_profiles[].egress_sip_ip and doc.host.sip_profiles[].egress_sip_port
 * doc.host.sip_profiles[].egress.host (string) Host for this profile. Default: doc.host.host
+* doc.host.sip_profiles[].egress.carrier (string) Carrier for this profile. Used for call rating. Default: the `gwid` value.
+* doc.host.sip_profiles[].egress.name (string) Display name for this profile.
 * doc.host.host (string) Hostname. Used to build doc.host._id
 * doc.host.sip_domain_name (string) SIP domain name for the host.
 * doc.host.sip_profiles[].egress.carrierid (string) Carrier identifier for this profile (considered as a gateway).

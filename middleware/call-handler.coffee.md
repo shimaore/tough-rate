@@ -90,8 +90,7 @@ Call attempt.
 
         yield @set
           ccnq_gateway_json: JSON.stringify gateway
-          ccnq_gateway: gateway.gwid
-          ccnq_carrier: gateway.carrierid
+          ccnq_carrier: gateway.carrier
 
         try
 
