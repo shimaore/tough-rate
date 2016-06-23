@@ -30,9 +30,9 @@ Returns information about the destination if the number is correct; returns true
     @is_correct = is_correct = (number) ->
 
 [Rec. E.164](https://www.itu.int/itu-t/recommendations/rec.aspx?rec=10688) section 6 limits the length of an E.164 number to 15 digits.
-Note how we might use `#` to indicate a national-only (e.g. short) number.
+Note how we might use `_` to indicate a national-only (e.g. short) number.
 
-      unless number.match /^\d[#\d]{3,14}$/
+      unless number.match /^\d[_\d]{3,14}$/
         debug 'number is not E.164 or compatible', number
         return false
 
