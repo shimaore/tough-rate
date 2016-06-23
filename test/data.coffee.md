@@ -141,7 +141,8 @@ The steps to placing outbound call(s) are:
               {source_registrant:true}
             ]
 
-    should = require 'should'
+    {expect} = chai = require 'chai'
+    chai.should()
     PouchDB = (require 'pouchdb').defaults db: require 'memdown'
     pkg = require '../package.json'
     GatewayManager = require '../gateway_manager'
@@ -296,7 +297,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           ready.then ->
             gm.resolve_carrier 'the_phone_company'
             .then (info) ->
-              should(info).be.an.instanceOf Array
+              expect(info).be.an.instanceOf Array
               info.should.have.length 2
               info.should.have.property 0
               info[0].should.have.property 'gwid', 'gw1'
@@ -389,7 +390,8 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             gws.should.have.property 0
             gws[0].should.have.property 'uri', 'sip:foo@bar'
             gws[0].should.have.property 'headers'
-            gws[0].headers.should.deep.equal 'P-Charge-Info':'sip:foo_bar@phone.local'
+            gws[0].headers.should.be.an.instanceOf Object
+            gws[0].headers.should.have.property 'P-Charge-Info', 'sip:foo_bar@phone.local'
 
         it 'should route registrant_host directly (adding default port)', ->
           ready.then ->
@@ -594,6 +596,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
           .then (ctx) ->
             ctx.res.should.have.property 'destination', '330112'
             gws = ctx.res.gateways
+            expect(gws).to.not.be.null
             gws.should.be.an.instanceOf Array
             gws.should.have.length 2
             gws.should.have.property 0
