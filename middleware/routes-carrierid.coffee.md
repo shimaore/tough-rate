@@ -56,6 +56,9 @@ Middleware definition
       if @res.finalized()
         debug "Routes CarrierID: already finalized."
         return
+      unless @res.gateways?
+        debug 'No gateways'
+        return
       promise_all @res.gateways, (x) ->
         Promise.resolve()
         .then ->

@@ -9,6 +9,10 @@ Flatten the gateways
 
       debug "Gateways before ops", JSON.stringify @res.gateways
 
+      unless @res.gateways?
+        debug 'No gateways'
+        return
+
 We must flatten the list so that CallHandler can use it.
 
       @res.gateways = @res.gateways.map (gateway) =>

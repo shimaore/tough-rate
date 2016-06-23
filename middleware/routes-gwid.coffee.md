@@ -24,6 +24,9 @@ Default `gwid` router plugin
       if @res.finalized()
         debug 'Routes GwID: already finalized.'
         return
+      unless @res.gateways?
+        debug 'No gateways'
+        return
       promise_all @res.gateways, (x) ->
         Promise.resolve()
         .then ->
