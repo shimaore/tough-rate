@@ -71,6 +71,10 @@ The steps to placing outbound call(s) are:
           _id:'destination:france'
           type:'destination'
           destination:'france'
+          gwlist:[
+            {carrierid:'the_other_company'}
+            {gwid:'backup'}
+          ]
 
       rulesets:
         default:
@@ -107,10 +111,6 @@ The steps to placing outbound call(s) are:
             type:'rule'
             prefix:'33'
             destination:'france'
-            gwlist:[
-              {carrierid:'the_other_company'}
-              {gwid:'backup'}
-            ]
             attrs:
               cdr: 'foo-bar'
 
@@ -128,7 +128,6 @@ The steps to placing outbound call(s) are:
             _id:'rule:330112'
             type:'rule'
             prefix:'330112'
-            destination:'france_emergency'
             emergency:true
 
         registrant:
@@ -181,7 +180,6 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
         records = []
         (records.push v) for k,v of dataset.gateways
         (records.push v) for k,v of dataset.carriers
-        (records.push v) for k,v of dataset.destinations
         (records.push v) for k,v of dataset.emergency
         provisioning.bulkDocs records
 
@@ -190,9 +188,10 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
         .destroy()
       .then ->
         default_ruleset = new PouchDB dataset.rulesets.default.database
-        rules = []
-        (rules.push v) for k,v of dataset.rules.default
-        default_ruleset.bulkDocs rules
+        records = []
+        (records.push v) for k,v of dataset.rules.default
+        (records.push v) for k,v of dataset.destinations
+        default_ruleset.bulkDocs records
 
       ready = ready.then ->
         new PouchDB dataset.rulesets.registrant.database
