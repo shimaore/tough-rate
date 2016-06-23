@@ -46,10 +46,10 @@ Route based on the route selected by the source, or using a default route.
 Provisioning error
 
       unless route?
-          debug 'RuleSet Middleware: No route available', {source}
-          cuddly.dev 'missing-route', {source}
-          yield @res.respond '485'
-          return
+        debug 'RuleSet Middleware: No route available', {source}
+        cuddly.dev 'missing-route', {source}
+        yield @res.respond '485'
+        return
 
       route = "#{route}"
       @res.route = route
@@ -63,10 +63,10 @@ Ruleset selection
 Management error
 
       unless ruleset? and ruleset_database?
-          debug 'No ruleset available', {source,route:@res.route,ruleset,ruleset_database}
-          cuddly.dev 'missing-ruleset', {source,route:@res.route,ruleset,ruleset_database}
-          yield @res.respond '500'
-          return
+        debug 'No ruleset available', {source,route:@res.route,ruleset,ruleset_database}
+        cuddly.dev 'missing-ruleset', {source,route:@res.route,ruleset,ruleset_database}
+        yield @res.respond '500'
+        return
 
       @res.ruleset = ruleset
       @res.ruleset_database = ruleset_database
@@ -81,10 +81,10 @@ Rule lookup
 Provisioning error or user error
 
       unless rule?
-          debug 'No route available', {source,destination:@res.destination,ruleset:@res.ruleset}
-          cuddly.dev 'missing-rule', {source,destination:@res.destination,ruleset:@res.ruleset}
-          yield @res.respond '485'
-          return
+        debug 'No route available', {source,destination:@res.destination,ruleset:@res.ruleset}
+        cuddly.dev 'missing-rule', {source,destination:@res.destination,ruleset:@res.ruleset}
+        yield @res.respond '485'
+        return
 
 * doc.rule.gwlist (array) List of gateways/carriers for this rule. Has priority over the `destination` field.
 
@@ -96,8 +96,8 @@ Provisioning error or user error
 
 Missing gateway list is normal for e.g. emergency call routing.
 
-          debug 'Missing gwlist (ignored)', rule
-          cuddly.dev 'missing-gwlist', {rule}
+        debug 'Missing gwlist (ignored)', rule
+        cuddly.dev 'missing-gwlist', {rule}
 
       @res.rule = rule
 
