@@ -94,13 +94,13 @@ The steps to placing outbound call(s) are:
 
 
       emergency:
-        '330112#brest':
-          _id:'emergency:330112#brest'
+        '33_112#brest':
+          _id:'emergency:33_112#brest'
           type:'emergency'
           destination:'33156'
 
-        '330112#paris':
-          _id:'emergency:330112#paris'
+        '33_112#paris':
+          _id:'emergency:33_112#paris'
           type:'emergency'
           destination:['33157','33158']
 
@@ -124,10 +124,10 @@ The steps to placing outbound call(s) are:
               {carrierid:'the_phone_company'}
             ]
 
-          330112:
-            _id:'rule:330112'
+          '33_112':
+            _id:'rule:33_112'
             type:'rule'
-            prefix:'330112'
+            prefix:'33_112'
             emergency:true
 
         registrant:
@@ -557,7 +557,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             cfg.use = use
             serialize cfg, 'init'
             .then ->
-              router.route call_ '336718', '330112', 'brest'
+              router.route call_ '336718', '33_112', 'brest'
           .then (ctx) ->
             ctx.res.should.have.property 'destination', '33156'
             gws = ctx.res.gateways
@@ -592,9 +592,11 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             cfg.use = use
             serialize cfg, 'init'
             .then ->
-              router.route call_ '336718', '330112', 'paris'
+              router.route call_ '336718', '33_112', 'paris'
           .then (ctx) ->
-            ctx.res.should.have.property 'destination', '330112'
+            ctx.should.have.property 'res'
+            ctx.res.should.have.property 'destination', '33_112'
+            ctx.res.should.have.property 'gateways'
             gws = ctx.res.gateways
             expect(gws).to.not.be.null
             gws.should.be.an.instanceOf Array
@@ -829,7 +831,7 @@ Gateways are randomized within carriers.
         it 'should route emergency', (done) ->
           ctx =
             data:
-              'Channel-Destination-Number': '330112'
+              'Channel-Destination-Number': '33_112'
               'Channel-Caller-ID-Number': '2348'
               'variable_sip_h_X-CCNQ3-Routing': 'brest'
             command: (c,v) ->
