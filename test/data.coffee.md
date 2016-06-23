@@ -496,7 +496,8 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             gws.should.be.an.instanceOf Array
             gws.should.have.length 2
             gws.should.have.property 0
-            gws[0].should.have.property 'gwid', 'gw3'
+            gws[0].should.have.property 'gwid'
+            gws[0].gwid.should.be.oneOf ['gw3','gw4'] # randomized
             gws.should.have.property 1
             gws[1].should.have.property 'gwid', 'backup'
 
@@ -561,7 +562,8 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             gws.should.be.an.instanceOf Array
             gws.should.have.length 2
             gws.should.have.property 0
-            gws[0].should.have.property 'gwid', 'gw3'
+            gws[0].should.have.property 'gwid'
+            gws[0].gwid.should.be.oneOf ['gw3','gw4'] # randomized
             gws.should.have.property 1
             gws[1].should.have.property 'gwid', 'backup'
 
@@ -596,10 +598,14 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             gws.should.have.length 2
             gws.should.have.property 0
             gws[0].should.have.property 'destination_number', '33157'
-            gws[0].should.have.property 'gwid', 'gw3'
             gws.should.have.property 1
             gws[1].should.have.property 'destination_number', '33158'
-            gws[1].should.have.property 'gwid', 'gw3'
+
+Gateways are randomized within carriers.
+
+            gws[0].should.have.property 'gwid'
+            gws[1].should.have.property 'gwid', gws[0].gwid
+            gws[0].gwid.should.be.oneOf ['gw3','gw4']
 
       describe 'The call handler', ->
 
@@ -673,7 +679,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             command: (c,v) ->
               if c in ['set','export']
                 return Promise.resolve().bind this
-              v.should.equal '[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800]sofia/something-egress/sip:336727@127.0.0.1:5068'
+              v.should.match /// \[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800\]sofia/something-egress/sip:336727@127.0.0.1:506[89] /// # randomized
               c.should.equal 'bridge'
               done()
               Promise.resolve
@@ -696,7 +702,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             command: (c,v) ->
               if c in ['set','export']
                 return Promise.resolve().bind this
-              v.should.equal '[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800]sofia/something-egress/sip:3368267@127.0.0.1:5068'
+              v.should.match /// \[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800\]sofia/something-egress/sip:3368267@127.0.0.1:506[89] /// # randomized
               c.should.equal 'bridge'
               done()
               Promise.resolve
@@ -716,7 +722,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
                 m[1].should.equal '{"cdr":"foo-bar"}'
               if c in ['set','export']
                 return Promise.resolve().bind this
-              v.should.equal '[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800]sofia/something-egress/sip:331234@127.0.0.1:5068'
+              v.should.match /// \[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800\]sofia/something-egress/sip:331234@127.0.0.1:506[89] /// # randomized
               c.should.equal 'bridge'
               done()
               Promise.resolve
@@ -737,7 +743,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
                 done()
               if c in ['set','export']
                 return Promise.resolve().bind this
-              v.should.equal '[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800]sofia/something-egress/sip:331234@127.0.0.1:5068'
+              v.should.match /// \[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800\]sofia/something-egress/sip:331234@127.0.0.1:506[89] /// # randomized
               c.should.equal 'bridge'
               Promise.resolve
                 body:
@@ -826,7 +832,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             command: (c,v) ->
               if c is 'set' or c is 'export'
                 return Promise.resolve().bind this
-              v.should.equal '[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800]sofia/something-egress/sip:33156@127.0.0.1:5068'
+              v.should.match /// \[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800\]sofia/something-egress/sip:33156@127.0.0.1:506[89] ///
               c.should.equal 'bridge'
               done()
               Promise.resolve

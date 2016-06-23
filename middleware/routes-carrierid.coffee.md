@@ -22,7 +22,14 @@ First we must sort the carrier entries using the local hostname preference.
           gateway.name ?= "carrier #{entry.carrierid}"
           # TODO Lookup faulty/suspicious status and skip in that case (i.e. set priority to 0)
 
-        gateways.sort (a,b) -> a.priority - b.priority
+        gateways.sort (a,b) ->
+          if a.priority isnt b.priority
+            a.priority - b.priority
+
+If gateways have the same priority, randomize / load-balance.
+
+          else
+            Math.random()
 
 And select only `try` entries where specified.
 
