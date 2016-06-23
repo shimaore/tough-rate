@@ -307,7 +307,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
               done()
 
       describe 'The call router', ->
-        it 'should NOT route local numbers directly', ->
+        it 'should NOT route invalid local numbers', ->
           ready.then ->
             provisioning.put _id:'number:1234',inbound_uri:'sip:foo@bar'
           .then ->
