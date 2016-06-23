@@ -32,6 +32,9 @@ Local number middleware
             auth: doc.account
             hostname: @cfg.sip_domain_name ? @cfg.host ? 'local'
           }
+        gw.name = 'local number'
+        gw.local_number = true
+        gw.carrier = 'LOCAL'
         null
       .catch (error) =>
         debug "Checking whether #{@destination} is local: #{error}"

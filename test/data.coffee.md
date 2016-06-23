@@ -361,6 +361,7 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
             gws[0].should.have.property 'uri', 'sip:foo@bar'
             gws[0].should.have.property 'headers'
             gws[0].headers.should.have.property 'P-Charge-Info', 'sip:boo@phone.local'
+            gws[0].should.have.property 'carrier', 'LOCAL'
 
         it 'should route local numbers with account', ->
           ready.then ->
