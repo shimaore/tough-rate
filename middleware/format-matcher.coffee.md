@@ -13,7 +13,7 @@
         when true
           return
         when false
-          @repond '484'
+          yield @respond '484'
         when null
           return
         else

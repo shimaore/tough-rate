@@ -31,7 +31,7 @@
     "huge-play": "^12.1.3",
     "nimble-direction": "^4.2.1",
     "numbering-plans": "^1.0.1",
-    "seem": "^1.2.0"
+    "seem": "^2.0.0"
   },
   "directories": {
     "test": "test"
