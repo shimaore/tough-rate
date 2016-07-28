@@ -3,7 +3,7 @@
         'field_merger'
         'find_rule_in'
         'gateway_manager'
-        'index'
+        'couch'
         'promise-all'
         'status'
         'middleware/alternate-response'
@@ -25,8 +25,8 @@
         'middleware/use-ccnq-to-e164'
         'middleware/use-session-gateways'
 
-        'middleware/config'
-        'middleware/server'
+        './middleware/config'
+        './middleware/server'
       ]
        do (m) ->
          it "should load #{m}", ->
