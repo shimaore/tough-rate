@@ -4,7 +4,7 @@
   "description": "Event-socket-based, middleware-driven LCR engine for FreeSwitch",
   "main": "index.js",
   "scripts": {
-    "prepublish": "coffee -m -c *.coffee.md middleware/*.coffee.md conf/*.coffee",
+    "prepublish": "coffee -m -c *.coffee.md middleware/*.coffee.md",
     "pretest": "npm install",
     "test": "mocha",
     "clean": "rm -f *.js *.js.map middleware/*.js middleware/*.js.map conf/*.js conf/*.js.map npm-debug.log"
