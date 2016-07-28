@@ -2,7 +2,8 @@ Status tests
 ============
 
     Status = require '../status'
-    should = require 'should'
+    chai = require 'chai'
+    chai.should()
 
     describe 'Status', ->
 
