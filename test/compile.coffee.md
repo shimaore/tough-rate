@@ -24,6 +24,9 @@
         'middleware/setup'
         'middleware/use-ccnq-to-e164'
         'middleware/use-session-gateways'
+
+        'middleware/config'
+        'middleware/server'
       ]
        do (m) ->
          it "should load #{m}", ->

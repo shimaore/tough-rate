@@ -19,7 +19,6 @@
     "esl": "^5.2.2",
     "memdown": "^1.2.0",
     "mocha": "^2.5.3",
-    "pouchdb": "^5.4.4",
     "useful-wind": "^7.2.1"
   },
   "dependencies": {
@@ -28,9 +27,11 @@
     "coffeescript-helpers": "^2.2.0",
     "cuddly": "^1.1.5",
     "debug": "^2.2.0",
-    "huge-play": "^13.0.0",
+    "huge-play": "^14.0.1",
+    "lru-cache": "^4.0.1",
     "nimble-direction": "^4.2.1",
     "numbering-plans": "^1.0.1",
+    "pouchdb": "^5.4.5",
     "seem": "^2.0.0"
   },
   "directories": {
