@@ -36,6 +36,13 @@ This plugin provides `registrant_host` as a gateway.
           address = "#{address}:#{default_port}" unless address.match /:/
 
         gateway = {address}
+
+* doc.global_number.rating (object) typically injected by session.ref_builder, contains an `entertaining-crib` `rating` object.
+* doc.global_number.timezone (string) typically injected by session.ref_builder, contains an `entertaining-crib` `timezone` string.
+
+        gateway.rating = source_doc.rating if source_doc.rating?
+        gateway.timezone = source_doc.timezone if source_doc.timezone?
+
         gateway.headers ?= {}
         for field, header of registrant_fields
           gateway.headers[header] = source_doc[field] if source_doc[field]?
