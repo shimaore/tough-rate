@@ -10,6 +10,12 @@ This plugin provides `registrant_host` as a gateway.
       registrant_remote_ipv4: 'X-CCNQ3-Registrant-Target'
       registrant_socket:      'X-CCNQ3-Registrant-HostPort'
 
+* doc.global_number.registrant_password (string) password for registrant; it is used to authenticate with a remote registrar.
+* doc.global_number.registrant_username (string) username for registrant; it is used to authenticate with a remote registrar.
+* doc.global_number.registrant_realm (string) authentication realm for registrant
+* doc.global_number.registrant_remote_ipv4 (string) registrar name or IP address, for registrant
+* doc.global_number.registrant_socket (string) local bind socket for registrant, as `{ip}:{port}`
+
     default_port = 5070
 
     update = (entry,ref) ->
@@ -21,7 +27,11 @@ This plugin provides `registrant_host` as a gateway.
       .then (source_doc) =>
         return if source_doc.disabled
 
+* doc.global_number.address (string, internal) If specified, the registrant routing address (i.e. the host and port to send the call to). The field might also be created by a custom session.ref_builder function, for example to translate a doc.global_number.registrant_host to the matching carrier-side SBC. Default: doc.global_number.registrant_host is used.
+* doc.global_number.registrant_host (string) If specified, the host (default port: 5070) or the `{host}:{port}` used as the registrant routing address (i.e. the host and port for our registrant OpenSIPS server). Should match the value of doc.global_number.registrant_socket (except it might use a host-name instead of an IP address).
+
         result = []
+
         if source_doc.address?
           address = source_doc.address
         else
@@ -31,8 +41,12 @@ This plugin provides `registrant_host` as a gateway.
             return result
 
           debug "Routes Registrant: mapping registrant", source_doc
+
+Deprecated: doc.global_number.registrant_host (array)
+
           if 'string' isnt typeof address
             address = address[0]
+
           address = "#{address}:#{default_port}" unless address.match /:/
 
         gateway = {address}
@@ -46,8 +60,11 @@ This plugin provides `registrant_host` as a gateway.
         gateway.headers ?= {}
         for field, header of registrant_fields
           gateway.headers[header] = source_doc[field] if source_doc[field]?
+
         result.push gateway
         result
+
+* session.ref_builder (function) Computes a data record for registrant routing; the first and only parameter is the provisioning database. Default: returns the doc.global_number provisioning record for `number:{@source}`.
 
     build_ref = (provisioning) ->
       debug "Routes Registrant build_ref locating #{@source}."
