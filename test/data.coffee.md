@@ -265,46 +265,43 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
         null
 
       describe 'Gateways', ->
-        it 'should have progress_timeout from their carrier: gw1', (done) ->
+        it 'should have progress_timeout from their carrier: gw1', ->
           ready.then ->
             gm.resolve_gateway 'gw1'
-            .then (doc) ->
-              doc.should.have.length 1
-              doc.should.be.an.instanceOf Array
-              doc.should.have.property 0
-              doc[0].should.have.property 'progress_timeout'
-              doc[0].progress_timeout.should.equal dataset.carriers.the_phone_company.progress_timeout
-              doc[0].should.have.property 'timezone', 'US/Eastern'
-              doc[0].should.have.property 'ratings'
-              done()
+          .then (doc) ->
+            doc.should.have.length 1
+            doc.should.be.an.instanceOf Array
+            doc.should.have.property 0
+            doc[0].should.have.property 'progress_timeout'
+            doc[0].progress_timeout.should.equal dataset.carriers.the_phone_company.progress_timeout
+            doc[0].should.have.property 'timezone', 'US/Eastern'
+            doc[0].should.have.property 'ratings'
 
-        it 'should have progress_timeout from their carrier: gw2', (done) ->
+        it 'should have progress_timeout from their carrier: gw2', ->
           ready.then ->
             gm.resolve_gateway 'gw2'
-            .then (doc) ->
-              doc.should.have.length 1
-              doc.should.be.an.instanceOf Array
-              doc.should.have.property 0
-              doc[0].should.have.property 'gwid', 'gw2'
-              doc[0].should.have.property 'progress_timeout'
-              doc[0].progress_timeout.should.equal dataset.carriers.the_phone_company.progress_timeout
-              doc[0].should.have.property 'timezone', 'US/Central'
-              done()
+          .then (doc) ->
+            doc.should.have.length 1
+            doc.should.be.an.instanceOf Array
+            doc.should.have.property 0
+            doc[0].should.have.property 'gwid', 'gw2'
+            doc[0].should.have.property 'progress_timeout'
+            doc[0].progress_timeout.should.equal dataset.carriers.the_phone_company.progress_timeout
+            doc[0].should.have.property 'timezone', 'US/Central'
 
       describe 'the_phone_company', ->
-        it 'should return its gateways', (done) ->
+        it 'should return its gateways', ->
           ready.then ->
             gm.resolve_carrier 'the_phone_company'
-            .then (info) ->
-              expect(info).be.an.instanceOf Array
-              info.should.have.length 2
-              info.should.have.property 0
-              info[0].should.have.property 'gwid', 'gw1'
-              info[0].should.have.property 'timezone', 'US/Eastern'
-              info.should.have.property 1
-              info[1].should.have.property 'gwid', 'gw2'
-              info[1].should.have.property 'timezone', 'US/Central'
-              done()
+          .then (info) ->
+            expect(info).be.an.instanceOf Array
+            info.should.have.length 2
+            info.should.have.property 0
+            info[0].should.have.property 'gwid', 'gw1'
+            info[0].should.have.property 'timezone', 'US/Eastern'
+            info.should.have.property 1
+            info[1].should.have.property 'gwid', 'gw2'
+            info[1].should.have.property 'timezone', 'US/Central'
 
       describe 'The call router', ->
         it 'should NOT route invalid local numbers', ->

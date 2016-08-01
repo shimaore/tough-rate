@@ -2,7 +2,7 @@
     chai.should()
     describe 'format matcher', ->
       {include} = require '../middleware/format-matcher'
-      it 'should accept non-geo FR numbers', (done) ->
+      it 'should accept non-geo FR numbers', ->
         ctx =
           session:
             direction: 'lcr'
@@ -14,9 +14,8 @@
           a = ctx.session.destination_information
           a.should.have.property 'fixed', true
           a.should.have.property 'geographic', false
-          done()
 
-      it 'should accept fixed geo FR numbers', (done) ->
+      it 'should accept fixed geo FR numbers', ->
         ctx =
           session:
             direction: 'lcr'
@@ -28,7 +27,6 @@
           a = ctx.session.destination_information
           a.should.have.property 'fixed', true
           a.should.have.property 'geographic', true
-          done()
 
       it 'should reject invalid FR numbers', (done) ->
         ctx =
@@ -38,8 +36,9 @@
           respond: (value) ->
             done() if value is '484'
         include.call ctx
+        null
 
-      it 'should accept US numbers', (done) ->
+      it 'should accept US numbers', ->
         ctx =
           session:
             direction: 'lcr'
@@ -50,7 +49,6 @@
           ctx.session.should.have.property 'destination_information'
           a = ctx.session.destination_information
           a.should.have.property 'name', 'NY'
-          done()
 
       it 'should reject unwanted US numbers', (done) ->
         ctx =
@@ -60,6 +58,7 @@
           respond: (value) ->
             done() if value is '484'
         include.call ctx
+        null
 
       it 'should reject unwanted US numbers', (done) ->
         ctx =
@@ -69,8 +68,9 @@
           respond: (value) ->
             done() if value is '484'
         include.call ctx
+        null
 
-      it 'should ignore numbers it does not know about', (done) ->
+      it 'should ignore numbers it does not know about', ->
         ctx =
           session:
             direction: 'lcr'
@@ -78,4 +78,3 @@
         include.call ctx
         .then ->
           ctx.session.should.not.have.property 'destination_information'
-          done()
