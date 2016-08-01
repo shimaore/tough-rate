@@ -18,7 +18,7 @@
     "coffee-script": "^1.10.0",
     "esl": "^5.2.2",
     "memdown": "^1.2.0",
-    "mocha": "^2.5.3",
+    "mocha": "^3.0.0",
     "useful-wind": "^7.2.1"
   },
   "dependencies": {
