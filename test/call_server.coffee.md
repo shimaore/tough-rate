@@ -45,15 +45,13 @@ Setup
             sip_port: 5062
             local_ip: '127.0.0.1'
             socket_port: 7002 # Outbound-Socket port
-            context:'test-sender'
           'test-catcher':
             sip_port: 5064
             local_ip: '127.0.0.1'
-            socket_port: 7002 # Outbound-Socket port
-            context:'answer'
+            socket_port: 7004 # Outbound-Socket port
         acls:
           default: [ '127.0.0.0/8' ]
-      xml = (require '../conf/freeswitch') cfg
+      xml = (require 'huge-play/conf/freeswitch') cfg
       fs.writeFileAsync 'test/live/freeswitch.xml', xml, 'utf-8'
     .catch (error) -> debug "write: #{error} in #{process.cwd()}"
     .then -> exec "docker kill #{p}"
@@ -155,7 +153,7 @@ Server (Unit Under Test)
 
         options =
           prov: provisioning
-          profile: 'huge-play-test-sender'
+          profile: 'huge-play-test-sender-egress'
           host: 'example.net'
           ruleset_of: ruleset_of
           sip_domain_name: sip_domain_name
@@ -180,6 +178,11 @@ Server (Unit Under Test)
           ].map (m) ->
             require m
 
+        console.log 'Declaring Catcher'
+        catcher = (require 'esl').server ->
+          @command 'answer'
+        catcher.listen 7004
+
         console.log 'Declaring Server'
         CallServer = require 'useful-wind/call_server'
         s = new CallServer options
@@ -199,7 +202,7 @@ Test
             source = '1234'
             destination = '33142'
             debug 'test1: originate'
-            @api "originate {origination_caller_id_number=#{source}}sofia/huge-play-test-sender/sip:#{destination}@#{domain} &park"
+            @api "originate {origination_caller_id_number=#{source}}sofia/huge-play-test-sender-ingress/sip:#{destination}@#{domain} &park"
             .then ->
               debug 'test1: delay'
               Promise.delay 700
@@ -216,7 +219,7 @@ Test
             client.end()
             reject new Error "test1 error #{data}"
           debug 'test1 client.connect'
-          client.connect 5702, '127.0.0.1'
+          client.connect 5722, '127.0.0.1'
           debug 'test1 connecting'
           client
         catch exception
@@ -233,7 +236,7 @@ Test
             source = '1235'
             destination = '330112'
             debug 'test2: originate'
-            @api "originate [origination_caller_id_number=#{source},sip_h_X-CCNQ3-Routing=brest]sofia/huge-play-test-sender/sip:#{destination}@#{domain} &park"
+            @api "originate [origination_caller_id_number=#{source},sip_h_X-CCNQ3-Routing=brest]sofia/huge-play-test-sender-ingress/sip:#{destination}@#{domain} &park"
             .then ->
               debug 'test2: client.end()'
               client.end()
@@ -247,7 +250,7 @@ Test
             client.end()
             reject new Error "test2 error: #{data}"
           debug 'test2 connect'
-          client.connect 5702, '127.0.0.1'
+          client.connect 5722, '127.0.0.1'
           debug 'test2 connecting'
           client
         catch exception

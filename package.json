@@ -17,6 +17,7 @@
     "chai-as-promised": "^5.3.0",
     "coffee-script": "^1.10.0",
     "esl": "^5.2.2",
+    "huge-play": "^14.0.2",
     "memdown": "^1.2.0",
     "mocha": "^3.0.0",
     "useful-wind": "^7.2.1"
