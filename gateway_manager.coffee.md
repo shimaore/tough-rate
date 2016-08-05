@@ -1,6 +1,8 @@
 Gateway (and carriers) manager
 ==============================
 
+    seem = require 'seem'
+
 The gateway manager provides services to the call handler.
 
     default_parameters =
@@ -36,53 +38,56 @@ The gateway manager provides services to the call handler.
             @default_parameters[k] = v
 
 * doc.carrier Parameters of an egress carrier.
-* doc.carrier._id (string) `carrier:<sip-domain-name>:<carrier-id>`
+* doc.carrier._id (string,required) `carrier:<sip_domain_name>:<carrierid>`
+* doc.carrier.type (string,required) `carrier`
+* doc.carrier.sip_domain_name (string, required)
+* doc.carrier.carrierid (string, required)
 
-      init: ->
-        Promise.resolve()
-        .then =>
-          @provisioning
+      init: seem ->
+
+        {rows} = yield @provisioning
           .allDocs startkey:"carrier:#{@sip_domain_name}:", endkey:"carrier:#{@sip_domain_name};", include_docs:yes
-        .catch (error) =>
-          debug error
-          debug "GatewayManager allDocs failed"
-          throw error
-        .then ({rows}) =>
-          for row in rows
-            do (row) => @_merge_carrier_row row
-          return
-        .catch (error) =>
-          debug error
-          debug "GatewayManager merge-carrier-row failed"
-          throw error
-        .then =>
-          @provisioning
+          .catch (error) ->
+            debug "GatewayManager allDocs failed: #{error.stack? error}"
+            {}
+
+        return unless rows?
+        for row in rows when row.doc?
+          yield @_merge_carrier row.doc
+
+        {rows} = yield @provisioning
           .query "#{pkg.name}-gateway-manager/gateways", startkey:[@sip_domain_name], endkey:[@sip_domain_name,{}]
-        .catch (error) =>
-          debug error
-          debug "GatewayManager query failed"
-          throw error
-        .then ({rows}) =>
-          for row in rows when row.value?.address?
-            do (row) => @_merge_gateway_row row
-          return
-        .catch (error) =>
-          debug error
-          debug "GatewayManager merge-gateway-row failed"
-          throw error
-        .then =>
-          debug "GatewayManager for #{@sip_domain_name}: gateways = #{JSON.stringify @gateways}"
-          debug "GatewayManager for #{@sip_domain_name}: carriers = #{JSON.stringify @carriers}"
-          return
+          .catch (error) =>
+            debug "GatewayManager query failed: #{error.stack ? error}"
+            {}
+
+        return unless rows?
+        for row in rows when row.value?
+          do (row) => @_merge_gateway row.value
+
+        debug 'GatewayManager init completed', {@sip_domain_name,@gateways,@carriers}
+        return
 
         # TODO Add monitoring of `_changes` on the view to update carriers and gateways
 
-      _merge_gateway_row: (row) ->
-        debug "GatewayManager merge-gateway-row #{JSON.stringify row}"
-        {gwid,carrierid} = row.value
-        assert gwid?
+* doc.gateway Parameters for an outbound gateway
+* doc.gateway.gwid (string,required)
+* doc.gateway.carrierid (string) Carrier for this gateway (see doc.carrier )
+* doc.gateway.disabled (boolean) optional field to mark the gateway as inexistent
 
-        if row.value.disabled
+      _merge_gateway: (value) ->
+        debug 'GatewayManager merge-gateway', {value}
+
+        {address,gwid,carrierid} = value
+        unless address?
+          debug 'Missing address, ignoring', value
+          return
+
+        unless gwid?
+          debug 'Missing gwid, ignoring', value
+          return
+
+        if value.disabled
           if carrierid?
             delete @carriers[carrierid]?._gateways[gwid]
           delete @gateways[gwid]
@@ -92,53 +97,62 @@ The gateway manager provides services to the call handler.
           @gateways[gwid] = field_merger
             default: @default_parameters
             carrier: @carriers[carrierid]
-            gateway: row.value
+            gateway: value
 
           @carriers[carrierid] ?= _gateways: {}
           @carriers[carrierid]._gateways[gwid] = true
         else
           @gateways[gwid] = field_merger
             default: @default_parameters
-            gateway: row.value
+            gateway: value
 
-      _reevaluate_gateways: (gateways) ->
-        @provisioning
-        .query "#{pkg.name}-gateway-manager/gateways", keys:gateways.map (x) => [@sip_domain_name,x]
-        .then ({rows}) =>
-          for row in rows when row.value?.address?
-            do (row) => @_merge_gateway_row row
-        .catch (error) ->
-          debug "GatewayManager reevaluate_gateways: #{error}"
+        return
 
-* doc.carrier.carrierid (string) identifier for the carrier, used in doc.carrier._id
-* doc.carrier.deleted (boolean) optional field to mark the carrier as deleted
+      _reevaluate_gateways: seem (gateways) ->
+        debug 'GatewayManager reevaluate gateways', gateways
+        {rows} = yield @provisioning
+          .query "#{pkg.name}-gateway-manager/gateways", keys:gateways.map (x) => [@sip_domain_name,x]
+          .catch (error) =>
+            debug "GatewayManager query failed: #{error.stack ? error}"
+            {}
 
-      _merge_carrier_row: (row) ->
-        debug "GatewayManager merge-carrier-row #{JSON.stringify row}"
-        carrierid = row.doc.carrierid
-        assert carrierid?
+        return unless rows?
+        for row in rows when row.value?
+          do (row) => @_merge_gateway row.value
 
-        if row.value.disabled
+* doc.carrier.carrierid (string,required) identifier for the carrier, used in doc.carrier._id
+* doc.carrier.disabled (boolean) optional field to mark the carrier as non-existent
+
+      _merge_carrier: seem (value) ->
+        debug 'GatewyManager merge-carrier', value
+
+        carrierid = value.carrierid
+        unless carrierid?
+          debug 'Missing carrierid, ignoring', value
+          return
+
+        if value.disabled
           gateways = @carriers[carrierid]._gateways
           delete @carriers[carrierid]
-          @_reevaluate_gateways gateways
+          yield @_reevaluate_gateways gateways
           return
 
         @carriers[carrierid] ?= _gateways: {}
-        for own k,v of row.doc
+        for own k,v of value
           @carriers[carrierid][k] = v
 
         return
 
-      _retrieve_gateway: (name) ->
+      _retrieve_gateway: seem (name) ->
         # TODO update with dynamic parameters (temporarily_disabled, ...)
+        return null unless name of @gateways
         info = {}
         info[k] = v for own k,v of @gateways[name]
         info.temporarily_disabled = @gateway_status[name]?.state in ['faulty']
-        Promise.resolve info
+        yield info
 
-      _retrieve_carrier: (name) ->
-        Promise.resolve @carriers[name]
+      _retrieve_carrier: seem (name) ->
+        yield @carriers[name]
 
 
 Gateway and carrier properties mapping
@@ -146,32 +160,30 @@ Gateway and carrier properties mapping
 
 Return gateway data (inside a list) as long as that gateway is available.
 
-      resolve_gateway: (name) ->
-        @_retrieve_gateway name
-        .then (info) ->
-          if not info?
-            return []
-          if info.disabled or info.temporarily_disabled
-            return []
-          [info]
+      resolve_gateway: seem (name) ->
+        info = yield @_retrieve_gateway name
+        if not info?
+          return []
+        if info.disabled or info.temporarily_disabled
+          return []
+        [info]
 
 Return gateway data (inside a list) for a given carrier.
 
-      resolve_carrier:  (name) ->
+      resolve_carrier:  seem (name) ->
         carrier = {}
-        @_retrieve_carrier name
-        .then (carrier) =>
-          if not carrier?
-            return []
-          if not carrier._gateways?
-            return []
-          gateways = Object.getOwnPropertyNames carrier._gateways
+        carrier = yield @_retrieve_carrier name
+        if not carrier?
+          return []
+        if not carrier._gateways?
+          return []
 
-Note: we could do `@resolve gateways` instead here and allow carrier-within-carrier, but I'm concerned about recursion issues so let's skip that for now.
+        res = []
+        for own gw of carrier._gateways
+          [x] = yield @resolve_gateway gw
+          res.push x
 
-          Promise.map gateways, (gw) =>
-            @resolve_gateway gw
-        .map ([x]) -> x
+        res
 
 Gateway ping
 ------------
