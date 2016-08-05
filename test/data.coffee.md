@@ -774,7 +774,7 @@ Gateways are randomized within carriers.
                   variable_last_bridge_hangup_cause: 'NORMAL_CALL_CLEARING'
 
           statistics.on 'call', (data) ->
-            console.dir data
+            # console.dir data
             if data.state is 'call-attempt' and data.source is '2348' and data.destination is '331244'
               done()
 
