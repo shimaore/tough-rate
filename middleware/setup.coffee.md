@@ -80,7 +80,6 @@ Manipulate the gateways list.
       return
 
     {EventEmitter} = require 'events'
-    pkg = require '../package.json'
     debug = (require 'debug') @name
 
 Init
