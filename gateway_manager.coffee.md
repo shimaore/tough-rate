@@ -82,7 +82,7 @@ The gateway manager provides services to the call handler.
         {gwid,carrierid} = row.value
         assert gwid?
 
-        if row.deleted or row.doc?._deleted
+        if row.value.disabled
           if carrierid?
             delete @carriers[carrierid]?._gateways[gwid]
           delete @gateways[gwid]
@@ -118,7 +118,7 @@ The gateway manager provides services to the call handler.
         carrierid = row.doc.carrierid
         assert carrierid?
 
-        if row.deleted or row.doc?._deleted
+        if row.value.disabled
           gateways = @carriers[carrierid]._gateways
           delete @carriers[carrierid]
           @_reevaluate_gateways gateways
@@ -269,6 +269,7 @@ The following fields are optional:
 * doc.host.sip_profiles[].egress.host (string) Host for this profile. Default: doc.host.host
 * doc.host.sip_profiles[].egress.carrier (string) Carrier for this profile. Used for call rating. Default: the `gwid` value.
 * doc.host.sip_profiles[].egress.name (string) Display name for this profile.
+* doc.host.sip_profiles[].egress.disabled (boolean) If true the gateway is ignored
 * doc.host.host (string) Hostname. Used to build doc.host._id
 * doc.host.sip_domain_name (string) SIP domain name for the host.
 * doc.host.sip_profiles[].egress.carrierid (string) Carrier identifier for this profile (considered as a gateway).
@@ -278,6 +279,7 @@ The following fields are optional:
                   egress.gwid ?= rec.egress_gwid
                   egress.address ?= [ip,port].join ':'
                   egress.host ?= doc.host
+                  egress.disabled ?= doc.disabled
                   if egress.gwid?
                     emit [doc.sip_domain_name, egress.carrierid], egress
                   return
