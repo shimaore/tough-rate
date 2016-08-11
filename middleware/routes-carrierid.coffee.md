@@ -33,7 +33,7 @@ First we must sort the carrier entries using the local hostname preference.
 If gateways have the same priority, randomize / load-balance.
 
           else
-            Math.random()
+            Math.random()-0.5
 
 And select only `try` entries where specified.
 
