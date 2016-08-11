@@ -11,6 +11,8 @@ Replace all carrierid entries with matching definitions.
       return entry unless entry.carrierid?
       gateway_manager.resolve_carrier entry.carrierid
       .then (gateways) =>
+        count = gateways[0]?.try
+
         gateways.forEach (gateway) =>
           gateway.priority = 1
 
@@ -37,7 +39,6 @@ If gateways have the same priority, randomize / load-balance.
 
 And select only `try` entries where specified.
 
-        count = gateways[0]?.try
         if count? and count > 0
           gateways = gateways[0...count]
 
