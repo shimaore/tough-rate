@@ -48,7 +48,7 @@ The gateway manager provides services to the call handler.
         {rows} = yield @provisioning
           .allDocs startkey:"carrier:#{@sip_domain_name}:", endkey:"carrier:#{@sip_domain_name};", include_docs:yes
           .catch (error) ->
-            debug "GatewayManager allDocs failed: #{error.stack? error}"
+            debug "GatewayManager allDocs failed: #{error.stack ? error}"
             {}
 
         return unless rows?
