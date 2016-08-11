@@ -606,8 +606,9 @@ Note: normally ruleset_of would be async, and would query provisioning to find t
 Gateways are randomized within carriers.
 
             gws[0].should.have.property 'gwid'
-            gws[1].should.have.property 'gwid', gws[0].gwid
             gws[0].gwid.should.be.oneOf ['gw3','gw4']
+            gws[1].should.have.property 'gwid'
+            gws[1].gwid.should.be.oneOf ['gw3','gw4']
 
       describe 'The call handler', ->
 
