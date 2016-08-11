@@ -56,7 +56,7 @@ The gateway manager provides services to the call handler.
           yield @_merge_carrier row.doc
 
         {rows} = yield @provisioning
-          .query "#{pkg.name}-gateway-manager/gateways", startkey:[@sip_domain_name], endkey:[@sip_domain_name,{}]
+          .query "#{design}/gateways", startkey:[@sip_domain_name], endkey:[@sip_domain_name,{}]
           .catch (error) =>
             debug "GatewayManager query failed: #{error.stack ? error}"
             {}
@@ -111,7 +111,7 @@ The gateway manager provides services to the call handler.
       _reevaluate_gateways: seem (gateways) ->
         debug 'GatewayManager reevaluate gateways', gateways
         {rows} = yield @provisioning
-          .query "#{pkg.name}-gateway-manager/gateways", keys:gateways.map (x) => [@sip_domain_name,x]
+          .query "#{design}/gateways", keys:gateways.map (x) => [@sip_domain_name,x]
           .catch (error) =>
             debug "GatewayManager query failed: #{error.stack ? error}"
             {}
