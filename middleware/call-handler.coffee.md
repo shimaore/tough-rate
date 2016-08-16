@@ -88,10 +88,6 @@ If there are gateways, attempt to call through them in the order listed.
 
 Call attempt.
 
-        yield @set
-          ccnq_gateway_json: JSON.stringify gateway
-          ccnq_carrier: gateway.carrier
-
         try
 
           debug "CallHandler: handling (next) gateway", gateway
