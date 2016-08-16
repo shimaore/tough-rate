@@ -110,6 +110,8 @@ Call attempt.
               debug "attempt error: #{error.stack ? error}"
               body: {}
           data = res.body
+          @session.bridge_data ?= []
+          @session.bridge_data.push data
 
           debug "CallHandler: FreeSwitch response: ", res
           @statistics.add 'call-status'
