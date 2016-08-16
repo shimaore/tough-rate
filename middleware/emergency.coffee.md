@@ -27,7 +27,8 @@ Since this code rewrites the destination before resolving gateways, it must be c
 
 Then, see whether the destination number is an emergency number, and process it.
 
-* doc.rule.emergency (boolean) true if the rule is a route for an emergency number. See doc.location and doc.emergency for more information.
+* doc.prefix.emergency (boolean) true if the rule is a route for an emergency number. See doc.location and doc.emergency for more information.
+* doc.destination.emergency (boolean) true if the rule is a route for an emergency number. See doc.location and doc.emergency for more information.
 
       if not @res.rule.emergency
         debug 'Emergency middleware: not an emergency rule.'

@@ -147,26 +147,43 @@ The database indicates the name of the database used to store the ruleset.
 destination
 -----------
 
-A destination record might be referenced by a rule in order to provide defaults for that rule.
+A destination record might be referenced by a prefix in order to provide values for that prefix.
 
     _id: "destination:#{destination}"
     type: 'destination'
     destination: destination
 
     disabled
+
+    gwlist: [
+      {gwid, weight, attrs,...}
+      {carrierid, weight, try, attrs,...}
+    ]
+
     progress_timeout
     answer_timeout
     dialog_timeout
     attrs
 
-rule
-----
+`prefix` record
+---------------
 
-Rules are defined in a ruleset database. There is one ruleset database per ruleset.
+Prefixes are first looked-up in `prefix` records:
 
-    _id: "rule:#{prefix}"
-    type: 'rule'
-    destination (optional)
+    _id: "prefix:{prefix}"
+    type: 'prefix'
+    prefix: "{prefix}"
+
+    disabled
+
+    destination: "{destination}"
+
+Sometimes it is more convenient to store data directly inside the prefix:
+
+    _id: "prefix:{prefix}"
+    type: 'prefix'
+    prefix: "{prefix}"
+
     gwlist: [
       {gwid, weight, attrs,...}
       {carrierid, weight, try, attrs,...}

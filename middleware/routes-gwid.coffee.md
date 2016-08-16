@@ -3,7 +3,8 @@ Default `gwid` router plugin
 
     update = (gateway_manager,entry) ->
 
-* doc.rule.gwlist[].gwid (string) ID of the destination doc.gateway
+* doc.prefix.gwlist[].gwid (string) ID of the destination doc.gateway
+* doc.destination.gwlist[].gwid (string) ID of the destination doc.gateway
 * doc.gateway ignore
 * doc.gateway.name (string) Name of the gateway
 * doc.gateway.carrier (string) Carrier of the gateway (used for call rating) in format `<sip_domain_name>:<carrierid>`

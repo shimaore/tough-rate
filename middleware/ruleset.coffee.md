@@ -86,7 +86,8 @@ Provisioning error or user error
         yield @res.respond '485'
         return
 
-* doc.rule.gwlist (array) List of gateways/carriers for this rule. Has priority over the `destination` field.
+* doc.prefix.gwlist (array) List of gateways/carriers for this rule.
+* doc.destination.gwlist (array) List of gateways/carriers for this rule.
 
       if rule.gwlist?
         @res.gateways = rule.gwlist
@@ -101,7 +102,8 @@ Missing gateway list is normal for e.g. emergency call routing.
 
       @res.rule = rule
 
-* doc.rule.attrs (object) Extra attributes for this rule.
+* doc.prefix.attrs (object) Extra attributes for this rule.
+* doc.destination.attrs (object) Extra attributes for this rule.
 
       @res.attr rule.attrs
       return

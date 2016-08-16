@@ -107,16 +107,16 @@ The steps to placing outbound call(s) are:
       rules:
         default:
           33:
-            _id:'rule:33'
-            type:'rule'
+            _id:'prefix:33'
+            type:'prefix'
             prefix:'33'
             destination:'france'
             attrs:
               cdr: 'foo-bar'
 
           336:
-            _id:'rule:336'
-            type:'rule'
+            _id:'prefix:336'
+            type:'prefix'
             prefix:'336'
             destination:'france_mobile'
             gwlist: [
@@ -125,15 +125,15 @@ The steps to placing outbound call(s) are:
             ]
 
           '33_112':
-            _id:'rule:33_112'
-            type:'rule'
+            _id:'prefix:33_112'
+            type:'prefix'
             prefix:'33_112'
             emergency:true
 
         registrant:
           33:
-            _id:'rule:33'
-            type:'rule'
+            _id:'prefix:33'
+            type:'prefix'
             prefix:'33'
             destination:'france'
             gwlist:[
