@@ -19,7 +19,7 @@
     "esl": "^5.2.2",
     "huge-play": "^14.0.2",
     "memdown": "^1.2.0",
-    "mocha": "^3.0.1",
+    "mocha": "^3.0.2",
     "useful-wind": "^7.2.1"
   },
   "dependencies": {
