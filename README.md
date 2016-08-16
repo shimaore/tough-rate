@@ -69,11 +69,6 @@ gateway (individual gateway records)
     dialog_timeout
     attrs
 
-Differences with ccnq3:
-- Some optional fields (`probe_mode`,`strip`,`pri_prefix`,`attrs`) are no longer supported.
-- New fields have been introduced.
-
-
 gateway (as part of host)
 -------------------------
 
@@ -92,10 +87,6 @@ The following gateway fields do not need to be specified:
 - `address` is computed based on the profile's data;
 - `sip_domain_name` is taken from the host.
 
-Differences with ccnq3:
-- The ccnq3 field `egress_gwid` has been obsoleted; it will be mapped to `egress.gwid` if the later is not present.
-
-
 carrier
 -------
 
@@ -105,7 +96,7 @@ A carrier is indicated alongside a gateway definition, either inside a `gateway`
 
 A carrier record might optionally be created to provide carrier-wide default values for the gateways listed under that carrier.
 
-    _id: "carrier:#{sip_domain_name}:#{carrierid}"
+    _id: "carrier:{sip_domain_name}:{carrierid}"
     type: 'carrier'
 
     sip_domain_name
@@ -118,11 +109,6 @@ A carrier record might optionally be created to provide carrier-wide default val
     answer_timeout
     dialog_timeout
     attrs
-
-Differences with ccnq3:
-- Carriers are defined inside a `sip_domain_name`, not inside a host. The field `local_gateway_extra_priority` is used instead in order to prioritize gateways local to a host.
-- The `gwlist` field found in the carrier records has been replaced by indication on each gateway. (This means a gateway can only belong to a single carrier. Conversely it prevents issues where inexistent gateways might be listed in a carrier.)
-
 
 ruleset
 -------
@@ -143,6 +129,18 @@ Rulesets records are found in the main provisioning database.
 The title is the name shown in the management tools.
 The description is a longer description of what this ruleset is about.
 The database indicates the name of the database used to store the ruleset.
+
+Rules
+=====
+
+Rules are defined in a ruleset database. There is one ruleset database per ruleset.
+
+The gwlist is converted into a list of gateways as follows:
+- Each record in the list is assigned an additional priority, starting from 0 for the last item in the list and adding 1 going backwards in the list.
+- Records which have a `carrierid` and no `gwid` are replaced with a list of the gateways for that carrierid, up to `try` entries. The value of `try` defaults to the number of gateways for that carrier. Gateways are selected using weighted round-robin.
+- Records which have a `gwid` are gateways. Other records are rejected.
+- Any gateway local to the host receives an additional `local_gateway_priority` (by default 0.5).
+- In the resulting list, gateways are sorted by descending priority if no `weight` field is present.
 
 destination
 -----------
@@ -196,12 +194,3 @@ Sometimes it is more convenient to store data directly inside the prefix:
     attrs
 
 
-The gwlist is converted into a list of gateways as follows:
-- Each record in the list is assigned an additional priority, starting from 0 for the last item in the list and adding 1 going backwards in the list.
-- Records which have a `carrierid` and no `gwid` are replaced with a list of the gateways for that carrierid, up to `try` entries. The value of `try` defaults to the number of gateways for that carrier. Gateways are selected using weighted round-robin.
-- Records which have a `gwid` are gateways. Other records are rejected.
-- Any gateway local to the host receives an additional `local_gateway_priority` (by default 0.5).
-- In the resulting list, gateways are sorted by descending priority if no `weight` field is present.
-
-Differences with ccnq3:
-- Since the `sip_domain_name` and `groupid` are common to all the rules inside a ruleset, they are not repeated inside the individual `rule` records.
