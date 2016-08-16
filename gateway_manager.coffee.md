@@ -113,10 +113,10 @@ The gateway manager provides services to the call handler.
 
         return
 
-      _reevaluate_gateways: seem (gateways) ->
-        debug 'GatewayManager reevaluate gateways', gateways
+      _reevaluate_gateways: seem (gateway_names) ->
+        debug 'GatewayManager reevaluate gateways', gateway_names
         {rows} = yield @provisioning
-          .query "#{design}/gateways", keys:gateways.map (x) => [@sip_domain_name,x]
+          .query "#{design}/gateways", keys:gateway_names.map (x) => [@sip_domain_name,x]
           .catch (error) =>
             debug "GatewayManager query failed: #{error.stack ? error}"
             {}
@@ -137,9 +137,9 @@ The gateway manager provides services to the call handler.
           return
 
         if value.disabled
-          gateways = @carriers[carrierid]._gateways
+          gateway_names = Object.getOwnPropertyNames @carriers[carrierid]._gateways
           delete @carriers[carrierid]
-          yield @_reevaluate_gateways gateways
+          yield @_reevaluate_gateways gateway_names
           return
 
         @carriers[carrierid] ?= _gateways: {}
