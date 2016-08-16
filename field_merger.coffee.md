@@ -1,11 +1,6 @@
 Field Merger
 ============
 
-From README.md:
-
-Different attribute values might be present. They are always resolved in the following order: default, carrier, gateway, ruleset, rule (either destination or prefix), gwlist entry.
-
-    resolution_order = 'default extra carrier gateway ruleset rule entry'.split ' '
     combiners =
       disabled: (a,b) -> a or b
       temporarily_disabled: (a,b) -> a or b
@@ -19,8 +14,7 @@ Different attribute values might be present. They are always resolved in the fol
 
       result = {}
 
-      for name in resolution_order when records[name]?
-        record = records[name]
+      for record in records
 
         for own field, value of record when field[0] isnt '_'
 

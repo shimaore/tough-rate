@@ -95,17 +95,21 @@ The gateway manager provides services to the call handler.
           return
 
         if carrierid?
-          @gateways[gwid] = field_merger
-            default: @default_parameters
-            carrier: @carriers[carrierid]
-            gateway: value
+          @gateways[gwid] = field_merger [
+            @default_parameters
+            @carriers[carrierid]
+            value
+          ]
 
           @carriers[carrierid] ?= _gateways: {}
           @carriers[carrierid]._gateways[gwid] = true
         else
-          @gateways[gwid] = field_merger
-            default: @default_parameters
-            gateway: value
+          @gateways[gwid] = field_merger [
+            @default_parameters
+            value
+          ]
+          for k,v of @carriers
+            delete v._gateways?[gwid]
 
         return
 

@@ -18,21 +18,21 @@ We must flatten the list so that CallHandler can use it.
       @res.gateways = @res.gateways.map (gateway) =>
         if isArray gateway
           gateway.map (gateway) =>
-            field_merger {
-              default: {destination:@res.destination}
-              extra: @res.extra
+            field_merger [
+              {destination:@res.destination}
+              @res.extra
               gateway
-              ruleset:@res.ruleset
-              rule:@res.rule
-            }
+              @res.ruleset
+              @res.rule
+            ]
         else
-          field_merger {
-            default: {destination:@res.destination}
-            extra: @res.extra
+          field_merger [
+            {destination:@res.destination}
+            @res.extra
             gateway
-            ruleset:@res.ruleset
-            rule:@res.rule
-          }
+            @res.ruleset
+            @res.rule
+          ]
 
       debug "Gateways after ops", JSON.stringify @res.gateways
       @res.gateways = flatten @res.gateways

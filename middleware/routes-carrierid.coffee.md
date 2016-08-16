@@ -80,5 +80,4 @@ Toolbox
     assert = require 'assert'
     Promise = require 'bluebird'
     promise_all = require '../promise-all'
-    field_merger = require '../field_merger'
     debug = (require 'debug') @name
