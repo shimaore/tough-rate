@@ -5,6 +5,7 @@ The steps to placing outbound call(s) are:
 
     pkg = require '../package'
     debug = (require 'debug') "#{pkg.name}:test:data"
+    seem = require 'seem'
 
     sip_domain_name = 'phone.local'
     dataset_1 =
@@ -733,15 +734,13 @@ Gateways are randomized within carriers.
           one_call ctx, 'default'
           null
 
-        it 'should insert winner data', (done) ->
+        it 'should insert winner data', seem (done) ->
           @timeout 6*1000
           ctx =
             data:
               'Channel-Destination-Number': '331234'
               'Channel-Caller-ID-Number': '2348'
             command: (c,v) ->
-              if c is 'set' and m = v.match /^ccnq_carrier=(.*)$/
-                done()
               if c in ['set','export']
                 return Promise.resolve().bind this
               v.should.match /// \[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800\]sofia/something-egress/sip:331234@127.0.0.1:506[89] /// # randomized
@@ -757,7 +756,9 @@ Gateways are randomized within carriers.
                     body:
                       billmsec: 2000
 
-          one_call ctx, 'default'
+          {session} = yield one_call ctx, 'default'
+          session.should.have.property 'winner'
+          session.winner.should.have.property 'carrierid', 'the_other_company'
           null
 
         it 'should emit call events', (done) ->
