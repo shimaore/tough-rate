@@ -22,10 +22,8 @@ First we must sort the carrier entries using the local hostname preference.
             gateway.priority += 0.5
 
 * doc.carrier.name Name of the carrier
-* doc.carrier.carrier Billing identifier of the carrier (used for rating). Default: the carrierid.
 
           gateway.name ?= entry.name ? "carrier #{entry.carrierid}"
-          gateway.carrier ?= entry.carrier ? entry.carrierid
           # TODO Lookup faulty/suspicious status and skip in that case (i.e. set priority to 0)
 
         gateways.sort (a,b) ->

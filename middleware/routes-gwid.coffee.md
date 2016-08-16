@@ -5,12 +5,11 @@ Default `gwid` router plugin
 
 * doc.rule.gwlist[].gwid (string) ID of the destination doc.gateway
 * doc.gateway ignore
-* doc.gateway.name Name of the gateway
-* doc.gateway.carrier Carrier of the gateway (used for call rating)
+* doc.gateway.name (string) Name of the gateway
+* doc.gateway.carrier (string) Carrier of the gateway (used for call rating) in format `<sip_domain_name>:<carrierid>`
 
       return entry unless entry.gwid?
       entry.name ?= "gateway #{entry.gwid}"
-      entry.carrier ?= entry.gwid
       # TODO Add lookup for gateway-faulty or suspicious, and skip the resolution in that case.
       gateway_manager.resolve_gateway entry.gwid
 

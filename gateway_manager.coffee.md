@@ -40,6 +40,7 @@ The gateway manager provides services to the call handler.
 * doc.carrier Parameters of an egress carrier.
 * doc.carrier._id (string,required) `carrier:<sip_domain_name>:<carrierid>`
 * doc.carrier.type (string,required) `carrier`
+* doc.carrier.carrier (string, required) `<sip_domain_name>:<carrierid>`
 * doc.carrier.sip_domain_name (string, required)
 * doc.carrier.carrierid (string, required)
 
@@ -256,7 +257,6 @@ The following fields are optional:
 * doc.gateway.gwid (string, required) Gateway identifier in the doc.gateway.sip_domain_name
 * doc.gateway.address (string, required) SIP URI domain to be used to route calls to that gateway
 * doc.gateway.carrierid (string, optional) Carrier route this gateway belongs to.
-* doc.gateway.carrier (string, optional) Carrier identifier used for call rating. Default: the `gwid` value.
 
             if doc.type is 'gateway'
               return emit [doc.sip_domain_name, doc.carrierid], doc
