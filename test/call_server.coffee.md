@@ -124,7 +124,7 @@ Server (Unit Under Test)
         ruleset = new PouchDB 'the_default_live_ruleset'
         ruleset.bulkDocs [
           {
-            _id:'rule:331'
+            _id:'prefix:331'
             gwlist: [
               {gwid:'gw1'}
             ]
@@ -132,7 +132,7 @@ Server (Unit Under Test)
               cdr: 'foo-bar'
           }
           {
-            _id:'rule:330112'
+            _id:'prefix:330112'
             emergency:true
           }
         ]
