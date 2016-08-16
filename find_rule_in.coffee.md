@@ -27,9 +27,7 @@ Lookup the `destination` if any.
           .get "destination:#{rule.destination}"
           .catch (error) ->
             debug 'destination', rule.destination, error.stack ? error.toString()
-            {}
-
-      return null
+            null
 
       debug 'rule', rule
       rule
