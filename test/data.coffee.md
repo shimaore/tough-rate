@@ -258,9 +258,6 @@ Note: normally `ruleset_of` would be async, and would query provisioning to find
           serialize cfg, 'init'
           .then ->
             router.route ctx
-        .catch (exception) ->
-          throw exception
-        null
 
       describe 'Gateways', ->
         it 'should have progress_timeout from their carrier: gw1', ->
@@ -622,6 +619,7 @@ Gateways are randomized within carriers.
               v.should.equal '484'
               done()
               Promise.resolve()
+          null
 
         it 'should reject invalid source numbers', (done) ->
           one_call
@@ -635,6 +633,7 @@ Gateways are randomized within carriers.
               v.should.equal '484'
               done()
               Promise.resolve()
+          null
 
         it 'should reject unknown destinations', (done) ->
           one_call
@@ -648,6 +647,7 @@ Gateways are randomized within carriers.
               v.should.equal '485'
               done()
               Promise.resolve()
+          null
 
         it 'should route known (local) destinations', (done) ->
           ctx =
@@ -840,6 +840,7 @@ Gateways are randomized within carriers.
                 body:
                   variable_last_bridge_hangup_cause: 'NORMAL_CALL_CLEARING'
           one_call ctx, 'default'
+          null
 
     describe.skip 'The Call Handler', ->
       it 'should handle additional headers', ->
