@@ -118,7 +118,6 @@ The steps to placing outbound call(s) are:
             _id:'prefix:336'
             type:'prefix'
             prefix:'336'
-            destination:'france_mobile'
             gwlist: [
               {carrierid:'the_other_company'}
               {carrierid:'the_phone_company'}
@@ -135,7 +134,6 @@ The steps to placing outbound call(s) are:
             _id:'prefix:33'
             type:'prefix'
             prefix:'33'
-            destination:'france'
             gwlist:[
               {source_registrant:true}
             ]
@@ -162,7 +160,7 @@ The steps to placing outbound call(s) are:
       provisioning = null
       gm = null
 
-Note: normally ruleset_of would be async, and would query provisioning to find the ruleset and then map it to its database.
+Note: normally `ruleset_of` would be async, and would query provisioning to find the ruleset and then map it to its database.
 
       ruleset_of = (x) ->
         if not dataset.rulesets[x]?
