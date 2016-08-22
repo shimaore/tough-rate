@@ -29,7 +29,7 @@
     "debug": "^2.2.0",
     "huge-play": "^14.1.1",
     "lru-cache": "^4.0.1",
-    "nimble-direction": "^4.2.1",
+    "nimble-direction": "^4.2.2",
     "numbering-plans": "^1.0.1",
     "pouchdb": "^5.4.5",
     "seem": "^2.0.0"
