@@ -11,6 +11,13 @@ Longest-match rule lookup
 
       ids = ("prefix:#{destination[0...l]}" for l in [0..destination.length]).reverse()
 
+FIXME backward-compatibility entry
+
+      rule_ids = ("rule:#{destination[0...l]}" for l in [0..destination.length]).reverse()
+      ids = ids.concat rule_ids
+
+/FIXME
+
       {rows} = yield database.allDocs keys:ids, include_docs: true
       rule = (row.doc for row in rows when row.doc? and not row.doc.disabled)[0]
 
