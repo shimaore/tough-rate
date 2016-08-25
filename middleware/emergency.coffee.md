@@ -91,7 +91,7 @@ If only one destination is present, we handle it as a regular call out; the same
       if destinations.length is 1
         destination = destinations[0]
         @res.redirect destination
-        rule = yield find_rule_in destination, @res.ruleset_database
+        rule = yield find_rule_in destination, @res.ruleset_database, @res.ruleset.key
         @res.gateways = rule.gwlist
         delete rule.gwlist
         @res.rule = rule
@@ -101,7 +101,7 @@ If multiple destination numbers are present, we cannot afford to try all combina
       else
         gateways = []
         for destination in destinations
-          rule = yield find_rule_in destination, @res.ruleset_database
+          rule = yield find_rule_in destination, @res.ruleset_database, @res.ruleset.key
           gw = rule.gwlist[0]
           gw.destination_number = destination
           gateways.push gw

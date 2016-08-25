@@ -74,7 +74,9 @@ Management error
 Rule lookup
 ===========
 
-      rule = yield find_rule_in @res.destination,ruleset_database
+* doc.ruleset.key (string) The type used for routing rules in the ruleset database. Default: "prefix".
+
+      rule = yield find_rule_in @res.destination, ruleset_database, @res.ruleset.key
         .catch (error) ->
           null
 

@@ -6,10 +6,10 @@ Longest-match rule lookup
     @name = "#{pkg.name}:find_rule_in"
     debug = (require 'debug') @name
 
-    module.exports = find_rule_in = seem (destination,database) =>
+    module.exports = find_rule_in = seem (destination,database,key = 'prefix') =>
       debug 'find', destination
 
-      ids = ("prefix:#{destination[0...l]}" for l in [0..destination.length]).reverse()
+      ids = ("#{key}:#{destination[0...l]}" for l in [0..destination.length]).reverse()
 
       {rows} = yield database.allDocs keys:ids, include_docs: true
       rule = (row.doc for row in rows when row.doc? and not row.doc.disabled)[0]
