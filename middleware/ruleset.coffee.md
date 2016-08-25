@@ -74,7 +74,7 @@ Management error
 Rule lookup
 ===========
 
-      rule = yield find_rule_in @res.destination,ruleset_database
+      rule = yield find_rule_in @res.destination, ruleset_database, @res.ruleset.key
         .catch (error) ->
           null
 
