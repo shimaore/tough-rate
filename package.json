@@ -23,14 +23,14 @@
   },
   "dependencies": {
     "acoustic-line": "^1.8.0",
-    "bluebird": "^3.4.1",
+    "bluebird": "^3.4.3",
     "coffeescript-helpers": "^2.2.0",
     "cuddly": "^1.1.5",
     "debug": "^2.2.0",
     "huge-play": "^14.1.2",
     "lru-cache": "^4.0.1",
     "nimble-direction": "^4.2.2",
-    "numbering-plans": "^1.0.1",
+    "numbering-plans": "^2.0.0",
     "pouchdb": "^5.4.5",
     "seem": "^2.0.0"
   },
