@@ -51,7 +51,7 @@ If it isn't present, we try to retrieve it from the location reference.
         doc = yield provisioning
           .get "location:#{location_ref}"
           .catch (error) ->
-            debug "Could not locate", location_ref, error.stack ? error.toString()
+            debug "Could not locate: #{error.stack ? error}", {location_ref}
             cuddly.dev "Could not locate #{location_ref}, call from #{@source} to #{@destination}"
             {}
         emergency_ref = doc.routing_data
