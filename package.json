@@ -17,21 +17,21 @@
     "chai-as-promised": "^5.3.0",
     "coffee-script": "^1.10.0",
     "esl": "^5.2.2",
-    "memdown": "^1.2.0",
+    "memdown": "^1.2.2",
     "mocha": "^3.0.2",
     "useful-wind": "^7.2.1"
   },
   "dependencies": {
     "acoustic-line": "^1.8.0",
-    "bluebird": "^3.4.3",
+    "bluebird": "^3.4.6",
     "coffeescript-helpers": "^2.2.0",
     "cuddly": "^1.1.5",
     "debug": "^2.2.0",
     "huge-play": "^14.1.2",
     "lru-cache": "^4.0.1",
     "nimble-direction": "^4.2.2",
-    "numbering-plans": "^2.0.0",
-    "pouchdb": "^5.4.5",
+    "numbering-plans": "^2.0.1",
+    "pouchdb": "^6.0.4",
     "seem": "^2.0.0"
   },
   "directories": {
