@@ -30,7 +30,7 @@
     "huge-play": "^14.1.2",
     "lru-cache": "^4.0.1",
     "nimble-direction": "^4.2.2",
-    "numbering-plans": "^2.0.1",
+    "numbering-plans": "^2.0.2",
     "pouchdb": "^6.0.4",
     "seem": "^2.0.0"
   },
