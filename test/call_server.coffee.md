@@ -60,7 +60,7 @@ Setup
     .catch -> true
     .then ->
       exec """
-        docker run --net=host -d --name #{p} -v "#{pwd}/test/live:/opt/freeswitch/etc/freeswitch" shimaore/freeswitch:3.0.1 /opt/freeswitch/bin/freeswitch -nf -nosql -nonat -nonatmap -nocal -nort -c
+        docker run --net=host -d --name #{p} -v "#{pwd}/test/live:/opt/freeswitch/etc/freeswitch" shimaore/freeswitch:4.0.4 /opt/freeswitch/bin/freeswitch -nf -nosql -nonat -nonatmap -nocal -nort -c
       """
     .then -> start_server()
     .then (s) -> server = s
