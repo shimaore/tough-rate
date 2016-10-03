@@ -4,7 +4,7 @@
   "description": "Event-socket-based, middleware-driven LCR engine for FreeSwitch",
   "main": "index.js",
   "scripts": {
-    "prepublish": "coffee -m -c *.coffee.md middleware/*.coffee.md",
+    "prepublish": "coffee -M -c *.coffee.md middleware/*.coffee.md",
     "pretest": "npm install",
     "test": "mocha",
     "clean": "rm -f *.js *.js.map middleware/*.js middleware/*.js.map conf/*.js conf/*.js.map npm-debug.log"
@@ -14,11 +14,11 @@
   "devDependencies": {
     "caring-band": "^1.4.3",
     "chai": "^3.5.0",
-    "chai-as-promised": "^5.3.0",
-    "coffee-script": "^1.10.0",
+    "chai-as-promised": "^6.0.0",
+    "coffee-script": "^1.11.1",
     "esl": "^5.2.2",
     "memdown": "^1.2.2",
-    "mocha": "^3.0.2",
+    "mocha": "^3.1.0",
     "useful-wind": "^7.2.1"
   },
   "dependencies": {
@@ -27,11 +27,11 @@
     "coffeescript-helpers": "^2.2.0",
     "cuddly": "^1.1.5",
     "debug": "^2.2.0",
-    "huge-play": "^14.1.2",
+    "huge-play": "^14.2.2",
     "lru-cache": "^4.0.1",
     "nimble-direction": "^4.2.2",
-    "numbering-plans": "^2.0.2",
-    "pouchdb": "^6.0.4",
+    "numbering-plans": "^2.2.0",
+    "pouchdb": "^6.0.6",
     "seem": "^2.0.0"
   },
   "directories": {
