@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/shimaore/tough-rate.svg?branch=master)](https://travis-ci.org/shimaore/tough-rate)
+
 About
 =====
 
@@ -6,24 +8,6 @@ About
 It runs under Node.js and uses CouchDB for provisioning.
 
 It is part of the [CCNQ SoftSwitch](http://ccnq.shimaore.net/).
-
-Usage
-=====
-
-You might want to look into the [matching docker image](https://github.com/shimaore/docker.tough-rate) which includes supervisord and FreeSwitch; its [server script](https://github.com/shimaore/docker.tough-rate/blob/master/server.coffee.md) demonstrates how to use this package.
-
-Note that the present package's `CallServer` module provides a default router equivalent using the following middleware:
-
-    ./middleware/numeric
-    ./middleware/response-handlers
-    ./middleware/local-number
-    ./middleware/ruleset
-    ./middleware/emergency
-    ./middleware/routes-gwid
-    ./middleware/routes-carrierid
-    ./middleware/routes-registrant
-    ./middleware/flatten
-    ./middleware/call-handler
 
 Controlling Records
 ===================
@@ -192,5 +176,3 @@ Sometimes it is more convenient to store data directly inside the prefix:
     answer_timeout
     dialog_timeout
     attrs
-
-
