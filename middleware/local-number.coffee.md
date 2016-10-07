@@ -35,6 +35,7 @@ Local number middleware
         gw.name = 'local number'
         gw.local_number = true
         gw.carrier = 'LOCAL'
+        @session.destination_onnet = true
         null
       .catch (error) =>
         debug "Checking whether #{@destination} is local: #{error.stack ? error}"

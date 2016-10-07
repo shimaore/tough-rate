@@ -43,6 +43,8 @@ Then, see whether the destination number is an emergency number, and process it.
 Normally we should be provided with the emergency reference.
 If it isn't present, we try to retrieve it from the location reference.
 
+      @session.destination_emergency = true
+
       emergency_ref = @session.emergency_ref ? @req.header 'X-CCNQ3-Routing'
       location_ref = @session.emergency_location ? @req.header 'X-CCNQ3-Location'
 

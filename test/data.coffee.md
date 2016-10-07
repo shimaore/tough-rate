@@ -321,6 +321,7 @@ Note: normally `ruleset_of` would be async, and would query provisioning to find
           .then (ctx) ->
             ctx.should.have.property 'res'
             ctx.res.should.have.property 'gateways'
+            ctx.session.should.not.have.property 'destination_onnet'
             gws = ctx.res.gateways
             gws.should.be.an.instanceOf Array
             gws.should.have.length 0
@@ -377,6 +378,7 @@ Note: normally `ruleset_of` would be async, and would query provisioning to find
           .then (ctx) ->
             ctx.should.have.property 'res'
             ctx.res.should.have.property 'gateways'
+            ctx.session.should.have.property 'destination_onnet', true
             gws = ctx.res.gateways
             gws.should.be.an.instanceOf Array
             gws.should.have.length 1
@@ -553,6 +555,7 @@ Note: normally `ruleset_of` would be async, and would query provisioning to find
               router.route call_ '336718', '33_112', 'brest'
           .then (ctx) ->
             ctx.res.should.have.property 'destination', '33156'
+            ctx.session.should.have.property 'destination_emergency', true
             gws = ctx.res.gateways
             gws.should.be.an.instanceOf Array
             gws.should.have.length 2
@@ -590,6 +593,7 @@ Note: normally `ruleset_of` would be async, and would query provisioning to find
             ctx.should.have.property 'res'
             ctx.res.should.have.property 'destination', '33_112'
             ctx.res.should.have.property 'gateways'
+            ctx.session.should.have.property 'destination_emergency', true
             gws = ctx.res.gateways
             expect(gws).to.not.be.null
             gws.should.be.an.instanceOf Array
