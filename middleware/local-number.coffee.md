@@ -37,7 +37,7 @@ Local number middleware
         gw.carrier = 'LOCAL'
         null
       .catch (error) =>
-        debug "Checking whether #{@destination} is local: #{error}"
+        debug "Checking whether #{@destination} is local: #{error.stack ? error}"
 
 Toolbox
 
