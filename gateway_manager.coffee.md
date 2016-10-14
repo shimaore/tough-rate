@@ -292,6 +292,5 @@ The following fields are optional:
 
     field_merger = require './field_merger'
     assert = require 'assert'
-    Promise = require 'bluebird'
     Status = require './status'
     debug = (require 'debug') "#{pkg.name}:gateway_manager"

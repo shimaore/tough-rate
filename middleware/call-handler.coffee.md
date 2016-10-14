@@ -198,7 +198,6 @@ call duration
 Toolbox
 -------
 
-    Promise = require 'bluebird'
     assert = require 'assert'
     debug = (require 'debug') @name
     cuddly = (require 'cuddly') @name

@@ -48,6 +48,5 @@ Toolbox
       result
 
     field_merger = require '../field_merger'
-    Promise = require 'bluebird'
     {isArray} = require 'util'
     debug = (require 'debug') @name

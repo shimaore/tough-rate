@@ -117,6 +117,5 @@ If multiple destination numbers are present, we cannot afford to try all combina
 Toolbox
 
     assert = require 'assert'
-    Promise = require 'bluebird'
     debug = (require 'debug') @name
     cuddly = (require 'cuddly') @name
