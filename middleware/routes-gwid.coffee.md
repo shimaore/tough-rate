@@ -1,6 +1,8 @@
 Default `gwid` router plugin
 ============================
 
+    seem = require 'seem'
+
     update = (gateway_manager,entry) ->
 
 * doc.prefix.gwlist[].gwid (string) ID of the destination doc.gateway
@@ -18,7 +20,7 @@ Default `gwid` router plugin
     @name = "#{pkg.name}:middleware:routes-gwid"
     @init = ->
       assert @cfg.gateway_manager?, 'Missing gateway manager.'
-    @include = ->
+    @include = seem ->
 
       return unless @session.direction is 'lcr'
 
@@ -30,18 +32,12 @@ Default `gwid` router plugin
       unless @res.gateways?
         debug 'No gateways'
         return
-      promise_all @res.gateways, (x) ->
-        Promise.resolve()
-        .then ->
-          update gateway_manager, x
-        .then (r) ->
-          for gw in r
-            gw.destination_number ?= x.destination_number if x.destination_number?
-          r
-      .then (gws) =>
-        @res.gateways = gws
+      @res.gateways = yield promise_all @res.gateways, seem (x) ->
+        r = yield update gateway_manager, x
+        for gw in r
+          gw.destination_number ?= x.destination_number if x.destination_number?
+        r
 
     assert = require 'assert'
-    Promise = require 'bluebird'
     promise_all = require '../promise-all'
     debug = (require 'debug') @name
