@@ -12,6 +12,7 @@
   "author": "Stéphane Alnet <stephane@shimaore.net> (http://stephane.shimaore.net/)",
   "license": "Unlicense",
   "devDependencies": {
+    "bluebird": "^3.4.6",
     "caring-band": "^1.4.3",
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
@@ -23,7 +24,6 @@
   },
   "dependencies": {
     "acoustic-line": "^1.8.0",
-    "bluebird": "^3.4.6",
     "coffeescript-helpers": "^2.2.0",
     "cuddly": "^1.1.5",
     "debug": "^2.2.0",
