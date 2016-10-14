@@ -1,5 +1,4 @@
     PouchDB = require 'pouchdb'
-    Promise = require 'bluebird'
     assert = require 'assert'
     nimble = require 'nimble-direction'
     GatewayManager = require '../gateway_manager'

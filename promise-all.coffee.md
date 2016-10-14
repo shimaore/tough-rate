@@ -5,5 +5,4 @@
         else
           fun entry
 
-    Promise = require 'bluebird'
     {isArray} = require 'util'
