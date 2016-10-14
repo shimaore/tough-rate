@@ -48,21 +48,13 @@ The gateway manager provides services to the call handler.
 
         {rows} = yield @provisioning
           .allDocs startkey:"carrier:#{@sip_domain_name}:", endkey:"carrier:#{@sip_domain_name};", include_docs:yes
-          .catch (error) ->
-            debug "GatewayManager allDocs failed: #{error.stack ? error}"
-            {}
 
-        return unless rows?
         for row in rows when row.doc?
           yield @_merge_carrier row.doc
 
         {rows} = yield @provisioning
           .query "#{design}/gateways", startkey:[@sip_domain_name], endkey:[@sip_domain_name,{}]
-          .catch (error) =>
-            debug "GatewayManager query failed: #{error.stack ? error}"
-            {}
 
-        return unless rows?
         for row in rows when row.value?
           do (row) => @_merge_gateway row.value
 
@@ -117,11 +109,7 @@ The gateway manager provides services to the call handler.
         debug 'GatewayManager reevaluate gateways', gateway_names
         {rows} = yield @provisioning
           .query "#{design}/gateways", keys:gateway_names.map (x) => [@sip_domain_name,x]
-          .catch (error) =>
-            debug "GatewayManager query failed: #{error.stack ? error}"
-            {}
 
-        return unless rows?
         for row in rows when row.value?
           do (row) => @_merge_gateway row.value
 
