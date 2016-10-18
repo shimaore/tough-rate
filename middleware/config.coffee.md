@@ -81,10 +81,8 @@ Push the `tough-rate` design document to the master provisioning database
         include_docs: true
 
       debug JSON.stringify rows
-      replications = for row in rows when row.doc?.database?
-        do (row) ->
-          debug "Going to replicate #{row.doc.database}"
-          cfg.replicate row.doc.database
-      yield Promise.all replications
+      for row in rows when row.doc?.database?
+        debug "Going to replicate #{row.doc.database}"
+        yield cfg.replicate row.doc.database
 
       debug "Configured."
