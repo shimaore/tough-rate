@@ -27,11 +27,11 @@
     "coffeescript-helpers": "^2.2.0",
     "cuddly": "^1.1.5",
     "debug": "^2.2.0",
-    "huge-play": "^14.5.1",
+    "huge-play": "^14.6.0",
     "lru-cache": "^4.0.1",
     "nimble-direction": "^5.0.0",
     "numbering-plans": "^2.2.0",
-    "pouchdb": "^6.0.6",
+    "pouchdb": "^6.0.7",
     "seem": "^2.0.0"
   },
   "directories": {
