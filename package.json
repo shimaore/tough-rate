@@ -18,6 +18,7 @@
     "chai-as-promised": "^6.0.0",
     "coffee-script": "^1.11.1",
     "esl": "^5.2.2",
+    "huge-play": "^14.6.0",
     "memdown": "^1.2.2",
     "mocha": "^3.1.2",
     "useful-wind": "^7.2.1"
@@ -27,7 +28,6 @@
     "coffeescript-helpers": "^2.2.0",
     "cuddly": "^1.1.5",
     "debug": "^2.2.0",
-    "huge-play": "^14.6.0",
     "lru-cache": "^4.0.1",
     "nimble-direction": "^5.0.0",
     "numbering-plans": "^2.2.0",
