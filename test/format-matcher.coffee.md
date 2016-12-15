@@ -74,7 +74,7 @@
         ctx =
           session:
             direction: 'lcr'
-          destination: '4372617278'
+          destination: '9372617278'
         include.call ctx
         .then ->
           ctx.session.should.not.have.property 'destination_information'
