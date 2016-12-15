@@ -12,11 +12,6 @@ This middleware is called normally at the end of the stack to process the gatewa
 
     @init = ->
       debug 'Missing `profile`.' unless @cfg.profile?
-    @notify = ->
-      @cfg.statistics.on 'call', (data) =>
-        @socket.emit 'call',
-          host: @cfg.host
-          data: data
 
     @include = seem ->
 
