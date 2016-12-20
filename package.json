@@ -29,7 +29,7 @@
     "cuddly": "^1.1.5",
     "debug": "^2.4.4",
     "lru-cache": "^4.0.2",
-    "nimble-direction": "^5.0.2",
+    "nimble-direction": "^6.0.0",
     "numbering-plans": "^2.3.0",
     "pouchdb": "^6.1.0",
     "seem": "^2.0.0"

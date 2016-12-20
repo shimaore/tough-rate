@@ -66,11 +66,11 @@ Push the `tough-rate` design document to the master provisioning database
           debug "Inserting Master couchapp failed."
           throw error
 
+      yield cfg.reject_tombstones cfg.prov
+
       yield cfg.replicate 'provisioning', (doc) ->
         debug "Using replication filter #{couch.replication_filter}"
         doc.filter = couch.replication_filter
-        doc.query_params =
-          sip_domain_name: cfg.sip_domain_name
         doc.comment += " for #{pkg.name}"
 
       source = new PouchDB "#{cfg.prefix_source}/provisioning"
