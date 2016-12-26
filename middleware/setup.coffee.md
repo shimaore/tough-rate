@@ -13,9 +13,7 @@ This is based on the calling number.
 
       return unless @session.direction is 'lcr'
 
-      ctx[k] ?= v for own k,v of {
-        statistics: @cfg.statistics
-        res:
+      ctx.res[k] ?= v for own k,v of {
           cause: null
           destination: @destination # aka final_destination
           __finalized: false
@@ -72,12 +70,13 @@ Manipulate the gateways list.
               for own n,v of name
                 ctx.res.attrs[n] = v
 
-        response_handlers: new EventEmitter()
-        on: (response,handler) ->
-          ctx.response_handlers.on response, ->
-            handler.apply this, arguments
-
       }
+
+      ctx.response_handlers ?= new EventEmitter()
+      ctx.on ?= (response,handler) ->
+        ctx.response_handlers.on response, ->
+          handler.apply this, arguments
+
       return
 
     {EventEmitter} = require 'events'

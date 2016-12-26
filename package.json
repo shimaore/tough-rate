@@ -35,7 +35,8 @@
     "seem": "^2.0.0"
   },
   "peerDependency": {
-    "huge-play": "^14.9"
+    "huge-play": "^14.9",
+    "useful-wind": "^7.3"
   },
   "directories": {
     "test": "test"
