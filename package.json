@@ -18,7 +18,7 @@
     "chai-as-promised": "^6.0.0",
     "coffee-script": "^1.12.2",
     "esl": "^5.2.2",
-    "huge-play": "^14.9.9",
+    "huge-play": "^15.0.0",
     "memdown": "^1.2.4",
     "mocha": "^3.2.0",
     "useful-wind": "^7.3.1"
@@ -27,15 +27,15 @@
     "acoustic-line": "^1.8.0",
     "coffeescript-helpers": "^2.2.0",
     "cuddly": "^1.1.5",
-    "debug": "^2.5.2",
+    "debug": "^2.6.0",
     "lru-cache": "^4.0.2",
-    "nimble-direction": "^6.0.2",
+    "nimble-direction": "^6.1.1",
     "numbering-plans": "^2.3.2",
     "pouchdb": "^6.1.0",
     "seem": "^2.0.0"
   },
   "peerDependency": {
-    "huge-play": "^14.9",
+    "huge-play": "^15.0",
     "useful-wind": "^7.3"
   },
   "directories": {
