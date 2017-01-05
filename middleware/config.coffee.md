@@ -2,10 +2,8 @@
     assert = require 'assert'
     nimble = require 'nimble-direction'
     GatewayManager = require '../gateway_manager'
-    {couch} = require '../couch'
     pkg = require '../package.json'
     debug = (require 'debug') "#{pkg.name}:middleware:config"
-    assert couch?, 'Missing design document'
 
     seem = require 'seem'
 
@@ -50,7 +48,7 @@ At this point it's unclear what this user is used for / supposed to do.
 Push the GatewayManager design document to the local provisioning database
 --------------------------------------------------------------------------
 
-      debug "Updating GatewayManager design document to version #{couch.version}."
+      debug "Updating GatewayManager design document."
       yield cfg
         .push GatewayManager.couch
         .catch (error) ->
@@ -60,17 +58,9 @@ Push the GatewayManager design document to the local provisioning database
 Push the `tough-rate` design document to the master provisioning database
 -------------------------------------------------------------------------
 
-      yield cfg
-        .master_push couch
-        .catch (error) ->
-          debug "Inserting Master couchapp failed."
-          throw error
-
       yield cfg.reject_tombstones cfg.prov
 
       yield cfg.replicate 'provisioning', (doc) ->
-        debug "Using replication filter #{couch.replication_filter}"
-        doc.filter = couch.replication_filter
         doc.comment += " for #{pkg.name}"
 
       source = new PouchDB "#{cfg.prefix_source}/provisioning"

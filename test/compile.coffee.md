@@ -3,7 +3,6 @@
         'field_merger'
         'find_rule_in'
         'gateway_manager'
-        'couch'
         'promise-all'
         'status'
         'middleware/alternate-response'
