@@ -8,7 +8,7 @@ The design document that must be installed on the master databases in order for 
       'config'
       # 'domain'
       'emergency'
-      # 'endpoint'
+      'endpoint'
       'gateway'
       'host'
       # 'list'
