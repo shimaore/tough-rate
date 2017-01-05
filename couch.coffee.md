@@ -11,10 +11,10 @@ The design document that must be installed on the master databases in order for 
       'endpoint'
       'gateway'
       'host'
-      # 'list'
+      'list'
       'location'
       'number'
-      # 'number_domain'
+      'number_domain'
       'ruleset'
     ]
 
