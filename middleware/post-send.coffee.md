@@ -14,4 +14,5 @@ Make sure the call isn't processed any further.
 
 The only post-call action currently is to hangup the call.
 
-      @action 'hangup'
+      unless @session.was_transfered
+        @action 'hangup'

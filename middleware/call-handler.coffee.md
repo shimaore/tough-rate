@@ -138,6 +138,7 @@ On successful connection we also get `variable_originate_disposition=SUCCESS, va
             @statistics.add ['connected-calls-carrier',gateway.carrierid]
             winner = gateway # Winner
             @session.winner = gateway
+            @session.was_transfered = data.variable_transfer_history?
 
           else
 
