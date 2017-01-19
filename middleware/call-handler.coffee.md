@@ -74,6 +74,8 @@ The `it` promise will return either a gateway, `false` if no gateway was found, 
       @session.sip_wait_for_aleg_ack ?= true
       yield @export sip_wait_for_aleg_ack: @session.sip_wait_for_aleg_ack
       yield @set sip_wait_for_aleg_ack: @session.sip_wait_for_aleg_ack
+      if @session.handled_transfer_context?
+        yield @set force_transfer_context: @session.handled_transfer_context
 
 If there are gateways, attempt to call through them in the order listed.
 
