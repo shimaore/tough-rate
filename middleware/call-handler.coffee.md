@@ -130,25 +130,37 @@ On successful connection we also get `variable_originate_disposition=SUCCESS, va
           @statistics.add ['cause-carrier',cause,gateway.carrierid]
           @statistics.add ['cause-carrier',cause,gateway.carrierid,@rule?.prefix]
 
-          if cause in ['NORMAL_CALL_CLEARING', 'NORMAL_CLEARING', 'SUCCESS']
+          @session.was_connected = cause in ['NORMAL_CALL_CLEARING', 'NORMAL_CLEARING', 'SUCCESS']
+          @session.was_transferred = data.variable_transfer_history?
 
-            debug "CallHandler: successful call: #{cause} when routing #{destination} through #{JSON.stringify gateway}."
-            @statistics.add 'connected-calls'
-            @statistics.add ['connected-calls-gw',gateway.gwid]
-            @statistics.add ['connected-calls-carrier',gateway.carrierid]
-            winner = gateway # Winner
-            @session.winner = gateway
-            @session.was_transfered = data.variable_transfer_history?
+          switch
+            when @session.was_connected
 
-          else
+              debug "CallHandler: connected call: #{cause} when routing #{destination} through #{JSON.stringify gateway}."
+              @statistics.add 'connected-calls'
+              @statistics.add ['connected-calls-gw',gateway.gwid]
+              @statistics.add ['connected-calls-carrier',gateway.carrierid]
+              winner = gateway # Winner
+              @session.winner = gateway
 
-            debug "CallHandler: call failed: #{cause} when routing #{destination} through #{JSON.stringify gateway}."
-            @statistics.add 'failed-attempts'
-            @statistics.add ['failed-attempts-gw',gateway.gwid]
-            @statistics.add ['failed-attempts-gw',gateway.gwid,cause]
-            @statistics.add ['failed-attempts-carrier',gateway.carrierid]
-            @statistics.add ['failed-attempts-carrier',gateway.carrierid,cause]
-            # No winner yet
+            when @session.was_transferred
+
+              debug "CallHandler: transferred call: #{cause} when routing #{destination} through #{JSON.stringify gateway}."
+              @statistics.add 'transferred-calls'
+              @statistics.add ['transferred-calls-gw',gateway.gwid]
+              @statistics.add ['transferred-calls-carrier',gateway.carrierid]
+              winner = gateway # Winner
+              @session.winner = gateway
+
+            else
+
+              debug "CallHandler: failed call: #{cause} when routing #{destination} through #{JSON.stringify gateway}."
+              @statistics.add 'failed-attempts'
+              @statistics.add ['failed-attempts-gw',gateway.gwid]
+              @statistics.add ['failed-attempts-gw',gateway.gwid,cause]
+              @statistics.add ['failed-attempts-carrier',gateway.carrierid]
+              @statistics.add ['failed-attempts-carrier',gateway.carrierid,cause]
+              # No winner yet
 
 However we do not propagate errors, since it would mean interrupting the call sequence. Since we didn't find any winner, we simply return `null`.
 
