@@ -16,27 +16,27 @@
     "caring-band": "^1.4.3",
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
-    "coffee-script": "^1.12.2",
+    "coffee-script": "^1.12.3",
     "esl": "^5.2.2",
     "huge-play": "^17.6.0",
     "memdown": "^1.2.4",
     "mocha": "^3.2.0",
-    "useful-wind": "^7.3.1"
+    "useful-wind": "^7.4.0"
   },
   "dependencies": {
-    "acoustic-line": "^1.8.0",
+    "acoustic-line": "^1.9.0",
     "coffeescript-helpers": "^2.2.0",
     "cuddly": "^1.1.5",
-    "debug": "^2.6.0",
+    "debug": "^2.6.1",
     "lru-cache": "^4.0.2",
     "nimble-direction": "^6.1.1",
     "numbering-plans": "^2.3.2",
-    "pouchdb": "^6.1.0",
+    "pouchdb": "6.1.1",
     "seem": "^2.0.0"
   },
   "peerDependency": {
     "huge-play": "^17.6.0",
-    "useful-wind": "^7.3"
+    "useful-wind": "^7.4.0"
   },
   "directories": {
     "test": "test"
