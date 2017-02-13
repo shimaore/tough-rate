@@ -25,6 +25,7 @@
             arg.should.eql '604'
             done()
             Promise.resolve()
+          debug: ->
         null
 
     describe.skip 'response-handlers', ->

@@ -239,6 +239,7 @@ Note: normally `ruleset_of` would be async, and would query provisioning to find
             statistics
           }
           use = [
+            'huge-play/middleware/logger'
             'huge-play/middleware/setup'
             './standalone'
             '../middleware/setup'
@@ -307,6 +308,7 @@ Note: normally `ruleset_of` would be async, and would query provisioning to find
             cfg = {prov:provisioning,ruleset_of,sip_domain_name,statistics}
             router = new Router cfg
             cfg.use = [
+              'huge-play/middleware/logger'
               'huge-play/middleware/setup'
               './standalone'
               '../middleware/setup'
@@ -332,6 +334,7 @@ Note: normally `ruleset_of` would be async, and would query provisioning to find
           .then ->
             router = new Router cfg = {prov:provisioning,ruleset_of,sip_domain_name,statistics}
             use = [
+              'huge-play/middleware/logger'
               'huge-play/middleware/setup'
               './standalone'
               '../middleware/setup'
@@ -363,6 +366,7 @@ Note: normally `ruleset_of` would be async, and would query provisioning to find
           .then ->
             router = new Router cfg = {prov:provisioning,ruleset_of,sip_domain_name,statistics}
             use = [
+              'huge-play/middleware/logger'
               'huge-play/middleware/setup'
               './standalone'
               '../middleware/setup'
@@ -394,6 +398,7 @@ Note: normally `ruleset_of` would be async, and would query provisioning to find
           .then ->
             router = new Router cfg = {prov:provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name,statistics}
             use = [
+              'huge-play/middleware/logger'
               'huge-play/middleware/setup'
               './standalone'
               '../middleware/setup'
@@ -421,6 +426,7 @@ Note: normally `ruleset_of` would be async, and would query provisioning to find
           .then ->
             router = new Router cfg = {prov:provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name,statistics}
             use = [
+              'huge-play/middleware/logger'
               'huge-play/middleware/setup'
               './standalone'
               '../middleware/setup'
@@ -446,6 +452,7 @@ Note: normally `ruleset_of` would be async, and would query provisioning to find
           .then ->
             router = new Router cfg = {prov:provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name,statistics}
             use = [
+              'huge-play/middleware/logger'
               'huge-play/middleware/setup'
               './standalone'
               '../middleware/setup'
@@ -475,6 +482,7 @@ Note: normally `ruleset_of` would be async, and would query provisioning to find
               statistics
             }
             use = [
+              'huge-play/middleware/logger'
               'huge-play/middleware/setup'
               './standalone'
               '../middleware/setup'
@@ -509,6 +517,7 @@ Note: normally `ruleset_of` would be async, and would query provisioning to find
               statistics
             }
             use = [
+              'huge-play/middleware/logger'
               'huge-play/middleware/setup'
               './standalone'
               '../middleware/setup'
@@ -539,6 +548,7 @@ Note: normally `ruleset_of` would be async, and would query provisioning to find
               statistics
             }
             use = [
+              'huge-play/middleware/logger'
               'huge-play/middleware/setup'
               './standalone'
               '../middleware/setup'
@@ -575,6 +585,7 @@ Note: normally `ruleset_of` would be async, and would query provisioning to find
               statistics
             }
             use = [
+              'huge-play/middleware/logger'
               'huge-play/middleware/setup'
               './standalone'
               '../middleware/setup'

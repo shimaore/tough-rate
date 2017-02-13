@@ -37,17 +37,16 @@ Route based on the route selected by the source, or using a default route.
       doc = yield provisioning
         .get "number:#{source}"
         .catch (error) =>
-          debug "RuleSet Middleware: error retrieving number:#{source}", error.stack ? error.toString()
+          @debug "RuleSet Middleware: error retrieving number:#{source}", error.stack ? error.toString()
           {}
 
-      debug "RuleSet Middleware: number:#{source} :", doc
+      @debug "RuleSet Middleware: number:#{source} :", doc
       route = doc.outbound_route ? default_outbound_route
 
 Provisioning error
 
       unless route?
-        debug 'RuleSet Middleware: No route available', {source}
-        cuddly.dev 'missing-route', {source}
+        @debug.dev 'missing-route: No route available', {source}
         yield @res.respond '485'
         return
 
@@ -57,14 +56,13 @@ Provisioning error
 Ruleset selection
 =================
 
-      debug "RuleSet Middleware: loading ruleset_of", {source,route}
+      @debug "RuleSet Middleware: loading ruleset_of", {source,route}
       {ruleset,ruleset_database} = yield ruleset_of route
 
 Management error
 
       unless ruleset? and ruleset_database?
-        debug 'No ruleset available', {source,route:@res.route,ruleset,ruleset_database}
-        cuddly.dev 'missing-ruleset', {source,route:@res.route,ruleset,ruleset_database}
+        @debug.dev 'missing-ruleset: No ruleset available', {source,route:@res.route,ruleset,ruleset_database}
         yield @res.respond '500'
         return
 
@@ -83,8 +81,7 @@ Rule lookup
 Provisioning error or user error
 
       unless rule?
-        debug 'No route available', {source,destination:@res.destination,ruleset:@res.ruleset}
-        cuddly.dev 'missing-rule', {source,destination:@res.destination,ruleset:@res.ruleset}
+        @debug.dev 'missing-rule: No route available', {source,destination:@res.destination,ruleset:@res.ruleset}
         yield @res.respond '485'
         return
 
@@ -99,8 +96,7 @@ Provisioning error or user error
 
 Missing gateway list is normal for e.g. emergency call routing.
 
-        debug 'Missing gwlist (ignored)', rule
-        cuddly.dev 'missing-gwlist', {rule}
+        @debug.dev 'missing-gwlist: Missing gwlist (ignored)', rule
 
       @res.rule = rule
 
@@ -111,5 +107,3 @@ Missing gateway list is normal for e.g. emergency call routing.
       return
 
     assert = require 'assert'
-    debug = (require 'debug') @name
-    cuddly = (require 'cuddly') @name

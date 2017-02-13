@@ -25,6 +25,4 @@ This is a dedicated bit of code that should be inserted before `ruleset` to forc
           @clear()
           @res.attempt doc.global_route
       .catch (error) =>
-        debug "Override-route-from-endpoint: #{error}"
-
-    debug = (require 'debug') @name
+        @debug "Override-route-from-endpoint: #{error}"

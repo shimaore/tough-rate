@@ -10,8 +10,8 @@ This middleware is called normally at the end of the stack to process the gatewa
     pkg = require '../package.json'
     @name = "#{pkg.name}:middleware:call-handler"
 
-    @init = ->
-      debug 'Missing `profile`.' unless @cfg.profile?
+    @server_pre = ->
+      @debug 'Missing `profile`.' unless @cfg.profile?
 
     @include = seem ->
 
@@ -23,9 +23,9 @@ Attempt Call
 Convert fields found in the record into fields for FreeSwitch `bridge` command.
 Returns an `esl` promise that completes when the call gets connected.
 
-      attempt = (destination,gateway) ->
+      attempt = (destination,gateway) =>
 
-        debug "CallHandler: attempt", {destination,gateway}
+        @debug "CallHandler: attempt", {destination,gateway}
 
         leg_options = {}
 
@@ -47,7 +47,7 @@ Sometimes we'll be provided with a pre-built URI (emergency calls, loopback call
         profile ?= @session.sip_profile
         profile ?= @cfg.profile
 
-        debug "CallHandler: attempt -- bridge [#{leg_options_text}]sofia/#{profile}/#{uri}"
+        @debug "CallHandler: attempt -- bridge [#{leg_options_text}]sofia/#{profile}/#{uri}"
         @action 'bridge', "[#{leg_options_text}]sofia/#{profile}/#{uri}"
 
 Middleware
@@ -62,7 +62,7 @@ The route-set might not be modified anymore.
 Do not process further if we already responded.
 
       if @session.call_failed?
-        debug "Already responded", @session.first_response_was
+        @debug "Already responded", @session.first_response_was
         return
 
 The `it` promise will return either a gateway, `false` if no gateway was found, or null if no gateway was successful.
@@ -87,7 +87,7 @@ Call attempt.
 
         try
 
-          debug "CallHandler: handling (next) gateway", gateway
+          @debug "CallHandler: handling (next) gateway", gateway
           @statistics.add 'call-attempts'
           @statistics.add ['call-attempts',@rule?.prefix]
           @statistics.add ['call-attempts-gw',gateway.gwid]
@@ -97,16 +97,15 @@ Call attempt.
           destination = gateway.destination_number ? @res.destination
           @session.gateway = gateway
           @session.destination = destination
-          res = yield attempt
-            .call this, destination, gateway
-            .catch (error) ->
-              debug "attempt error: #{error.stack ? error}"
+          res = yield attempt destination, gateway
+            .catch (error) =>
+              @debug "attempt error: #{error.stack ? error}"
               body: {}
           data = res.body
           @session.bridge_data ?= []
           @session.bridge_data.push data
 
-          debug "CallHandler: FreeSwitch response: ", res
+          @debug "CallHandler: FreeSwitch response: ", res
           @statistics.add 'call-status'
 
 On CANCEL we get `variable_originate_disposition=ORIGINATOR_CANCEL` instead of a proper `last_bridge_hangup_cause`.
@@ -115,14 +114,14 @@ On successful connection we also get `variable_originate_disposition=SUCCESS, va
           @res.cause = cause = data?.variable_last_bridge_hangup_cause ? data?.variable_originate_disposition
 
           unless cause?
-            debug "CallHandler: Unable to parse reply '#{res}'", res
+            @debug "CallHandler: Unable to parse reply '#{res}'", res
             continue
 
           try
             @response_handlers.emit cause, gateway
             @response_handlers.emit 'call-completed', gateway
           catch error
-            debug "CallHandler: Response handler(s) for #{cause} failed: #{error.stack ? error}"
+            @debug "CallHandler: Response handler(s) for #{cause} failed: #{error.stack ? error}"
 
           @statistics.add ['cause',cause]
           @statistics.add ['cause-gw',cause,gateway.gwid]
@@ -136,7 +135,7 @@ On successful connection we also get `variable_originate_disposition=SUCCESS, va
           switch
             when @session.was_connected
 
-              debug "CallHandler: connected call: #{cause} when routing #{destination} through #{JSON.stringify gateway}."
+              @debug "CallHandler: connected call: #{cause} when routing #{destination} through #{JSON.stringify gateway}."
               @statistics.add 'connected-calls'
               @statistics.add ['connected-calls-gw',gateway.gwid]
               @statistics.add ['connected-calls-carrier',gateway.carrierid]
@@ -145,7 +144,7 @@ On successful connection we also get `variable_originate_disposition=SUCCESS, va
 
             when @session.was_transferred
 
-              debug "CallHandler: transferred call: #{cause} when routing #{destination} through #{JSON.stringify gateway}."
+              @debug "CallHandler: transferred call: #{cause} when routing #{destination} through #{JSON.stringify gateway}."
               @statistics.add 'transferred-calls'
               @statistics.add ['transferred-calls-gw',gateway.gwid]
               @statistics.add ['transferred-calls-carrier',gateway.carrierid]
@@ -154,7 +153,7 @@ On successful connection we also get `variable_originate_disposition=SUCCESS, va
 
             else
 
-              debug "CallHandler: failed call: #{cause} when routing #{destination} through #{JSON.stringify gateway}."
+              @debug "CallHandler: failed call: #{cause} when routing #{destination} through #{JSON.stringify gateway}."
               @statistics.add 'failed-attempts'
               @statistics.add ['failed-attempts-gw',gateway.gwid]
               @statistics.add ['failed-attempts-gw',gateway.gwid,cause]
@@ -165,15 +164,15 @@ On successful connection we also get `variable_originate_disposition=SUCCESS, va
 However we do not propagate errors, since it would mean interrupting the call sequence. Since we didn't find any winner, we simply return `null`.
 
         catch error
-          debug 'Internal or FreeSwitch error (ignored, skipping to next gateway): ', error.toString()
+          @debug 'Internal or FreeSwitch error (ignored, skipping to next gateway): ', error.toString()
           @statistics.add 'gateway-skip'
 
       if not winner?
-        debug "CallHandler: No Route."
+        @debug "CallHandler: No Route."
         @statistics.add 'no-route'
         yield @respond '604'
       else
-        debug "CallHandler: the winning gateway was: #{JSON.stringify winner}"
+        @debug "CallHandler: the winning gateway was: #{JSON.stringify winner}"
         @statistics.add 'route'
         @res.winner = winner
         @res.attr winner.attrs
@@ -209,5 +208,3 @@ Toolbox
 -------
 
     assert = require 'assert'
-    debug = (require 'debug') @name
-    cuddly = (require 'cuddly') @name

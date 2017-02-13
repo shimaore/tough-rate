@@ -59,10 +59,10 @@ Middleware definition
       host = @cfg.host
 
       if @res.finalized()
-        debug "Routes CarrierID: already finalized."
+        @debug "Routes CarrierID: already finalized."
         return
       unless @res.gateways?
-        debug 'No gateways'
+        @debug 'No gateways'
         return
       @res.gateways = yield promise_all @res.gateways, seem (x) ->
         r = yield update gateway_manager, host, x
@@ -75,4 +75,3 @@ Toolbox
 
     assert = require 'assert'
     promise_all = require '../promise-all'
-    debug = (require 'debug') @name

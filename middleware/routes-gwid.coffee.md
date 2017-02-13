@@ -27,10 +27,10 @@ Default `gwid` router plugin
       gateway_manager = @cfg.gateway_manager
 
       if @res.finalized()
-        debug 'Routes GwID: already finalized.'
+        @debug 'Routes GwID: already finalized.'
         return
       unless @res.gateways?
-        debug 'No gateways'
+        @debug 'No gateways'
         return
       @res.gateways = yield promise_all @res.gateways, seem (x) ->
         r = yield update gateway_manager, x
@@ -40,4 +40,3 @@ Default `gwid` router plugin
 
     assert = require 'assert'
     promise_all = require '../promise-all'
-    debug = (require 'debug') @name

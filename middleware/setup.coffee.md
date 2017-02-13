@@ -31,9 +31,9 @@ Manipulate the gateways list.
 
         finalize: (callback) ->
           if ctx.res.finalized()
-            debug "`finalize` called when the route-set is already finalized"
+            ctx.debug "`finalize` called when the route-set is already finalized"
             return
-          debug 'finalizing'
+          ctx.debug 'finalizing'
           ctx.res.__finalized = true
           callback?()
         finalized: ->
@@ -52,13 +52,13 @@ Manipulate the gateways list.
 
         attempt: (gateway) ->
           if ctx.res.finalized()
-            debug "`attempt` called when the route-set is already finalized", gateway
+            ctx.debug "`attempt` called when the route-set is already finalized", gateway
             return
           ctx.res.gateways.push gateway
 
         clear: ->
           if ctx.res.finalized()
-            debug "`clear` called when the route-set is already finalized"
+            ctx.debug "`clear` called when the route-set is already finalized"
             return
           ctx.res.gateways = []
 
@@ -80,7 +80,6 @@ Manipulate the gateways list.
       return
 
     {EventEmitter} = require 'events'
-    debug = (require 'debug') @name
 
 Init
 ----
@@ -106,7 +105,7 @@ Create the gateway-manager.
             @cfg.gateway_manager.set @cfg.default
           started = true
         catch error
-          debug "CallServer startup error: Gateway Manager init() failed: #{error.stack ? error}"
+          @debug "CallServer startup error: Gateway Manager init() failed: #{error.stack ? error}"
       null
 
     assert = require 'assert'

@@ -7,10 +7,10 @@ Flatten the gateways
 
       return unless @session.direction is 'lcr'
 
-      debug "Gateways before ops", JSON.stringify @res.gateways
+      @debug "Gateways before ops", JSON.stringify @res.gateways
 
       unless @res.gateways?
-        debug 'No gateways'
+        @debug 'No gateways'
         return
 
 We must flatten the list so that CallHandler can use it.
@@ -34,9 +34,9 @@ We must flatten the list so that CallHandler can use it.
             @res.rule
           ]
 
-      debug "Gateways after ops", JSON.stringify @res.gateways
+      @debug "Gateways after ops", JSON.stringify @res.gateways
       @res.gateways = flatten @res.gateways
-      debug "Gateways after flatten", JSON.stringify @res.gateways
+      @debug "Gateways after flatten", JSON.stringify @res.gateways
       return
 
 Toolbox
@@ -49,4 +49,3 @@ Toolbox
 
     field_merger = require '../field_merger'
     {isArray} = require 'util'
-    debug = (require 'debug') @name

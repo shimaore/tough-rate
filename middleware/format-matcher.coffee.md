@@ -1,7 +1,6 @@
     seem = require 'seem'
     pkg = require '../package'
     @name = "#{pkg.name}:middleware:format-matcher"
-    debug = (require 'debug') @name
 
     plans = require 'numbering-plans'
 

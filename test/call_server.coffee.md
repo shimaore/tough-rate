@@ -159,6 +159,7 @@ Server (Unit Under Test)
           sip_domain_name: sip_domain_name
           statistics: new CaringBand()
           use: [
+            'huge-play/middleware/logger'
             'huge-play/middleware/setup'
             './catcher'
             './standalone'

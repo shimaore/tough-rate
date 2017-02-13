@@ -15,14 +15,14 @@ Local number middleware
 
       return if @res.finalized()
 
-      debug "Checking whether #{@destination} is local."
+      @debug "Checking whether #{@destination} is local."
       provisioning.get "number:#{@destination}"
       .then (doc) =>
         if doc.disabled
-          debug "#{doc._id} is local but is disabled."
+          @debug "#{doc._id} is local but is disabled."
           return
         if not doc.account?
-          debug "#{doc._id} is local but has no account."
+          @debug "#{doc._id} is local but has no account."
           return
 
         gw = @res.sendto doc.inbound_uri
@@ -38,10 +38,9 @@ Local number middleware
         @session.destination_onnet = true
         null
       .catch (error) =>
-        debug "Checking whether #{@destination} is local: #{error.stack ? error}"
+        @debug "Checking whether #{@destination} is local: #{error.stack ? error}"
 
 Toolbox
 
     assert = require 'assert'
     url = require 'url'
-    debug = (require 'debug') @name

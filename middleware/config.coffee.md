@@ -3,14 +3,13 @@
     nimble = require 'nimble-direction'
     GatewayManager = require '../gateway_manager'
     pkg = require '../package.json'
-    debug = (require 'debug') "#{pkg.name}:middleware:config"
 
     seem = require 'seem'
 
     @name = "#{pkg.name}:middleware:config"
     @config = seem ->
       cfg = @cfg
-      debug "Configuring #{pkg.name} version #{pkg.version}.", cfg
+      @debug "Configuring #{pkg.name} version #{pkg.version}.", cfg
       assert cfg.prefix_source?, 'Missing prefix_source'
       assert cfg.sip_domain_name?, 'Missing sip_domain_name'
 
@@ -24,15 +23,14 @@ Create a local `tough-rate` user
 
 At this point it's unclear what this user is used for / supposed to do.
 
-      debug "Querying user 'tough-rate'."
+      @debug "Querying user 'tough-rate'."
       doc = yield cfg.users
         .get 'org.couchdb.user:tough-rate'
-        .catch (error) ->
-          debug error
-          debug '(ignored)'
+        .catch (error) =>
+          @debug "#{error.stack ? error} (ignored)"
           {}
 
-      debug "Updating user 'tough-rate'."
+      @debug "Updating user 'tough-rate'."
       doc._id ?= "org.couchdb.user:tough-rate"
       doc.name ?= 'tough-rate'
       doc.type ?= 'user'
@@ -40,19 +38,18 @@ At this point it's unclear what this user is used for / supposed to do.
       doc.roles = ['provisioning_reader']
       yield cfg.users
         .put doc
-        .catch (error) ->
-          debug error
-          debug "User creation failed."
+        .catch (error) =>
+          @debug "User creation failed: #{error.stack ? error}"
           throw error
 
 Push the GatewayManager design document to the local provisioning database
 --------------------------------------------------------------------------
 
-      debug "Updating GatewayManager design document."
+      @debug "Updating GatewayManager design document."
       yield cfg
         .push GatewayManager.couch
-        .catch (error) ->
-          debug "Inserting GatewayManager couchapp failed."
+        .catch (error) =>
+          @debug "Inserting GatewayManager couchapp failed."
           throw error
 
 Push the `tough-rate` design document to the master provisioning database
@@ -64,15 +61,15 @@ Push the `tough-rate` design document to the master provisioning database
         doc.comment += " for #{pkg.name}"
 
       source = new PouchDB "#{cfg.prefix_source}/provisioning"
-      debug "Querying for rulesets on master database."
+      @debug "Querying for rulesets on master database."
       {rows} = yield source.allDocs
         startkey: "ruleset:#{cfg.sip_domain_name}:"
         endkey: "ruleset:#{cfg.sip_domain_name};"
         include_docs: true
 
-      debug JSON.stringify rows
+      @debug JSON.stringify rows
       for row in rows when row.doc?.database?
-        debug "Going to replicate #{row.doc.database}"
+        @debug "Going to replicate #{row.doc.database}"
         yield cfg.replicate row.doc.database
 
-      debug "Configured."
+      @debug "Configured."

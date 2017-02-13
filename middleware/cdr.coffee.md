@@ -11,10 +11,10 @@
 
 Export winner data to our local CDR
 
-        debug "CDR: Channel Hangup Complete"
+        @debug "CDR: Channel Hangup Complete"
         data = res.body
 
-        debug "CDR: Channel Hangup Complete", billmsec: data.variable_billmsec
+        @debug "CDR: Channel Hangup Complete", billmsec: data.variable_billmsec
         data =
           duration:       data.variable_mduration
           billable:       data.variable_billmsec
@@ -60,8 +60,6 @@ Export attributes in our local CDR
         ccnq_attrs: json_attrs
 
       null
-
-    debug = (require 'debug') "#{pkg.name}:middleware:cdr"
 
 variable_mduration: # total duration
 variable_billmsec: # billable (connected)
