@@ -224,6 +224,7 @@ Note: normally `ruleset_of` would be async, and would query provisioning to find
             'Channel-Destination-Number': destination
             'variable_sip_h_X-CCNQ3-Routing': emergency_ref
             'variable_ccnq_to_e164': ccnq_to_e164
+          emit: ->
 
       one_call = (ctx,outbound_route,sip_domain_name) ->
         ctx.once ?= ->
@@ -635,6 +636,7 @@ Gateways are randomized within carriers.
               v.should.equal '484'
               done()
               Promise.resolve()
+            emit: ->
           null
 
         it 'should reject invalid source numbers', (done) ->
@@ -649,6 +651,7 @@ Gateways are randomized within carriers.
               v.should.equal '484'
               done()
               Promise.resolve()
+            emit: ->
           null
 
         it 'should reject unknown destinations', (done) ->
@@ -663,6 +666,7 @@ Gateways are randomized within carriers.
               v.should.equal '485'
               done()
               Promise.resolve()
+            emit: ->
           null
 
         it 'should route known (local) destinations', (done) ->
@@ -788,8 +792,7 @@ Gateways are randomized within carriers.
                 body:
                   variable_last_bridge_hangup_cause: 'NORMAL_CALL_CLEARING'
 
-          statistics.on 'call', (data) ->
-            # console.dir data
+          statistics.on 'report', (data) ->
             if data.state is 'call-attempt' and data.source is '2348' and data.destination is '331244'
               done()
 
@@ -811,6 +814,7 @@ Gateways are randomized within carriers.
                 v.should.equal '604'
                 done()
                 Promise.resolve()
+            emit: ->
 
           ready.then ->
             one_call ctx, 'default'
@@ -834,6 +838,7 @@ Gateways are randomized within carriers.
                 v.should.equal '604'
                 done()
                 Promise.resolve()
+            emit: ->
 
           ready.then ->
             one_call ctx, 'default'

@@ -6,23 +6,9 @@
 
       return unless @session.direction is 'lcr'
 
-      @call.once 'CHANNEL_HANGUP_COMPLETE'
-      .then (res) =>
+      @on 'report', ({data}) =>
 
 Export winner data to our local CDR
-
-        @debug "CDR: Channel Hangup Complete"
-        data = res.body
-
-        @debug "CDR: Channel Hangup Complete", billmsec: data.variable_billmsec
-        data =
-          duration:       data.variable_mduration
-          billable:       data.variable_billmsec
-          progress:       data.variable_progressmsec
-          answer:         data.variable_answermsec
-          wait:           data.variable_waitmsec
-          progress_media: data.variable_progress_mediamsec
-          flow_bill:      data.variable_flow_billmsec
 
         for own k,v of data
           @statistics.add k, v
@@ -30,13 +16,6 @@ Export winner data to our local CDR
           @statistics.add ["#{k}-gw",@session.gateway?.gwid,@rule?.prefix], v
           @statistics.add ["#{k}-carrier",@session.gateway?.carrierid], v
           @statistics.add ["#{k}-carrier",@session.gateway?.carrierid,@rule?.prefix], v
-
-        @statistics.emit 'call',
-          state: 'end'
-          call: @call.uuid
-          source: @source
-          destination: @destination
-          data: data
 
 Compatibility layer for CCNQ3 -- remove once the LCR generates its own CDRs.
 
@@ -51,20 +30,12 @@ Compatibility layer for CCNQ3 -- remove once the LCR generates its own CDRs.
       json_attrs = JSON.stringify attrs
       yield @set
 
-Export attributes towards the carrier SBC
+Export attributes towards the carrier SBC (this is used to map carrier-side CDRs with client-side CDRs).
 
         'sip_h_X-CCNQ3-Attrs': json_attrs
 
-Export attributes in our local CDR
+Export attributes in our local CDR.
 
         ccnq_attrs: json_attrs
 
       null
-
-variable_mduration: # total duration
-variable_billmsec: # billable (connected)
-variable_progressmsec: # progress
-variable_answermsec: # answer
-variable_waitmsec: # wait = answer?
-variable_progress_mediamsec: # 0
-variable_flow_billmsec: # total duration
