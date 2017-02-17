@@ -72,11 +72,6 @@ Manipulate the gateways list.
 
       }
 
-      ctx.response_handlers ?= new EventEmitter()
-      ctx.on ?= (response,handler) ->
-        ctx.response_handlers.on response, ->
-          handler.apply this, arguments
-
       return
 
     {EventEmitter} = require 'events'

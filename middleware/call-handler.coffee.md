@@ -117,12 +117,6 @@ On successful connection we also get `variable_originate_disposition=SUCCESS, va
             @debug "CallHandler: Unable to parse reply '#{res}'", res
             continue
 
-          try
-            @response_handlers.emit cause, gateway
-            @response_handlers.emit 'call-completed', gateway
-          catch error
-            @debug "CallHandler: Response handler(s) for #{cause} failed: #{error.stack ? error}"
-
           @statistics.add ['cause',cause]
           @statistics.add ['cause-gw',cause,gateway.gwid]
           @statistics.add ['cause-gw',cause,gateway.gwid,@rule?.prefix]
