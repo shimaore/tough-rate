@@ -10,7 +10,7 @@
 
 Export winner data to our local CDR
 
-        for own k,v of data
+        for own k,v of data when typeof v is 'number' or (typeof v is 'string' and v.match /^\d+$/)
           @statistics.add k, v
           @statistics.add ["#{k}-gw",@session.gateway?.gwid], v
           @statistics.add ["#{k}-gw",@session.gateway?.gwid,@rule?.prefix], v
