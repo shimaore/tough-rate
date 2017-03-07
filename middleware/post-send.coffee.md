@@ -1,5 +1,4 @@
-    pkg = require '../package'
-    @name = "#{pkg.name}:middleware:client:egress:post-send"
+    @name = "tough-rate:middleware:post-send"
 
     @include = ->
 
@@ -12,6 +11,9 @@ Make sure the call isn't processed any further.
       delete @session.direction
 
 The only post-call action currently is to hangup the call.
+FIXME: This does not belong here, since this code gets executed immediately after the call is connected.
 
+      ###
       unless @session.was_transferred
         @action 'hangup'
+      ###
