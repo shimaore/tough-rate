@@ -13,14 +13,14 @@
 Helper to report a gateway as faulty to the gateway manager.
 
       mark_gateway_as_faulty = (gateway) =>
-        @debug "Asking the gateway manager to mark gateway #{JSON.stringify gateway} as faulty."
+        @debug "Asking the gateway manager to mark gateway as faulty.", gateway.name
         if gateway.name?
           gateway_manager.mark_gateway_as_faulty gateway.name
 
 Helper to report a gateway as suspicious to the gateway manager.
 
       mark_gateway_as_suspicious = (gateway) =>
-        @debug "Asking the router to mark gateway #{JSON.stringify gateway} as suspicious."
+        @debug "Asking the router to mark gateway as suspicious.", gateway.name
         if gateway.name?
           gateway_manager.mark_gateway_as_suspicious gateway.name
 

@@ -67,7 +67,6 @@ Push the `tough-rate` design document to the master provisioning database
         endkey: "ruleset:#{cfg.sip_domain_name};"
         include_docs: true
 
-      @debug JSON.stringify rows
       for row in rows when row.doc?.database?
         @debug "Going to replicate #{row.doc.database}"
         yield cfg.replicate row.doc.database

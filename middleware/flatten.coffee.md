@@ -7,7 +7,7 @@ Flatten the gateways
 
       return unless @session.direction is 'lcr'
 
-      @debug "Gateways before ops", JSON.stringify @res.gateways
+      @debug "Gateways before ops", @res.gateways
 
       unless @res.gateways?
         @debug 'No gateways'
@@ -34,9 +34,9 @@ We must flatten the list so that CallHandler can use it.
             @res.rule
           ]
 
-      @debug "Gateways after ops", JSON.stringify @res.gateways
+      @debug "Gateways after ops", @res.gateways
       @res.gateways = flatten @res.gateways
-      @debug "Gateways after flatten", JSON.stringify @res.gateways
+      @debug "Gateways after flatten", @res.gateways
       return
 
 Toolbox

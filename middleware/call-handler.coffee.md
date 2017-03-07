@@ -105,7 +105,6 @@ Call attempt.
           @session.bridge_data ?= []
           @session.bridge_data.push data
 
-          @debug "CallHandler: FreeSwitch response: ", res
           @statistics.add 'call-status'
 
 On CANCEL we get `variable_originate_disposition=ORIGINATOR_CANCEL` instead of a proper `last_bridge_hangup_cause`.
@@ -114,7 +113,7 @@ On successful connection we also get `variable_originate_disposition=SUCCESS, va
           @res.cause = cause = data?.variable_last_bridge_hangup_cause ? data?.variable_originate_disposition
 
           unless cause?
-            @debug "CallHandler: Unable to parse reply '#{res}'", res
+            @debug.dev "CallHandler: Unable to parse reply", res
             continue
 
           @statistics.add ['cause',cause]
@@ -129,7 +128,7 @@ On successful connection we also get `variable_originate_disposition=SUCCESS, va
           switch
             when @session.was_connected
 
-              @debug "CallHandler: connected call: #{cause} when routing #{destination} through #{JSON.stringify gateway}."
+              @debug "CallHandler: connected call: #{cause} when routing #{destination} through", gateway
               @statistics.add 'connected-calls'
               @statistics.add ['connected-calls-gw',gateway.gwid]
               @statistics.add ['connected-calls-carrier',gateway.carrierid]
@@ -138,7 +137,7 @@ On successful connection we also get `variable_originate_disposition=SUCCESS, va
 
             when @session.was_transferred
 
-              @debug "CallHandler: transferred call: #{cause} when routing #{destination} through #{JSON.stringify gateway}."
+              @debug "CallHandler: transferred call: #{cause} when routing #{destination} through", gateway
               @statistics.add 'transferred-calls'
               @statistics.add ['transferred-calls-gw',gateway.gwid]
               @statistics.add ['transferred-calls-carrier',gateway.carrierid]
@@ -147,7 +146,7 @@ On successful connection we also get `variable_originate_disposition=SUCCESS, va
 
             else
 
-              @debug "CallHandler: failed call: #{cause} when routing #{destination} through #{JSON.stringify gateway}."
+              @debug "CallHandler: failed call: #{cause} when routing #{destination} through", gateway
               @statistics.add 'failed-attempts'
               @statistics.add ['failed-attempts-gw',gateway.gwid]
               @statistics.add ['failed-attempts-gw',gateway.gwid,cause]
@@ -166,7 +165,7 @@ However we do not propagate errors, since it would mean interrupting the call se
         @statistics.add 'no-route'
         yield @respond '604'
       else
-        @debug "CallHandler: the winning gateway was: #{JSON.stringify winner}"
+        @debug "CallHandler: the winning gateway was", winner
         @statistics.add 'route'
         @res.winner = winner
         @res.attr winner.attrs
