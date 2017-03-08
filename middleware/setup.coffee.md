@@ -79,14 +79,18 @@ Manipulate the gateways list.
 Init
 ----
 
-    @init = seem ->
+    @server_pre = seem ->
 
       return if @cfg.gateway_manager?
 
 Create the gateway-manager.
 
-      assert @cfg.prov?, 'Missing `prov`.'
-      assert @cfg.sip_domain_name?, 'Missing `sip_domain_name`.'
+      unless @cfg.prov?
+        @debug.dev 'Missing cfg.prov.'
+        return
+      unless @cfg.sip_domain_name?
+        @debug.dev 'Missing cfg.sip_domain_name.'
+        return
 
 * cfg.gateway_manager In pkg:tough-rate, the object that manages gateways and carrier records.
 
@@ -100,7 +104,8 @@ Create the gateway-manager.
             @cfg.gateway_manager.set @cfg.default
           started = true
         catch error
-          @debug "CallServer startup error: Gateway Manager init() failed: #{error.stack ? error}"
+          @debug.dev "CallServer startup error: Gateway Manager init() failed: #{error.stack ? error}"
+      @debug.dev "Gateway Manager started"
       null
 
     assert = require 'assert'

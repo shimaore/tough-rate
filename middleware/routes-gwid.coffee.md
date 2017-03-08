@@ -18,13 +18,15 @@ Default `gwid` router plugin
 
     pkg = require '../package.json'
     @name = "#{pkg.name}:middleware:routes-gwid"
-    @init = ->
-      assert @cfg.gateway_manager?, 'Missing gateway manager.'
     @include = seem ->
 
       return unless @session.direction is 'lcr'
 
       gateway_manager = @cfg.gateway_manager
+
+      unless gateway_manager?
+        @debug.dev 'Missing gateway manager'
+        return
 
       if @res.finalized()
         @debug 'Routes GwID: already finalized.'

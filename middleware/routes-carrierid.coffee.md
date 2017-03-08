@@ -49,14 +49,16 @@ Middleware definition
 
     pkg = require '../package.json'
     @name = "#{pkg.name}:middleware:routes-carrierid"
-    @init = ->
-      assert @cfg.gateway_manager?, 'Missing `gateway_manager`.'
     @include = seem ->
 
       return unless @session.direction is 'lcr'
 
       gateway_manager = @cfg.gateway_manager
       host = @cfg.host
+
+      unless gateway_manager?
+        @debug.dev 'Missing gateway manager'
+        return
 
       if @res.finalized()
         @debug "Routes CarrierID: already finalized."

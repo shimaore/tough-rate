@@ -1,12 +1,14 @@
     pkg = require '../package.json'
     @name = "#{pkg.name}:middleware:response-handlers"
-    @init = ->
-      assert @cfg.gateway_manager?, 'Missing `gateway_manager`.'
     @include = ->
 
       return unless @session.direction is 'lcr'
 
       gateway_manager = @cfg.gateway_manager
+
+      unless gateway_manager?
+        @debug.dev 'Missing gateway manager'
+        return
 
       gateway_to_id = (gateway) ->
 

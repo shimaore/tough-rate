@@ -12,6 +12,8 @@ Live test with FreeSwitch
     CaringBand = require 'caring-band'
     fs = Promise.promisifyAll require 'fs'
 
+    seem = require 'seem'
+
 Parameters for docker.io image
 ==============================
 
@@ -143,7 +145,7 @@ Server (Unit Under Test)
         console.log 'Inserting Gateway Manager Couch'
         GatewayManager = require '../gateway_manager'
         provisioning.put GatewayManager.couch
-      .then ->
+      .then seem ->
 
         ruleset_of = (x) ->
           provisioning.get "ruleset:#{sip_domain_name}:#{x}"
@@ -158,6 +160,7 @@ Server (Unit Under Test)
           ruleset_of: ruleset_of
           sip_domain_name: sip_domain_name
           statistics: new CaringBand()
+          prefix_admin: ''
           use: [
             'huge-play/middleware/logger'
             'huge-play/middleware/setup'
@@ -185,6 +188,9 @@ Server (Unit Under Test)
         catcher.listen 7004
 
         console.log 'Declaring Server'
+        ctx = cfg: options
+        for m in options.use
+          yield m.server_pre?.call ctx
         CallServer = require 'useful-wind/call_server'
         s = new CallServer options
         s.listen 7002
