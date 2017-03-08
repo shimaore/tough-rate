@@ -31,7 +31,7 @@ Manipulate the gateways list.
 
         finalize: (callback) ->
           if ctx.res.finalized()
-            ctx.debug "`finalize` called when the route-set is already finalized"
+            ctx.debug.dev "`finalize` called when the route-set is already finalized"
             return
           ctx.debug 'finalizing'
           ctx.res.__finalized = true
@@ -52,13 +52,13 @@ Manipulate the gateways list.
 
         attempt: (gateway) ->
           if ctx.res.finalized()
-            ctx.debug "`attempt` called when the route-set is already finalized", gateway
+            ctx.debug.dev "`attempt` called when the route-set is already finalized", gateway
             return
           ctx.res.gateways.push gateway
 
         clear: ->
           if ctx.res.finalized()
-            ctx.debug "`clear` called when the route-set is already finalized"
+            ctx.debug.dev "`clear` called when the route-set is already finalized"
             return
           ctx.res.gateways = []
 
