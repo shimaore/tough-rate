@@ -1,4 +1,5 @@
     seem = require 'seem'
+    @name = 'test/catcher'
     @include = seem ->
 
       return unless @data['Channel-Context'] is 'answer'
