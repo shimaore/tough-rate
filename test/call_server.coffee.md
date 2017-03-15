@@ -79,7 +79,9 @@ Setup
 Server (Unit Under Test)
 ========================
 
-    PouchDB = (require 'pouchdb').defaults db: require 'memdown'
+    PouchDB = (require 'pouchdb')
+      .plugin require 'pouchdb-adapter-memory'
+      .defaults adapter: 'memory'
     FS = require 'esl'
     options = null
 

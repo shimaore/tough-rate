@@ -141,7 +141,9 @@ The steps to placing outbound call(s) are:
 
     {expect} = chai = require 'chai'
     chai.should()
-    PouchDB = (require 'pouchdb').defaults db: require 'memdown'
+    PouchDB = (require 'pouchdb')
+      .plugin require 'pouchdb-adapter-memory'
+      .defaults adapter: 'memory'
     pkg = require '../package.json'
     GatewayManager = require '../gateway_manager'
     Router = require 'useful-wind/router'
