@@ -735,6 +735,7 @@ Gateways are randomized within carriers.
           null
 
         it 'should insert CDR data', (done) ->
+          success = false
           ctx =
             data:
               'Channel-Destination-Number': '331234'
@@ -742,11 +743,15 @@ Gateways are randomized within carriers.
             command: (c,v) ->
               if c is 'set' and m = v.match /^sip_h_X-CCNQ3-Attrs=(.*)$/
                 m[1].should.equal '{"cdr":"foo-bar"}'
+                success = true
               if c in ['set','export']
                 return Promise.resolve().bind this
               v.should.match /// \[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800\]sofia/something-egress/sip:331234@127.0.0.1:506[89] /// # randomized
               c.should.equal 'bridge'
-              done()
+              if success
+                done()
+              else
+                done new Error 'X-CCNQ3-Attrs was invalid or not set'
               Promise.resolve
                 body:
                   variable_last_bridge_hangup_cause: 'NORMAL_CALL_CLEARING'

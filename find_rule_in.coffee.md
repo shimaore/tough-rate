@@ -5,6 +5,7 @@ Longest-match rule lookup
     pkg = require './package'
     @name = "#{pkg.name}:find_rule_in"
     debug = (require 'debug') @name
+    merge = require './field_merger'
 
     module.exports = find_rule_in = seem (destination,database,key = 'prefix') =>
       debug 'find', destination
@@ -23,11 +24,17 @@ Lookup the `destination` if any.
 
       if rule?.destination?
         debug 'destination', rule.destination
-        rule = yield database
+        destination = yield database
           .get "destination:#{rule.destination}"
           .catch (error) ->
             debug 'destination', rule.destination, error.stack ? error.toString()
             null
+
+        if destination?
+          debug 'merging', {rule,destination}
+          rule = merge [rule,destination]
+        else
+          rule = null
 
       debug 'rule', rule
       rule
