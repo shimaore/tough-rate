@@ -1,5 +1,5 @@
     pkg = require '../package'
-    @name = "#{pkg.name}:middleware:client:egress:post-send"
+    @name = "#{pkg.name}:middleware:post-send"
 
     @include = ->
 
@@ -11,8 +11,11 @@ Make sure the call isn't processed any further.
 
       delete @session.direction
 
+      if @session.skip_lcr_hangup
+        @debug 'Skip LCR hangup.'
+        return
+
 The only post-call action currently is to hangup the call.
 
-      unless @session.was_transferred
-        @debug 'Would hangup here.'
-        # @action 'hangup'
+      @debug 'hangup'
+      @action 'hangup'

@@ -69,7 +69,6 @@ The `it` promise will return either a gateway, `false` if no gateway was found, 
 
       yield @set
         continue_on_fail: true
-        hangup_after_bridge: false
 
       @session.sip_wait_for_aleg_ack ?= true
       yield @export sip_wait_for_aleg_ack: @session.sip_wait_for_aleg_ack
