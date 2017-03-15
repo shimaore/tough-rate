@@ -72,6 +72,9 @@ Middleware definition
           gw.destination_number ?= x.destination_number if x.destination_number?
         r
 
+      @debug 'Gateways', @res.gateways
+      return
+
 Toolbox
 -------
 

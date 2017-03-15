@@ -62,12 +62,14 @@ Ruleset selection
 Management error
 
       unless ruleset? and ruleset_database?
-        @debug.dev 'missing-ruleset: No ruleset available', {source,route:@res.route,ruleset,ruleset_database}
+        @debug.dev 'missing-ruleset: No ruleset available', {source,route:@res.route,ruleset,db:ruleset_database.name}
         yield @res.respond '500'
         return
 
       @res.ruleset = ruleset
       @res.ruleset_database = ruleset_database
+
+      @debug 'Using ruleset', {source,route:@res.route,ruleset,db:ruleset_database.name}
 
 Rule lookup
 ===========
@@ -99,6 +101,8 @@ Missing gateway list is normal for e.g. emergency call routing.
         @debug.dev 'missing-gwlist: Missing gwlist (ignored)', rule
 
       @res.rule = rule
+
+      @debug 'Using rule', rule
 
 * doc.prefix.attrs (object) Extra attributes for this rule.
 * doc.destination.attrs (object) Extra attributes for this rule.

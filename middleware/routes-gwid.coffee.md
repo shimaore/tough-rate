@@ -40,5 +40,8 @@ Default `gwid` router plugin
           gw.destination_number ?= x.destination_number if x.destination_number?
         r
 
+      @debug 'Gateways', @res.gateways
+      return
+
     assert = require 'assert'
     promise_all = require '../promise-all'
