@@ -163,7 +163,7 @@ The steps to placing outbound call(s) are:
       provisioning = null
       gm = null
 
-Note: normally `ruleset_of` would be async, and would query provisioning to find the ruleset and then map it to its database.
+Note: normally `ruleset_of` would query provisioning to find the ruleset and then map it to its database.
 
       ruleset_of = (x) ->
         if not dataset.rulesets[x]?
@@ -171,6 +171,7 @@ Note: normally `ruleset_of` would be async, and would query provisioning to find
         response =
           ruleset: dataset.rulesets[x]
           ruleset_database: new PouchDB dataset.rulesets[x].database
+        Promise.resolve response
 
       ready = Promise.resolve true
       .then ->
