@@ -13,6 +13,8 @@ This is based on the calling number.
 
       return unless @session.direction is 'lcr'
 
+      @debug 'Starting LCR'
+
       ctx.res[k] ?= v for own k,v of {
         cause: null
         destination: @destination # aka final_destination
