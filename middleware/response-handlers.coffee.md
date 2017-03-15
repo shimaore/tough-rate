@@ -1,5 +1,6 @@
     pkg = require '../package.json'
     @name = "#{pkg.name}:middleware:response-handlers"
+
     @include = ->
 
       return unless @session.direction is 'lcr'
@@ -28,11 +29,15 @@ Helper to report a gateway as suspicious to the gateway manager.
 
 Default call post-processing.
 
-      @on 'CALL_REJECTED',            mark_gateway_as_faulty # 403, 603
-      @on 'RECOVERY_ON_TIMER_EXPIRE', mark_gateway_as_faulty # 408, 504
-      @on 'NETWORK_OUT_OF_ORDER',     mark_gateway_as_suspicious # 502
-      @on 'NORMAL_TEMPORARY_FAILURE', mark_gateway_as_suspicious # 503
+      @call.once 'gateway:CALL_REJECTED'
+      .then mark_gateway_as_faulty # 403, 603
+      @call.once 'gateway:RECOVERY_ON_TIMER_EXPIRE'
+      .then mark_gateway_as_faulty # 408, 504
+      @call.once 'gateway:NETWORK_OUT_OF_ORDER'
+      .then mark_gateway_as_suspicious # 502
+      @call.once 'gateway:NORMAL_TEMPORARY_FAILURE'
+      .then mark_gateway_as_suspicious # 503
 
-Toolbox
+Make sure to not return a blocking Promise.
 
-    assert = require 'assert'
+      null

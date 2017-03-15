@@ -147,6 +147,7 @@ On successful connection we also get `variable_originate_disposition=SUCCESS, va
             else
 
               @debug "CallHandler: failed call: #{cause} when routing #{destination} through", gateway
+              @call.emit "gateway:#{cause}", gateway
               @statistics.add 'failed-attempts'
               @statistics.add ['failed-attempts-gw',gateway.gwid]
               @statistics.add ['failed-attempts-gw',gateway.gwid,cause]

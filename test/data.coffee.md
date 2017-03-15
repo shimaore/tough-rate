@@ -229,6 +229,7 @@ Note: normally `ruleset_of` would be async, and would query provisioning to find
       one_call = (ctx,outbound_route,sip_domain_name) ->
         ctx.once ?= ->
           then: ->
+        ctx.emit ?= ->
         ready.then ->
           router = new Router cfg = {
             gateway_manager: gm

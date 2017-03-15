@@ -6,7 +6,8 @@
 
       return unless @session.direction is 'lcr'
 
-      @on 'report', ({data}) =>
+      @call.once 'report'
+      .then ({data}) =>
 
 Export winner data to our local CDR
 
