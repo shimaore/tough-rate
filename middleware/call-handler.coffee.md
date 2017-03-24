@@ -133,6 +133,7 @@ On successful connection we also get `variable_originate_disposition=SUCCESS, va
               @statistics.add ['connected-calls-carrier',gateway.carrierid]
               winner = gateway # Winner
               @session.winner = gateway
+              @tag 'answered'
 
             when @session.was_transferred
 
@@ -142,6 +143,7 @@ On successful connection we also get `variable_originate_disposition=SUCCESS, va
               @statistics.add ['transferred-calls-carrier',gateway.carrierid]
               winner = gateway # Winner
               @session.winner = gateway
+              @tag 'transferred'
 
             else
 
@@ -163,6 +165,7 @@ However we do not propagate errors, since it would mean interrupting the call se
       if not winner?
         @debug "CallHandler: No Route."
         @statistics.add 'no-route'
+        @tag 'failed'
         yield @respond '604'
       else
         @debug "CallHandler: the winning gateway was", winner

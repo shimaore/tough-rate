@@ -26,6 +26,7 @@
             done()
             Promise.resolve()
           debug: ->
+          tag: ->
         null
 
     describe.skip 'response-handlers', ->

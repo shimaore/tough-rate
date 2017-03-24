@@ -22,4 +22,5 @@ Make sure the call isn't processed any further.
 The only post-call action currently is to hangup the call.
 
       @debug 'hangup'
+      @tag 'hangup'
       @action 'hangup'
