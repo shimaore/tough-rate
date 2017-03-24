@@ -15,6 +15,10 @@ Make sure the call isn't processed any further.
         @debug 'Skip LCR hangup.'
         return
 
+      if @session.was_transferred
+        @debug 'Session was transferred'
+        return
+
 The only post-call action currently is to hangup the call.
 
       @debug 'hangup'
