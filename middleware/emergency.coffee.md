@@ -34,6 +34,8 @@ Then, see whether the destination number is an emergency number, and process it.
         @debug 'Emergency middleware: not an emergency rule.'
         return
 
+      @tag 'emergency'
+
 * hdr.X-CCNQ3-Routing Emergency Reference. (Obsolete CCNQ3 header.) Key into doc.emergency.
 * hdr.X-CCNQ3-Location Emergency location, gets translation into an Emergency Reference (doc.emergency) via doc.location records.
 * doc.location Translation of Emergency Locations into Emergency References
