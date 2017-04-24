@@ -56,6 +56,7 @@ Deprecated: doc.global_number.registrant_host (array)
 
       gateway.rating = source_doc.rating if source_doc.rating?
       gateway.timezone = source_doc.timezone if source_doc.timezone?
+      gateway.codecs = source_doc.codecs if source_doc.codecs?
 
       gateway.headers ?= {}
       for field, header of registrant_fields
