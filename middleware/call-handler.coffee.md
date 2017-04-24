@@ -13,6 +13,9 @@ This middleware is called normally at the end of the stack to process the gatewa
     @server_pre = ->
       @debug 'Missing `profile`.' unless @cfg.profile?
 
+    escape = (v) ->
+      "#{v}".replace ',', ','
+
     @include = seem ->
 
       return unless @session.direction is 'lcr'
@@ -36,9 +39,7 @@ Returns an `esl` promise that completes when the call gets connected.
           for h of gateway.headers
             leg_options["sip_h_#{h}"] = gateway.headers[h]
 
-FIXME: build a more resistant list.
-
-        leg_options_text = ("#{k}=#{v}" for k,v of leg_options).join ','
+        leg_options_text = ("#{k}=#{escape v}" for k,v of leg_options).join ','
 
 Sometimes we'll be provided with a pre-built URI (emergency calls, loopback calls). In other cases we build the URI from the destination number and the gateway's address.
 
@@ -199,6 +200,10 @@ counts from the progress indication onwards.
 call duration
 
       dialog_timeout: 'sofia_session_timeout'
+
+codecs
+
+      codecs: 'absolute_codec_string'
 
 Toolbox
 -------

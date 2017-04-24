@@ -1,4 +1,3 @@
-The steps to placing outbound call(s) are:
 - gather the rule for the given prefix and environment
 - from that rule's gwlist, build a single list of unique gateways we will attempt in order
 - place the calls
@@ -66,6 +65,7 @@ The steps to placing outbound call(s) are:
           ratings:
             '2016-07-28':
               table: 'cheap'
+          codecs:'PCMA'
 
       destinations:
         france:
@@ -261,6 +261,7 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
             '../middleware/call-handler'
           ].map (m) -> require m
           router.use m for m in use
+          cfg.dev_logger = true
           cfg.use = use
           serialize cfg, 'init'
           .then ->
@@ -278,6 +279,7 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
             doc[0].progress_timeout.should.equal dataset.carriers.the_phone_company.progress_timeout
             doc[0].should.have.property 'timezone', 'US/Eastern'
             doc[0].should.have.property 'ratings'
+            doc[0].should.have.property 'codecs', 'PCMA'
 
         it 'should have progress_timeout from their carrier: gw2', ->
           ready.then ->

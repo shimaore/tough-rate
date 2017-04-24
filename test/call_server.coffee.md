@@ -102,6 +102,7 @@ Server (Unit Under Test)
             sip_domain_name:'phone.local'
             gwid:'gw1'
             address:"#{domain_name}:5064"
+            codecs:"PCMA,PCMU"
           }
           {
             _id:'ruleset:phone.local:default'
