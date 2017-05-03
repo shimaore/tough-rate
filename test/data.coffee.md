@@ -683,7 +683,7 @@ Gateways are randomized within carriers.
             command: (c,v) ->
               if c in ['set','export']
                 return Promise.resolve().bind this
-              v.should.equal '[sip_h_P-Charge-Info=sip:barf@pooh]sofia/something-egress/sip:bar@foo'
+              v.should.equal '{}[sip_h_P-Charge-Info=sip:barf@pooh]sofia/something-egress/sip:bar@foo'
               c.should.equal 'bridge'
               done()
               Promise.resolve

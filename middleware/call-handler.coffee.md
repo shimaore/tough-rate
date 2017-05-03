@@ -16,6 +16,9 @@ This middleware is called normally at the end of the stack to process the gatewa
     escape = (v) ->
       "#{v}".replace ',', ','
 
+    make_params = (data) ->
+      ("#{k}=#{escape v}" for own k,v of data).join ','
+
     @include = seem ->
 
       return unless @session.direction is 'lcr'
@@ -39,7 +42,11 @@ Returns an `esl` promise that completes when the call gets connected.
           for h of gateway.headers
             leg_options["sip_h_#{h}"] = gateway.headers[h]
 
-        leg_options_text = ("#{k}=#{escape v}" for k,v of leg_options).join ','
+        leg_options_text = make_params leg_options
+
+        call_options = @session.call_options ? {}
+
+        call_options_text = make_params call_options
 
 Sometimes we'll be provided with a pre-built URI (emergency calls, loopback calls). In other cases we build the URI from the destination number and the gateway's address.
 
@@ -49,7 +56,7 @@ Sometimes we'll be provided with a pre-built URI (emergency calls, loopback call
         profile ?= @cfg.profile
 
         @debug "CallHandler: attempt -- bridge [#{leg_options_text}]sofia/#{profile}/#{uri}"
-        @action 'bridge', "[#{leg_options_text}]sofia/#{profile}/#{uri}"
+        @action 'bridge', "{#{call_options_text}}[#{leg_options_text}]sofia/#{profile}/#{uri}"
 
 Middleware
 ----------
