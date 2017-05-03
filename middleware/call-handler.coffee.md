@@ -30,7 +30,7 @@ Returns an `esl` promise that completes when the call gets connected.
 
         @debug "CallHandler: attempt", {destination,gateway}
 
-        leg_options = {}
+        leg_options = @session?.leg_options ? {}
 
         for g,l of field_mapping when gateway[g]?
           leg_options[l] = gateway[g]
