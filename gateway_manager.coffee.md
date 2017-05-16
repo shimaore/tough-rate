@@ -295,4 +295,4 @@ The following fields are optional:
     field_merger = require './field_merger'
     assert = require 'assert'
     Status = require './status'
-    debug = (require 'debug') "#{pkg.name}:gateway_manager"
+    debug = (require 'tangible') "#{pkg.name}:gateway_manager"

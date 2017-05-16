@@ -4,7 +4,7 @@ Longest-match rule lookup
     seem = require 'seem'
     pkg = require './package'
     @name = "#{pkg.name}:find_rule_in"
-    debug = (require 'debug') @name
+    debug = (require 'tangible') @name
     merge = require './field_merger'
 
     module.exports = find_rule_in = seem (destination,database,key = 'prefix') =>
