@@ -86,6 +86,7 @@ Server (Unit Under Test)
     options = null
 
     start_server = ->
+      debug 'start_server'
       provisioning = null
       sip_domain_name = 'phone.local'
       Promise.resolve()
@@ -142,13 +143,14 @@ Server (Unit Under Test)
           }
         ]
       .catch (error) ->
-        console.error "bulkDocs failed"
+        debug "bulkDocs failed"
         throw error
       .then ->
-        console.log 'Inserting Gateway Manager Couch'
+        debug 'Inserting Gateway Manager Couch'
         GatewayManager = require '../gateway_manager'
         provisioning.put GatewayManager.couch
       .then seem ->
+        debug 'End of start_server'
 
         ruleset_of = (x) ->
           provisioning.get "ruleset:#{sip_domain_name}:#{x}"
@@ -185,18 +187,19 @@ Server (Unit Under Test)
           ].map (m) ->
             require m
 
-        console.log 'Declaring Catcher'
+        debug 'Declaring Catcher'
         catcher = (require 'esl').server ->
           @command 'answer'
         catcher.listen 7004
 
-        console.log 'Declaring Server'
+        debug 'Declaring Server'
         ctx = cfg: options
         for m in options.use
           yield m.server_pre?.call ctx
         CallServer = require 'useful-wind/call_server'
         s = new CallServer options
         s.listen 7002
+        debug 'start_server done'
         s
 
 Test
@@ -283,13 +286,13 @@ Test
           t.should.eventually.equal true
 
       after ->
-        console.log "Stopping..."
+        debug "Stopping..."
         ready
         .then -> server?.stop()
         .then -> exec "docker logs #{p} > #{p}.log"
         .then -> exec "docker kill #{p}"
         .then -> exec "docker rm #{p}"
         .catch (error) ->
-          console.log "`after` failed (ignored): #{error}"
+          debug "`after` failed (ignored): #{error}"
           true
         null
