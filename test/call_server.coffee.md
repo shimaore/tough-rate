@@ -167,7 +167,7 @@ Server (Unit Under Test)
           statistics: new CaringBand()
           prefix_admin: ''
           use: [
-            'tangible'
+            'tangible/middleware'
             'huge-play/middleware/setup'
             './catcher'
             './standalone'

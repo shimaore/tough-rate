@@ -24,18 +24,18 @@
     "mocha": "^3.4.1",
     "pouchdb-adapter-memory": "^6.1.2",
     "socket.io-client": "^2.0.1",
-    "useful-wind": "^7.5.1",
+    "useful-wind": "^7.5.2",
     "useful-wind-serialize": "^1.1.1"
   },
   "dependencies": {
     "acoustic-line": "^1.9.0",
     "coffeescript-helpers": "^2.2.0",
     "lru-cache": "^4.0.2",
-    "nimble-direction": "^6.1.1",
+    "nimble-direction": "^6.1.2",
     "numbering-plans": "^2.5.2",
     "pouchdb": "6.1.1",
     "seem": "^2.0.0",
-    "tangible": "^1.0.3"
+    "tangible": "^1.2.0"
   },
   "peerDependency": {
     "huge-play": ">=20.2.0",

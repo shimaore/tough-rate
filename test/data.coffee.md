@@ -244,7 +244,7 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
             statistics
           }
           use = [
-            'tangible'
+            'tangible/middleware'
             'huge-play/middleware/setup'
             './standalone'
             '../middleware/setup'
@@ -315,7 +315,7 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
             cfg = {prov:provisioning,ruleset_of,sip_domain_name,statistics}
             router = new Router cfg
             cfg.use = [
-              'tangible'
+              'tangible/middleware'
               'huge-play/middleware/setup'
               './standalone'
               '../middleware/setup'
@@ -341,7 +341,7 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
           .then ->
             router = new Router cfg = {prov:provisioning,ruleset_of,sip_domain_name,statistics}
             use = [
-              'tangible'
+              'tangible/middleware'
               'huge-play/middleware/setup'
               './standalone'
               '../middleware/setup'
@@ -373,7 +373,7 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
           .then ->
             router = new Router cfg = {prov:provisioning,ruleset_of,sip_domain_name,statistics}
             use = [
-              'tangible'
+              'tangible/middleware'
               'huge-play/middleware/setup'
               './standalone'
               '../middleware/setup'
@@ -405,7 +405,7 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
           .then ->
             router = new Router cfg = {prov:provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name,statistics}
             use = [
-              'tangible'
+              'tangible/middleware'
               'huge-play/middleware/setup'
               './standalone'
               '../middleware/setup'
@@ -433,7 +433,7 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
           .then ->
             router = new Router cfg = {prov:provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name,statistics}
             use = [
-              'tangible'
+              'tangible/middleware'
               'huge-play/middleware/setup'
               './standalone'
               '../middleware/setup'
@@ -459,7 +459,7 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
           .then ->
             router = new Router cfg = {prov:provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name,statistics}
             use = [
-              'tangible'
+              'tangible/middleware'
               'huge-play/middleware/setup'
               './standalone'
               '../middleware/setup'
@@ -489,7 +489,7 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
               statistics
             }
             use = [
-              'tangible'
+              'tangible/middleware'
               'huge-play/middleware/setup'
               './standalone'
               '../middleware/setup'
@@ -524,7 +524,7 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
               statistics
             }
             use = [
-              'tangible'
+              'tangible/middleware'
               'huge-play/middleware/setup'
               './standalone'
               '../middleware/setup'
@@ -555,7 +555,7 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
               statistics
             }
             use = [
-              'tangible'
+              'tangible/middleware'
               'huge-play/middleware/setup'
               './standalone'
               '../middleware/setup'
@@ -592,7 +592,7 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
               statistics
             }
             use = [
-              'tangible'
+              'tangible/middleware'
               'huge-play/middleware/setup'
               './standalone'
               '../middleware/setup'
