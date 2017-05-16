@@ -120,7 +120,7 @@ On successful connection we also get `variable_originate_disposition=SUCCESS, va
           @res.cause = cause = data?.variable_last_bridge_hangup_cause ? data?.variable_originate_disposition
 
           unless cause?
-            @debug.dev "CallHandler: Unable to parse reply", res
+            @debug.dev "CallHandler: Unable to parse reply"
             continue
 
           @statistics.add ['cause',cause]

@@ -12,7 +12,7 @@
       cfg = @cfg
       assert cfg.sip_domain_name?, 'Missing `sip_domain_name` option.'
 
-      @debug "Booting #{pkg.name} #{pkg.version}.", cfg
+      @debug "Booting #{pkg.name} #{pkg.version}."
 
 `ruleset_of`
 ------------

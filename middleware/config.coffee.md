@@ -9,7 +9,7 @@
     @name = "#{pkg.name}:middleware:config"
     @config = seem ->
       cfg = @cfg
-      @debug "Configuring #{pkg.name} version #{pkg.version}.", cfg
+      @debug "Configuring #{pkg.name} version #{pkg.version}."
       assert cfg.prefix_source?, 'Missing prefix_source'
       assert cfg.sip_domain_name?, 'Missing sip_domain_name'
 
