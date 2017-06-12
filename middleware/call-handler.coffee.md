@@ -130,7 +130,9 @@ On successful connection we also get `variable_originate_disposition=SUCCESS, va
           @statistics.add ['cause-carrier',cause,gateway.carrierid,@rule?.prefix]
 
           @session.was_connected = cause in ['NORMAL_CALL_CLEARING', 'NORMAL_CLEARING', 'SUCCESS']
-          @session.was_transferred = data.variable_transfer_history?
+          @session.was_transferred = data.variable_transfer_history? or
+            data.variable_endpoint_disposition is 'BLIND_TRANSFER' or
+            data.variable_endpoint_disposition is 'ATTENDED_TRANSFER'
 
           switch
             when @session.was_connected
