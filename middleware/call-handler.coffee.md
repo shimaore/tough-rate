@@ -99,7 +99,7 @@ Call attempt.
           @statistics.add ['call-attempts',@rule?.prefix]
           @statistics.add ['call-attempts-gw',gateway.gwid]
           @statistics.add ['call-attempts-carrier',gateway.carrierid]
-          @report state: 'call-attempt'
+          @notify state: 'call-attempt'
 
           destination = gateway.destination_number ? @res.destination
           @session.gateway = gateway
