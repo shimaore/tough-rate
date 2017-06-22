@@ -6,18 +6,6 @@
 
       return unless @session.direction is 'lcr'
 
-      @call.once 'report'
-      .then ({data}) =>
-
-Export winner data to our local CDR
-
-        for own k,v of data when typeof v is 'number' or (typeof v is 'string' and v.match /^\d+$/)
-          @statistics.add k, v
-          @statistics.add ["#{k}-gw",@session.gateway?.gwid], v
-          @statistics.add ["#{k}-gw",@session.gateway?.gwid,@rule?.prefix], v
-          @statistics.add ["#{k}-carrier",@session.gateway?.carrierid], v
-          @statistics.add ["#{k}-carrier",@session.gateway?.carrierid,@rule?.prefix], v
-
 Compatibility layer for CCNQ3 -- remove once the LCR generates its own CDRs.
 
 * hdr.X-CCNQ3-Attrs JSON-encoded attributes, set in LCR so that they show up in CDRs as doc.CDR.variables.ccnq_attrs.
