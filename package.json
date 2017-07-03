@@ -35,6 +35,7 @@
     "numbering-plans": "^2.5.2",
     "pouchdb": "*",
     "seem": "^2.0.0",
+    "shimaore-pouchdb": "*",
     "tangible": "^1.7.0"
   },
   "peerDependency": {

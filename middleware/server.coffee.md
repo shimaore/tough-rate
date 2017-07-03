@@ -1,4 +1,4 @@
-    PouchDB = require 'pouchdb'
+    PouchDB = require 'shimaore-pouchdb'
     assert = require 'assert'
     nimble = require 'nimble-direction'
     LRU = require 'lru-cache'
@@ -23,7 +23,18 @@ Retrieve the ruleset (and ruleset database) for the given ruleset name.
 
 Use a cache since the calls to `ruleset_of()` seem to not release the databases.
 
-        database_cache = LRU cfg.ruleset_database_cache_size ? 100
+        cache = LRU
+          max: cfg.ruleset_database_cache_size ? 100
+          dispose: (key,value) ->
+            debug 'Dispose of', key
+            value?.close?()
+
+        get_db = (name) ->
+          db = cache.get name
+          return db if db?
+          db = new PouchDB doc.database, prefix: cfg.prefix_local
+          cache.set name, db
+          db
 
         cfg.ruleset_of = (x) =>
           cfg.prov.get "ruleset:#{cfg.sip_domain_name}:#{x}"
@@ -32,10 +43,7 @@ Use a cache since the calls to `ruleset_of()` seem to not release the databases.
               @debug "Ruleset #{cfg.sip_domain_name}:#{x} should have a database field."
               return {}
 
-            db = database_cache.get doc.database
-            if not db?
-              db = new PouchDB "#{cfg.prefix_local}/#{doc.database}"
-              database_cache.set doc.database, db
+            db = get_db doc.database
 
             data =
               ruleset: doc
