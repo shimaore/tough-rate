@@ -34,12 +34,12 @@ Parameters for docker.io image
 Setup
 =====
 
-    ready = Promise.resolve()
-    .then ->
-      fs.mkdirAsync 'test/live'
-    .catch (error) ->
-      debug "mkdir #{error.stack ? error}"
-    .then ->
+    ready = seem ->
+      debug 'ready'
+      yield fs
+        .mkdirAsync 'test/live'
+        .catch (error) ->
+          debug "mkdir #{error.stack ? error} (ignored)"
       cfg =
         test: yes
         profiles:
@@ -54,25 +54,18 @@ Setup
         acls:
           default: [ '127.0.0.0/8' ]
       xml = (require 'huge-play/conf/freeswitch') cfg
-      fs.writeFileAsync 'test/live/freeswitch.xml', xml, 'utf-8'
-    .catch (error) -> debug "write: #{error} in #{process.cwd()}"
-    .then -> exec "docker kill #{p}"
-    .catch -> true
-    .then -> exec "docker rm #{p}"
-    .catch -> true
-    .then ->
-      exec """
+      yield fs
+        .writeFileAsync 'test/live/freeswitch.xml', xml, 'utf-8'
+        .catch (error) -> debug "write: #{error} in #{process.cwd()} (ignored)"
+      yield exec("docker kill #{p}").catch -> true
+      yield exec("docker rm #{p}").catch -> true
+      yield exec """
         docker run --net=host -d --name #{p} -v "#{pwd}/test/live:/opt/freeswitch/etc/freeswitch" shimaore/freeswitch:4.0.7 /opt/freeswitch/bin/freeswitch -nf -nosql -nonat -nonatmap -nocal -nort -c
       """
-    .then -> start_server()
-    .then (s) -> server = s
-    .catch (error) ->
-      debug "Start server failed: #{error}"
-      throw error
-    .then ->
+      debug 'Docker with FreeSwitch should be running, starting our own server.'
+      server = yield start_server()
       debug 'Start server OK, waiting...'
-    .delay 10000
-    .then ->
+      yield Promise.delay 10000
       debug 'Start server OK, done.'
       null
 
@@ -85,122 +78,111 @@ Server (Unit Under Test)
     FS = require 'esl'
     options = null
 
-    start_server = ->
+    start_server = seem ->
       debug 'start_server'
       provisioning = null
       sip_domain_name = 'phone.local'
-      Promise.resolve()
-      .then -> PouchDB.destroy 'live-provisioning'
-      .catch -> true
-      .then -> PouchDB.destroy 'the_default_live_ruleset'
-      .catch -> true
-      .then ->
-        provisioning = new PouchDB 'live-provisioning'
-        provisioning.bulkDocs [
-          {
-            _id:'gateway:phone.local:gw1'
-            type:'gateway'
-            sip_domain_name:'phone.local'
-            gwid:'gw1'
-            address:"#{domain_name}:5064"
-            codecs:"PCMA,PCMU"
-          }
-          {
-            _id:'ruleset:phone.local:default'
-            type:'ruleset'
-            sip_domain_name:'phone.local'
-            groupid:'default'
-            database:'the_default_live_ruleset'
-          }
-          {
-            _id:'emergency:330112#brest'
-            destination:'33156'
-          }
-          {
-            _id:'number:1234'
-            outbound_route:'default'
-          }
-          {
-            _id:'number:1235'
-            outbound_route:'default'
-            registrant_host: "#{domain_name}:5064"
-          }
-        ]
-      .then ->
-        ruleset = new PouchDB 'the_default_live_ruleset'
-        ruleset.bulkDocs [
-          {
-            _id:'prefix:331'
-            gwlist: [
-              {gwid:'gw1'}
-            ]
-            attrs:
-              cdr: 'foo-bar'
-          }
-          {
-            _id:'prefix:330112'
-            emergency:true
-          }
-        ]
-      .catch (error) ->
-        debug "bulkDocs failed"
-        throw error
-      .then ->
-        debug 'Inserting Gateway Manager Couch'
-        GatewayManager = require '../gateway_manager'
-        provisioning.put GatewayManager.couch
-      .then seem ->
-        debug 'End of start_server'
+      yield new PouchDB('live-provisioning').destroy().catch -> true
+      yield new PouchDB('the_default_live_ruleset').destroy().catch -> true
+      provisioning = new PouchDB 'live-provisioning'
+      yield provisioning.bulkDocs [
+        {
+          _id:'gateway:phone.local:gw1'
+          type:'gateway'
+          sip_domain_name:'phone.local'
+          gwid:'gw1'
+          address:"#{domain_name}:5064"
+          codecs:"PCMA,PCMU"
+        }
+        {
+          _id:'ruleset:phone.local:default'
+          type:'ruleset'
+          sip_domain_name:'phone.local'
+          groupid:'default'
+          database:'the_default_live_ruleset'
+        }
+        {
+          _id:'emergency:330112#brest'
+          destination:'33156'
+        }
+        {
+          _id:'number:1234'
+          outbound_route:'default'
+        }
+        {
+          _id:'number:1235'
+          outbound_route:'default'
+          registrant_host: "#{domain_name}:5064"
+        }
+      ]
+      ruleset = new PouchDB 'the_default_live_ruleset'
+      yield ruleset.bulkDocs [
+        {
+          _id:'prefix:331'
+          gwlist: [
+            {gwid:'gw1'}
+          ]
+          attrs:
+            cdr: 'foo-bar'
+        }
+        {
+          _id:'prefix:330112'
+          emergency:true
+        }
+      ]
+      debug 'Inserting Gateway Manager Couch'
+      GatewayManager = require '../gateway_manager'
+      yield provisioning.put GatewayManager.couch
 
-        ruleset_of = (x) ->
-          provisioning.get "ruleset:#{sip_domain_name}:#{x}"
-          .then (doc) ->
-            ruleset: doc
-            ruleset_database: new PouchDB doc.database
+      ruleset_of = (x) ->
+        provisioning.get "ruleset:#{sip_domain_name}:#{x}"
+        .then (doc) ->
+          ruleset: doc
+          ruleset_database: new PouchDB doc.database
 
-        options =
-          prov: provisioning
-          profile: 'huge-play-test-sender-egress'
-          host: 'example.net'
-          ruleset_of: ruleset_of
-          sip_domain_name: sip_domain_name
-          statistics: new CaringBand()
-          prefix_admin: ''
-          use: [
-            'tangible/middleware'
-            'huge-play/middleware/setup'
-            './catcher'
-            './standalone'
-            '../middleware/setup'
-            '../middleware/numeric'
-            '../middleware/response-handlers'
-            '../middleware/local-number'
-            '../middleware/ruleset'
-            '../middleware/emergency'
-            '../middleware/routes-gwid'
-            '../middleware/routes-carrierid'
-            '../middleware/routes-registrant'
-            '../middleware/flatten'
-            '../middleware/cdr'
-            '../middleware/call-handler'
-            '../middleware/use-ccnq-to-e164'
-          ].map (m) ->
-            require m
+      options =
+        prov: provisioning
+        profile: 'huge-play-test-sender-egress'
+        host: 'example.net'
+        ruleset_of: ruleset_of
+        sip_domain_name: sip_domain_name
+        statistics: new CaringBand()
+        prefix_admin: ''
+        use: [
+          'tangible/middleware'
+          'huge-play/middleware/setup'
+          './catcher'
+          './standalone'
+          '../middleware/setup'
+          '../middleware/numeric'
+          '../middleware/response-handlers'
+          '../middleware/local-number'
+          '../middleware/ruleset'
+          '../middleware/emergency'
+          '../middleware/routes-gwid'
+          '../middleware/routes-carrierid'
+          '../middleware/routes-registrant'
+          '../middleware/flatten'
+          '../middleware/cdr'
+          '../middleware/call-handler'
+          '../middleware/use-ccnq-to-e164'
+        ].map (m) ->
+          require m
 
-        debug 'Declaring Catcher'
-        catcher = (require 'esl').server ->
-          @command 'answer'
-        catcher.listen 7004
+      debug 'Declaring Catcher'
+      catcher = (require 'esl').server ->
+        @command 'answer'
+      catcher.listen 7004
 
-        debug 'Declaring Server'
-        ctx = cfg: options
-        for m in options.use
-          yield m.server_pre?.call ctx
-        CallServer = require 'useful-wind/call_server'
-        s = new CallServer options
-        s.listen 7002
-        debug 'start_server done'
-        s
+      debug 'Declaring Server'
+      ctx = cfg: options
+      for m in options.use
+        yield m.server_pre?.call ctx
+      CallServer = require 'useful-wind/call_server'
+      s = new CallServer options
+      s.listen 7002
+      debug 'start_server done'
+      s
 
 Test
 ====
@@ -275,24 +257,22 @@ Test
       describe 'FreeSwitch', ->
         @timeout 21000
         before ->
-          ready
+          @timeout 40000
+          ready()
         it 'should process a regular call', ->
-          t = ready.then test1
+          t = test1()
           t.should.be.fulfilled
           t.should.eventually.equal true
         it 'should process a registrant call', ->
-          t = ready.then test2
+          t = test2()
           t.should.be.fulfilled
           t.should.eventually.equal true
 
-      after ->
+      after seem ->
+        @timeout 20000
         debug "Stopping..."
-        ready
-        .then -> server?.stop()
-        .then -> exec "docker logs #{p} > #{p}.log"
-        .then -> exec "docker kill #{p}"
-        .then -> exec "docker rm #{p}"
-        .catch (error) ->
-          debug "`after` failed (ignored): #{error}"
-          true
-        null
+        server.stop()
+        debug "Server stopped, now stopping docker instance..."
+        yield exec "docker logs #{p} > #{p}.log"
+        yield exec "docker kill #{p}"
+        yield exec "docker rm #{p}"
