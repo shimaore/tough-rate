@@ -33,7 +33,7 @@
     "lru-cache": "^4.1.1",
     "nimble-direction": "^6.1.4",
     "numbering-plans": "^2.5.2",
-    "pouchdb": "6.1.1",
+    "pouchdb": "*",
     "seem": "^2.0.0",
     "tangible": "^1.7.0"
   },
