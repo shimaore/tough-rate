@@ -1,4 +1,4 @@
-    PouchDB = require 'shimaore-pouchdb'
+    PouchDB = require 'pouchdb'
     assert = require 'assert'
     nimble = require 'nimble-direction'
     LRU = require 'lru-cache'

@@ -271,7 +271,7 @@ Test
       after seem ->
         @timeout 20000
         debug "Stopping..."
-        server.stop()
+        server?.stop()
         debug "Server stopped, now stopping docker instance..."
         yield exec "docker logs #{p} > #{p}.log"
         yield exec "docker kill #{p}"
