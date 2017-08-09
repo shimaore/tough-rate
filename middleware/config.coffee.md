@@ -50,7 +50,8 @@ Push the GatewayManager design document to the local provisioning database
         .push GatewayManager.couch
         .catch (error) =>
           @debug "Inserting GatewayManager couchapp failed."
-          throw error
+
+We do not throw, the error might be a 509, in which case it means another process took care of it.
 
 Push the `tough-rate` design document to the master provisioning database
 -------------------------------------------------------------------------
