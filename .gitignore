@@ -7,3 +7,4 @@ local/
 log/
 test/live/freeswitch.xml
 test/live/
+package-lock.json
