@@ -119,7 +119,7 @@ The gateway manager provides services to the call handler.
 * doc.carrier.disabled (boolean) optional field to mark the carrier as non-existent
 
       _merge_carrier: seem (value) ->
-        debug 'GatewyManager merge-carrier', value
+        debug 'GatewayManager merge-carrier', value
 
         carrierid = value.carrierid
         unless carrierid?
