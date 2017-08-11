@@ -20,7 +20,6 @@
     "debug": "^3.0.0",
     "esl": "^5.4.0",
     "huge-play": ">=22.6.0",
-    "memdown": "^1.2.4",
     "mocha": "^3.5.0",
     "pouchdb-adapter-memory": "^6.3.4",
     "socket.io-client": "^2.0.3",
@@ -31,14 +30,15 @@
     "acoustic-line": "^1.9.0",
     "coffeescript-helpers": "^2.2.0",
     "lru-cache": "^4.1.1",
-    "nimble-direction": "^6.1.4",
+    "nimble-direction": "^6.2.2",
     "numbering-plans": "^2.5.2",
-    "pouchdb": "^6.3.4",
+    "pouchdb-adapter-http": "^6.3.4",
+    "pouchdb-core": "^6.3.4",
     "seem": "^2.0.0",
     "tangible": "^1.7.0"
   },
   "peerDependency": {
-    "huge-play": ">=22.7.0",
+    "huge-play": ">=29.0.3",
     "useful-wind": "^7.4.0"
   },
   "directories": {

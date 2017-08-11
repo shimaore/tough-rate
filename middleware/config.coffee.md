@@ -1,4 +1,5 @@
-    PouchDB = require 'pouchdb'
+    PouchDB = require 'pouchdb-core'
+      .plugin require 'pouchdb-adapter-http'
     assert = require 'assert'
     nimble = require 'nimble-direction'
     GatewayManager = require '../gateway_manager'

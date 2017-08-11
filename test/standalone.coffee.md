@@ -2,3 +2,4 @@
     @include = ->
       @session.direction = 'lcr'
       @debug = (require 'tangible') 'tests'
+      @reference = add_tag: ->

@@ -72,7 +72,7 @@ Setup
 Server (Unit Under Test)
 ========================
 
-    PouchDB = (require 'pouchdb')
+    PouchDB = require 'pouchdb-core'
       .plugin require 'pouchdb-adapter-memory'
       .defaults adapter: 'memory'
     FS = require 'esl'
