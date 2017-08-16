@@ -225,7 +225,7 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
           data:
             'Channel-Caller-ID-Number': source
             'Channel-Destination-Number': destination
-            'variable_sip_h_X-CCNQ3-Routing': emergency_ref
+            'variable_sip_h_X-Ro': emergency_ref
             'variable_ccnq_to_e164': ccnq_to_e164
           emit: ->
           command: ->
@@ -426,7 +426,7 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
             gws.should.have.property 0
             gws[0].should.have.property 'address', 'foo:5070'
             gws[0].should.have.property 'headers'
-            gws[0].headers.should.have.property 'X-CCNQ3-Registrant-Password', 'badabing'
+            gws[0].headers.should.have.property 'X-RP', 'badabing'
 
         it 'should route registrant_host directly (using provided port)', ->
           ready.then ->
@@ -747,7 +747,7 @@ Gateways are randomized within carriers.
               'Channel-Destination-Number': '331234'
               'Channel-Caller-ID-Number': '2348'
             command: (c,v) ->
-              if c is 'set' and m = v.match /^sip_h_X-CCNQ3-Attrs=(.*)$/
+              if c is 'set' and m = v.match /^sip_h_X-At=(.*)$/
                 m[1].should.equal '{"cdr":"foo-bar"}'
                 success = true
               if c in ['set','export']
@@ -757,7 +757,7 @@ Gateways are randomized within carriers.
               if success
                 done()
               else
-                done new Error 'X-CCNQ3-Attrs was invalid or not set'
+                done new Error 'X-At was invalid or not set'
               Promise.resolve
                 body:
                   variable_last_bridge_hangup_cause: 'NORMAL_CALL_CLEARING'
@@ -862,7 +862,7 @@ Gateways are randomized within carriers.
             data:
               'Channel-Destination-Number': '33_112'
               'Channel-Caller-ID-Number': '2348'
-              'variable_sip_h_X-CCNQ3-Routing': 'brest'
+              'variable_sip_h_X-Ro': 'brest'
             command: (c,v) ->
               if c is 'set' or c is 'export'
                 return Promise.resolve().bind this

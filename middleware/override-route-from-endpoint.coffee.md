@@ -15,7 +15,7 @@ This is a dedicated bit of code that should be inserted before `ruleset` to forc
 
       return if @res.finalized()
 
-      endpoint = (@req.header 'X-CCNQ3-Extra')?.match(/^\w+ \S+ \d+ -> \S+ \d+ (\S+)/)?[1]
+      endpoint = (@req.header 'X-Ex')?.match(/^\w+ \S+ \d+ -> \S+ \d+ (\S+)/)?[1]
 
       return unless endpoint?
 

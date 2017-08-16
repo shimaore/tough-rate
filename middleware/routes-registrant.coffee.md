@@ -6,11 +6,11 @@ Registrant plugin
 This plugin provides `registrant_host` as a gateway.
 
     registrant_fields =
-      registrant_password:    'X-CCNQ3-Registrant-Password'
-      registrant_username:    'X-CCNQ3-Registrant-Username'
-      registrant_realm:       'X-CCNQ3-Registrant-Realm'
-      registrant_remote_ipv4: 'X-CCNQ3-Registrant-Target'
-      registrant_socket:      'X-CCNQ3-Registrant-HostPort'
+      registrant_password:    'X-RP'
+      registrant_username:    'X-RU'
+      registrant_realm:       'X-RR'
+      registrant_remote_ipv4: 'X-RT'
+      registrant_socket:      'X-RH'
 
 * doc.global_number.registrant_password (string) password for registrant; it is used to authenticate with a remote registrar.
 * doc.global_number.registrant_username (string) username for registrant; it is used to authenticate with a remote registrar.

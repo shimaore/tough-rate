@@ -231,7 +231,7 @@ Test
             source = '1235'
             destination = '330112'
             debug 'test2: originate'
-            @api "originate [origination_caller_id_number=#{source},sip_h_X-CCNQ3-Routing=brest]sofia/huge-play-test-sender-ingress/sip:#{destination}@#{domain} &park"
+            @api "originate [origination_caller_id_number=#{source},sip_h_X-Ro=brest]sofia/huge-play-test-sender-ingress/sip:#{destination}@#{domain} &park"
             .then ->
               debug 'test2: client.end()'
               client.end()

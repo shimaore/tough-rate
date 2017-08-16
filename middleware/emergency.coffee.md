@@ -36,8 +36,8 @@ Then, see whether the destination number is an emergency number, and process it.
 
       @tag 'emergency'
 
-* hdr.X-CCNQ3-Routing Emergency Reference. (Obsolete CCNQ3 header.) Key into doc.emergency.
-* hdr.X-CCNQ3-Location Emergency location, gets translation into an Emergency Reference (doc.emergency) via doc.location records.
+* hdr.X-Ro Emergency Reference. (Obsolete CCNQ3 header.) Key into doc.emergency.
+* hdr.X-Lo Emergency location, gets translation into an Emergency Reference (doc.emergency) via doc.location records.
 * doc.location Translation of Emergency Locations into Emergency References
 * doc.location._id `location:<location-reference>`
 * doc.location.routing_data (string) Emergency Reference for this location. Concatenated with the emergency called number to form the key into doc.emergency.
@@ -47,8 +47,8 @@ If it isn't present, we try to retrieve it from the location reference.
 
       @session.destination_emergency = true
 
-      emergency_ref = @session.emergency_ref ? @req.header 'X-CCNQ3-Routing'
-      location_ref = @session.emergency_location ? @req.header 'X-CCNQ3-Location'
+      emergency_ref = @session.emergency_ref ? @req.header 'X-Ro'
+      location_ref = @session.emergency_location ? @req.header 'X-Lo'
 
       if not emergency_ref? and location_ref?
         @debug "Locating", {location_ref}
@@ -110,7 +110,7 @@ If multiple destination numbers are present, we cannot afford to try all combina
         @res.gateways = gateways
         @res.rule = {}
 
-* hdr.X-CCNQ3-Attrs.emergency True if the called number is a translated emergency number.
+* hdr.X-At.emergency True if the called number is a translated emergency number.
 
       @res.attr emergency: true
 
