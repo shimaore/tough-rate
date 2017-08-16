@@ -104,6 +104,16 @@
           type:'emergency'
           destination:['33157','33158']
 
+      location:
+        'home':
+          _id:'location:home'
+          type:'location'
+          routing_data:'brest'
+        'work':
+          _id:'location:work'
+          type:'location'
+          routing_data:'paris'
+
       rules:
         default:
           33:
@@ -183,6 +193,7 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
         (records.push v) for k,v of dataset.gateways
         (records.push v) for k,v of dataset.carriers
         (records.push v) for k,v of dataset.emergency
+        (records.push v) for k,v of dataset.location
         provisioning.bulkDocs records
 
       ready = ready.then ->
@@ -220,13 +231,13 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
         gm.set 'progress_timeout', 4
         gm.init()
 
-      call_ = (source,destination,emergency_ref,ccnq_to_e164) ->
+      call_ = (source,destination,location,ccnq_to_e164) ->
         call =
           data:
             'Channel-Caller-ID-Number': source
             'Channel-Destination-Number': destination
-            'variable_sip_h_X-Ro': emergency_ref
             'variable_ccnq_to_e164': ccnq_to_e164
+            'variable_location': location
           emit: ->
           command: ->
 
@@ -267,6 +278,8 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
           serialize cfg, 'init'
           .then ->
             router.route ctx
+
+      before -> ready
 
       describe 'Gateways', ->
         it 'should have progress_timeout from their carrier: gw1', ->
@@ -570,7 +583,7 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
             cfg.use = use
             serialize cfg, 'init'
             .then ->
-              router.route call_ '336718', '33_112', 'brest'
+              router.route call_ '336718', '33_112', 'home'
           .then (ctx) ->
             ctx.res.should.have.property 'destination', '33156'
             ctx.session.should.have.property 'destination_emergency', true
@@ -607,7 +620,7 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
             cfg.use = use
             serialize cfg, 'init'
             .then ->
-              router.route call_ '336718', '33_112', 'paris'
+              router.route call_ '336718', '33_112', 'work'
           .then (ctx) ->
             ctx.should.have.property 'res'
             ctx.res.should.have.property 'destination', '33_112'
@@ -862,7 +875,7 @@ Gateways are randomized within carriers.
             data:
               'Channel-Destination-Number': '33_112'
               'Channel-Caller-ID-Number': '2348'
-              'variable_sip_h_X-Ro': 'brest'
+              'variable_location':'home'
             command: (c,v) ->
               if c is 'set' or c is 'export'
                 return Promise.resolve().bind this

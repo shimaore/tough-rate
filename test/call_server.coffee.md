@@ -102,8 +102,12 @@ Server (Unit Under Test)
           database:'the_default_live_ruleset'
         }
         {
-          _id:'emergency:330112#brest'
+          _id:'emergency:33_112#brest'
           destination:'33156'
+        }
+        {
+          _id:'location:home'
+          routing_data:'brest'
         }
         {
           _id:'number:1234'
@@ -126,7 +130,7 @@ Server (Unit Under Test)
             cdr: 'foo-bar'
         }
         {
-          _id:'prefix:330112'
+          _id:'prefix:33_112'
           emergency:true
         }
       ]
@@ -229,9 +233,9 @@ Test
         try
           client = FS.client ->
             source = '1235'
-            destination = '330112'
+            destination = '33_112'
             debug 'test2: originate'
-            @api "originate [origination_caller_id_number=#{source},sip_h_X-Ro=brest]sofia/huge-play-test-sender-ingress/sip:#{destination}@#{domain} &park"
+            @api "originate [origination_caller_id_number=#{source},sip_h_X-Bear=home]sofia/huge-play-test-sender-ingress/sip:#{destination}@#{domain} &park"
             .then ->
               debug 'test2: client.end()'
               client.end()
