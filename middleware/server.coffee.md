@@ -33,13 +33,13 @@ Use a cache since the calls to `ruleset_of()` seem to not release the databases.
         get_db = (name) ->
           db = cache.get name
           return db if db?
-          db = new PouchDB doc.database, prefix: cfg.prefix_local
+          db = new PouchDB name, prefix: cfg.prefix_local
           cache.set name, db
           db
 
         cfg.ruleset_of = (x) =>
           cfg.prov.get "ruleset:#{cfg.sip_domain_name}:#{x}"
-          .then (doc) ->
+          .then (doc) =>
             if not doc.database?
               @debug "Ruleset #{cfg.sip_domain_name}:#{x} should have a database field."
               return {}
@@ -53,7 +53,7 @@ Use a cache since the calls to `ruleset_of()` seem to not release the databases.
 We _must_ return an object, even if an error occurred. The router will detect no data is present and report the problem via SIP.
 
           .catch (error) =>
-            @debug "Could not locate information for ruleset #{x} in #{cfg.sip_domain_name}."
+            @debug "Could not locate information for ruleset #{x} in #{cfg.sip_domain_name}.", error
             {}
 
       else
