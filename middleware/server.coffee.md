@@ -2,7 +2,6 @@
       .plugin require 'pouchdb-adapter-http'
     assert = require 'assert'
     nimble = require 'nimble-direction'
-    LRU = require 'lru-cache'
     pkg = require '../package.json'
 
     @name = "#{pkg.name}:middleware:server"
@@ -22,20 +21,8 @@ Retrieve the ruleset (and ruleset database) for the given ruleset name.
 
       if cfg.prefix_local?
 
-Use a cache since the calls to `ruleset_of()` seem to not release the databases.
-
-        cache = LRU
-          max: cfg.ruleset_database_cache_size ? 100
-          dispose: (key,value) ->
-            debug 'Dispose of', key
-            value?.close?()
-
         get_db = (name) ->
-          db = cache.get name
-          return db if db?
-          db = new PouchDB name, prefix: cfg.prefix_local
-          cache.set name, db
-          db
+          new PouchDB name, prefix: cfg.prefix_local
 
         cfg.ruleset_of = (x) =>
           cfg.prov.get "ruleset:#{cfg.sip_domain_name}:#{x}"

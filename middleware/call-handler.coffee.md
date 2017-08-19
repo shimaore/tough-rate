@@ -186,6 +186,7 @@ However we do not propagate errors, since it would mean interrupting the call se
 Release leaking fields
 
       @res.ruleset = null
+      @res.ruleset_database?.close()
       @res.ruleset_database = null
 
       return

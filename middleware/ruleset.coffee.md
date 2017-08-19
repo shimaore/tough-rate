@@ -62,6 +62,7 @@ Ruleset selection
 Management error
 
       unless ruleset? and ruleset_database?
+        ruleset_database?.close()
         @debug.dev 'missing-ruleset: No ruleset available', {source,route:@res.route,ruleset,db:ruleset_database.name}
         yield @res.respond '500'
         return
