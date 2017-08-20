@@ -60,7 +60,7 @@ Setup
       yield exec("docker kill #{p}").catch -> true
       yield exec("docker rm #{p}").catch -> true
       yield exec """
-        docker run --net=host -d --name #{p} -v "#{pwd}/test/live:/opt/freeswitch/etc/freeswitch" shimaore/freeswitch:4.0.7 /opt/freeswitch/bin/freeswitch -nf -nosql -nonat -nonatmap -nocal -nort -c
+        docker run --net=host -d --name #{p} -v "#{pwd}/test/live:/opt/freeswitch/etc/freeswitch" shimaore/docker.freeswitch /opt/freeswitch/bin/freeswitch -nf -nosql -nonat -nonatmap -nocal -nort -c
       """
       debug 'Docker with FreeSwitch should be running, starting our own server.'
       server = yield start_server()
