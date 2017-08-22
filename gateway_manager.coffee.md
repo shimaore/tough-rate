@@ -46,19 +46,23 @@ The gateway manager provides services to the call handler.
 
       init: seem ->
 
-        {rows} = yield @provisioning
-          .allDocs startkey:"carrier:#{@sip_domain_name}:", endkey:"carrier:#{@sip_domain_name};", include_docs:yes
+        until carrier_rows?
+          {rows} = yield @provisioning
+            .allDocs startkey:"carrier:#{@sip_domain_name}:", endkey:"carrier:#{@sip_domain_name};", include_docs:yes
+            .catch -> rows:null
+          carrier_rows = rows
 
-        if rows?
-          for row in rows when row.doc?
-            yield @_merge_carrier row.doc
+        until gateway_rows?
+          {rows} = yield @provisioning
+            .query "#{design}/gateways", startkey:[@sip_domain_name], endkey:[@sip_domain_name,{}]
+            .catch -> rows:null
+          gateway_rows = rows
 
-        {rows} = yield @provisioning
-          .query "#{design}/gateways", startkey:[@sip_domain_name], endkey:[@sip_domain_name,{}]
+        for row in carrier_rows when row.doc?
+          yield @_merge_carrier row.doc
 
-        if rows?
-          for row in rows when row.value?
-            do (row) => @_merge_gateway row.value
+        for row in gateway_rows when row.value?
+          do (row) => @_merge_gateway row.value
 
         debug 'GatewayManager init completed', {@sip_domain_name,@gateways,@carriers}
         return
