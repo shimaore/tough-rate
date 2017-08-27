@@ -17,13 +17,13 @@
     "chai": "^4.1.1",
     "chai-as-promised": "^7.1.1",
     "coffee-script": "^1.12.7",
-    "debug": "^3.0.0",
-    "esl": "^5.4.0",
-    "huge-play": ">=22.6.0",
+    "debug": "^3.0.1",
+    "esl": "^6.0.0-0",
+    "huge-play": ">=32.0.0-0",
     "mocha": "^3.5.0",
     "pouchdb-adapter-memory": "^6.3.4",
     "socket.io-client": "^2.0.3",
-    "useful-wind": "^7.5.3",
+    "useful-wind": "^7.6.0-0",
     "useful-wind-serialize": "^1.3.2"
   },
   "dependencies": {
