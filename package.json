@@ -1,6 +1,6 @@
 {
   "name": "tough-rate",
-  "version": "19.1.0-2",
+  "version": "19.1.0",
   "description": "Event-socket-based, middleware-driven LCR engine for FreeSwitch",
   "main": "index.js",
   "scripts": {
@@ -18,12 +18,12 @@
     "chai-as-promised": "^7.1.1",
     "coffee-script": "^1.12.7",
     "debug": "^3.0.1",
-    "esl": "^6.0.0-0",
-    "huge-play": ">=32.0.0-2",
+    "esl": "^6.0.1",
+    "huge-play": ">=32.0.0",
     "mocha": "^3.5.0",
     "pouchdb-adapter-memory": "^6.3.4",
     "socket.io-client": "^2.0.3",
-    "useful-wind": "^7.6.0-0",
+    "useful-wind": "^7.6.0",
     "useful-wind-serialize": "^1.3.2"
   },
   "dependencies": {
@@ -38,7 +38,7 @@
     "tangible": "^1.8.3"
   },
   "peerDependency": {
-    "huge-play": ">=30.1.0",
+    "huge-play": ">=32.0.0",
     "useful-wind": "^7.5.3"
   },
   "directories": {
