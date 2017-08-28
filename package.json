@@ -19,7 +19,7 @@
     "coffee-script": "^1.12.7",
     "debug": "^3.0.1",
     "esl": "^6.0.1",
-    "huge-play": ">=32.0.0",
+    "huge-play": ">=32.0.1",
     "mocha": "^3.5.0",
     "pouchdb-adapter-memory": "^6.3.4",
     "socket.io-client": "^2.0.3",
@@ -38,7 +38,7 @@
     "tangible": "^1.8.3"
   },
   "peerDependency": {
-    "huge-play": ">=32.0.0",
+    "huge-play": ">=32.0.1",
     "useful-wind": "^7.5.3"
   },
   "directories": {
