@@ -10,7 +10,7 @@
 Make sure the call isn't processed any further.
 
       delete @session.direction
-      @call.emit 'tough-rate-hangup'
+      @emit 'tough-rate-hangup'
 
       if @session.skip_lcr_hangup
         @debug 'Skip LCR hangup.'

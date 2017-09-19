@@ -38,7 +38,7 @@
     "tangible": "^1.8.3"
   },
   "peerDependency": {
-    "huge-play": ">=32.0.1",
+    "huge-play": ">=32.5.0",
     "useful-wind": "^7.5.3"
   },
   "directories": {
