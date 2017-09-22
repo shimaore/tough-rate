@@ -29,14 +29,14 @@ Helper to report a gateway as suspicious to the gateway manager.
 
 Default call post-processing.
 
-      @once 'gateway:CALL_REJECTED'
-      .then mark_gateway_as_faulty # 403, 603
-      @once 'gateway:RECOVERY_ON_TIMER_EXPIRE'
-      .then mark_gateway_as_faulty # 408, 504
-      @once 'gateway:NETWORK_OUT_OF_ORDER'
-      .then mark_gateway_as_suspicious # 502
-      @once 'gateway:NORMAL_TEMPORARY_FAILURE'
-      .then mark_gateway_as_suspicious # 503
+      @once 'gateway:CALL_REJECTED', ->
+        mark_gateway_as_faulty # 403, 603
+      @once 'gateway:RECOVERY_ON_TIMER_EXPIRE', ->
+        mark_gateway_as_faulty # 408, 504
+      @once 'gateway:NETWORK_OUT_OF_ORDER', ->
+        mark_gateway_as_suspicious # 502
+      @once 'gateway:NORMAL_TEMPORARY_FAILURE', ->
+        mark_gateway_as_suspicious # 503
 
 Make sure to not return a blocking Promise.
 
