@@ -31,7 +31,7 @@
     "coffeescript-helpers": "^2.2.0",
     "lru-cache": "^4.1.1",
     "nimble-direction": "^6.2.2",
-    "numbering-plans": "^2.5.2",
+    "numbering-plans": "^2.5.3",
     "pouchdb-adapter-http": "^6.3.4",
     "pouchdb-core": "^6.3.4",
     "seem": "^2.0.0",
