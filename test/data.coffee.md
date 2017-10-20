@@ -150,9 +150,8 @@
 
     {expect} = chai = require 'chai'
     chai.should()
-    PouchDB = require 'pouchdb-core'
+    PouchDB = require 'ccnq4-pouchdb'
       .plugin require 'pouchdb-adapter-memory'
-      .plugin require 'pouchdb-mapreduce'
       .defaults adapter: 'memory'
     pkg = require '../package.json'
     GatewayManager = require '../gateway_manager'

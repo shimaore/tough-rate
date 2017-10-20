@@ -72,7 +72,7 @@ Setup
 Server (Unit Under Test)
 ========================
 
-    PouchDB = require 'pouchdb-core'
+    PouchDB = require 'ccnq4-pouchdb'
       .plugin require 'pouchdb-adapter-memory'
       .defaults adapter: 'memory'
     FS = require 'esl'
