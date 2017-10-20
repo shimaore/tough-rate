@@ -152,6 +152,7 @@ Server (Unit Under Test)
         sip_domain_name: sip_domain_name
         statistics: new CaringBand()
         prefix_admin: ''
+        redis: {}
         use: [
           'tangible/middleware'
           'huge-play/middleware/setup'

@@ -12,12 +12,12 @@
   "author": "Stéphane Alnet <stephane@shimaore.net> (http://stephane.shimaore.net/)",
   "license": "Unlicense",
   "devDependencies": {
-    "bluebird": "^3.5.0",
+    "bluebird": "^3.5.1",
     "caring-band": "^1.4.3",
-    "chai": "^4.1.1",
+    "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "coffee-script": "^1.12.7",
-    "debug": "^3.0.1",
+    "debug": "^3.1.0",
     "esl": "^6.0.1",
     "huge-play": ">=32.0.1",
     "mocha": "^3.5.0",
@@ -31,10 +31,10 @@
     "ccnq4-pouchdb": "^1.0.0",
     "coffeescript-helpers": "^2.2.0",
     "lru-cache": "^4.1.1",
-    "nimble-direction": "^6.2.2",
+    "nimble-direction": "^6.3.1",
     "numbering-plans": "^2.5.3",
     "seem": "^2.0.0",
-    "tangible": "^1.8.3"
+    "tangible": "^1.9.0"
   },
   "peerDependency": {
     "huge-play": ">=32.5.0",
