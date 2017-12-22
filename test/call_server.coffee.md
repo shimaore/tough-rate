@@ -30,6 +30,7 @@ Parameters for docker.io image
       real_exec cmd
 
     server = null
+    catcher = null
 
 Setup
 =====
@@ -277,6 +278,8 @@ Test
         @timeout 20000
         debug "Stopping..."
         server?.stop()
+        catcher?.close()
+        server?.cfg?.global_redis_client?.end()
         debug "Server stopped, now stopping docker instance..."
         yield exec "docker logs #{p} > #{p}.log"
         yield exec "docker kill #{p}"
