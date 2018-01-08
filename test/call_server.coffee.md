@@ -193,12 +193,18 @@ Server (Unit Under Test)
 Test
 ====
 
-    test1 = ->
-      new Promise (resolve,reject) ->
-        setTimeout ->
-          reject new Error 'test1 timed out'
-        , 6000
-        try
+    describe 'Live Tests', ->
+
+      @timeout 21000
+      before ->
+        @timeout 40000
+        ready()
+
+      describe 'FreeSwitch', ->
+        it 'should process a regular call', (done) ->
+          @timeout 6000
+          after ->
+            client.end()
           client = FS.client ->
             source = '1234'
             destination = '33142'
@@ -210,29 +216,23 @@ Test
             .then ->
               debug 'test1: client.end'
               client.end()
-              resolve true
+              done()
             .catch (exception) ->
               debug "test1 Error: #{exception}"
               client.end()
-              reject exception
+              done exception
           client.on 'error', (data) ->
             debug 'test1.on error', data
             client.end()
-            reject new Error "test1 error #{data}"
+            done new Error "test1 error #{data}"
           debug 'test1 client.connect'
           client.connect 5722, '127.0.0.1'
           debug 'test1 connecting'
-          client
-        catch exception
-          debug 'test1 caught', exception
-          reject exception
 
-    test2 = ->
-      new Promise (resolve,reject) ->
-        setTimeout ->
-          reject new Error 'test2 timed out'
-        , 6000
-        try
+      it 'should process a registrant call', (done) ->
+          @timeout 6000
+          after ->
+            client.end()
           client = FS.client ->
             source = '1235'
             destination = '33_112'
@@ -241,45 +241,24 @@ Test
             .then ->
               debug 'test2: client.end()'
               client.end()
-              resolve true
+              done()
             .catch (exception) ->
               debug 'test2: exception'
               client.end()
-              reject exception
+              done exception
           client.on 'error', (data) ->
             debug 'test2.on error', data
             client.end()
-            reject new Error "test2 error: #{data}"
+            done new Error "test2 error: #{data}"
           debug 'test2 connect'
           client.connect 5722, '127.0.0.1'
           debug 'test2 connecting'
-          client
-        catch exception
-          debug 'test2 caught', exception
-          reject exception
-
-    describe 'Live Tests', ->
-
-      describe 'FreeSwitch', ->
-        @timeout 21000
-        before ->
-          @timeout 40000
-          ready()
-        it 'should process a regular call', ->
-          t = test1()
-          t.should.be.fulfilled
-          t.should.eventually.equal true
-        it 'should process a registrant call', ->
-          t = test2()
-          t.should.be.fulfilled
-          t.should.eventually.equal true
 
       after seem ->
         @timeout 20000
         debug "Stopping..."
         server?.stop()
         catcher?.close()
-        server?.cfg?.global_redis_client?.end()
         debug "Server stopped, now stopping docker instance..."
         yield exec "docker logs #{p} > #{p}.log"
         yield exec "docker kill #{p}"

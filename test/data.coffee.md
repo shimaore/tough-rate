@@ -4,6 +4,8 @@
 
     pkg = require '../package'
     seem = require 'seem'
+    Promise = require 'bluebird'
+    Promise.config cancellation:true
 
     sip_domain_name = 'phone.local'
     dataset_1 =
@@ -156,7 +158,6 @@
     pkg = require '../package.json'
     GatewayManager = require '../gateway_manager'
     Router = require 'useful-wind/router'
-    Promise = require 'bluebird'
     serialize = require 'useful-wind-serialize'
     CaringBand = require 'caring-band'
     statistics = new CaringBand()
