@@ -3,7 +3,7 @@
     @name = "#{pkg.name}:middleware:use-session-gateways"
     @include = ->
 
-      return unless @session.direction is 'lcr'
+      return unless @session?.direction is 'lcr'
 
       return if @res.finalized()
 

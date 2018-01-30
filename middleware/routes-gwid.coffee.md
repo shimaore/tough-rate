@@ -20,7 +20,7 @@ Default `gwid` router plugin
     @name = "#{pkg.name}:middleware:routes-gwid"
     @include = seem ->
 
-      return unless @session.direction is 'lcr'
+      return unless @session?.direction is 'lcr'
 
       gateway_manager = @cfg.gateway_manager
 

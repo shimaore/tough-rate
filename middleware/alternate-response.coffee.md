@@ -9,7 +9,7 @@ Mask errors in downstream handling. (Optional. Used by `huge-play`'s `@respond` 
 
     @include = ->
 
-      return unless @session.direction is 'lcr'
+      return unless @session?.direction is 'lcr'
 
       @session.alternate_response = seem (response) =>
         @debug 'Response', {response}

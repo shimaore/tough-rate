@@ -14,7 +14,7 @@ Ruleset Loader
 
     @include = seem ->
 
-      return unless @session.direction is 'lcr'
+      return unless @session?.direction is 'lcr'
 
       provisioning = @cfg.prov
       ruleset_of = @cfg.ruleset_of

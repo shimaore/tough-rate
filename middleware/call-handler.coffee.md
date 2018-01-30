@@ -21,7 +21,7 @@ This middleware is called normally at the end of the stack to process the gatewa
 
     @include = seem ->
 
-      return unless @session.direction is 'lcr'
+      return unless @session?.direction is 'lcr'
 
 Attempt Call
 ------------

@@ -77,7 +77,7 @@ Deprecated: doc.global_number.registrant_host (array)
       assert @cfg.prov?, 'Missing `prov`.'
     @include = seem ->
 
-      return unless @session.direction is 'lcr'
+      return unless @session?.direction is 'lcr'
 
       ref_builder = @session.ref_builder ? build_ref
       provisioning = @cfg.prov

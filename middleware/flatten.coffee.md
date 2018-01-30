@@ -5,7 +5,7 @@ Flatten the gateways
     @name = "#{pkg.name}:middleware:flatten"
     @include = ->
 
-      return unless @session.direction is 'lcr'
+      return unless @session?.direction is 'lcr'
 
       @debug "Gateways before ops", @res.gateways
 

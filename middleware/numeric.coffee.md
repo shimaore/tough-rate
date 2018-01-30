@@ -2,7 +2,7 @@
     @name = "#{pkg.name}:middleware:numeric"
     @include = ->
 
-      return unless @session.direction is 'lcr'
+      return unless @session?.direction is 'lcr'
 
 Source
 ======

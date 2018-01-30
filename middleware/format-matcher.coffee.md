@@ -6,7 +6,7 @@
 
     @include = seem ->
 
-      return unless @session.direction is 'lcr'
+      return unless @session?.direction is 'lcr'
 
       switch data = plans.validate @destination
         when true

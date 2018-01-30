@@ -4,7 +4,7 @@
     @name = "#{pkg.name}:middleware:cdr"
     @include = seem ->
 
-      return unless @session.direction is 'lcr'
+      return unless @session?.direction is 'lcr'
 
 Compatibility layer for CCNQ3 -- remove once the LCR generates its own CDRs.
 

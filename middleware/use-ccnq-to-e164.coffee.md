@@ -2,7 +2,7 @@
     @name = "#{pkg.name}:middleware:use-ccnq-to-e164"
     @include = ->
 
-      return unless @session.direction is 'lcr'
+      return unless @session?.direction is 'lcr'
 
       @debug "Forcing #{@data.variable_ccnq_from_e164} -> #{@data.variable_ccnq_to_e164}"
       @source      = @data.variable_ccnq_from_e164

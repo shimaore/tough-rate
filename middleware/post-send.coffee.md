@@ -3,7 +3,7 @@
 
     @include = ->
 
-      return unless @session.direction is 'lcr'
+      return unless @session?.direction is 'lcr'
 
       @debug 'Ready'
 

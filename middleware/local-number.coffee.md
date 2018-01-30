@@ -9,7 +9,7 @@ Local number middleware
 
     @include = () ->
 
-      return unless @session.direction is 'lcr'
+      return unless @session?.direction is 'lcr'
 
       provisioning = @cfg.prov
 

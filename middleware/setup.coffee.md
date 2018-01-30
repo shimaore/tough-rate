@@ -11,7 +11,7 @@ This is based on the calling number.
       @cfg.versions[pkg.name] = pkg.version
     @include = (ctx) ->
 
-      return unless @session.direction is 'lcr'
+      return unless @session?.direction is 'lcr'
 
       @debug 'Starting LCR'
 

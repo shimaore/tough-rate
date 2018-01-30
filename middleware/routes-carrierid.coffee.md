@@ -51,7 +51,7 @@ Middleware definition
     @name = "#{pkg.name}:middleware:routes-carrierid"
     @include = seem ->
 
-      return unless @session.direction is 'lcr'
+      return unless @session?.direction is 'lcr'
 
       gateway_manager = @cfg.gateway_manager
       host = @cfg.host
