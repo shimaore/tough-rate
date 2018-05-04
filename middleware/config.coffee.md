@@ -57,9 +57,9 @@ Push the `tough-rate` design document to the master provisioning database
 -------------------------------------------------------------------------
 
       yield cfg.reject_tombstones cfg.prov
+      yield cfg.reject_types cfg.prov
 
-      yield cfg.replicate 'provisioning', (doc) ->
-        doc.comment += " for #{pkg.name}"
+      yield cfg.replicate 'provisioning'
 
       source = new PouchDB "#{cfg.prefix_source}/provisioning"
       @debug "Querying for rulesets on master database."
