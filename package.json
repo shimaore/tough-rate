@@ -31,7 +31,7 @@
     "ccnq4-pouchdb": "^1.0.0",
     "coffeescript-helpers": "^2.2.0",
     "lru-cache": "^4.1.1",
-    "nimble-direction": "^7.0.0",
+    "nimble-direction": "^7.1.0",
     "numbering-plans": "^2.5.3",
     "seem": "^2.0.0",
     "tangible": "^1.9.0"
