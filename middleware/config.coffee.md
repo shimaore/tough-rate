@@ -18,30 +18,6 @@ Configure CouchDB
 
       yield nimble cfg
 
-Create a local `tough-rate` user
---------------------------------
-
-At this point it's unclear what this user is used for / supposed to do.
-
-      @debug "Querying user 'tough-rate'."
-      doc = yield cfg.users
-        .get 'org.couchdb.user:tough-rate'
-        .catch (error) =>
-          @debug "#{error.stack ? error} (ignored)"
-          {}
-
-      @debug "Updating user 'tough-rate'."
-      doc._id ?= "org.couchdb.user:tough-rate"
-      doc.name ?= 'tough-rate'
-      doc.type ?= 'user'
-      doc.password = 'tough-rate-password'
-      doc.roles = ['provisioning_reader']
-      yield cfg.users
-        .put doc
-        .catch (error) =>
-          @debug "User creation failed: #{error.stack ? error}"
-          throw error
-
 Push the GatewayManager design document to the local provisioning database
 --------------------------------------------------------------------------
 
