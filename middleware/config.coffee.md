@@ -36,7 +36,7 @@ Push the `tough-rate` design document to the master provisioning database
       yield cfg.reject_types cfg.prov
 
       unless yield cfg.replicate 'provisioning'
-        @debug.dev "Replication of the provisioning database did not start."
+        throw new Error "Unable to start replication of the provisioning database."
 
       source = new PouchDB "#{cfg.prefix_source}/provisioning"
       @debug "Querying for rulesets on master database."
@@ -48,6 +48,6 @@ Push the `tough-rate` design document to the master provisioning database
       for row in rows when row.doc?.database?
         @debug "Going to replicate #{row.doc.database}"
         unless yield cfg.replicate row.doc.database
-          @debug.dev "Replication of #{row.doc.database} did not start."
+          throw new Error "Unable to start replication of #{row.doc.database} database."
 
       @debug "Configured."
