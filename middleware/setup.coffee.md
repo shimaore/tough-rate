@@ -98,15 +98,9 @@ Create the gateway-manager.
 
       @cfg.gateway_manager = new GatewayManager @cfg.prov, @cfg.sip_domain_name
 
-      started = false
-      while not started
-        try
-          yield @cfg.gateway_manager.init()
-          if @cfg.default?
-            @cfg.gateway_manager.set @cfg.default
-          started = true
-        catch error
-          @debug.dev "CallServer startup error: Gateway Manager init() failed: #{error.stack ? error}"
+      yield @cfg.gateway_manager.init()
+      if @cfg.default?
+        @cfg.gateway_manager.set @cfg.default
       @debug.dev "Gateway Manager started"
       null
 

@@ -2,6 +2,7 @@ Gateway (and carriers) manager
 ==============================
 
     seem = require 'seem'
+    sleep = (timeout) -> new Promise (resolve) -> setTimeout resolve, timeout
 
 The gateway manager provides services to the call handler.
 
@@ -45,14 +46,21 @@ The gateway manager provides services to the call handler.
 * doc.carrier.carrierid (string, required)
 
       init: seem ->
+        debug 'GatewayManager init starting'
 
-        until carrier_rows?
+        retries = 10
+
+        until carrier_rows? and gateway_rows?
+          if retries-- is 0
+            throw new Error 'Unable to retrieve carrier/gateway data, is database available?'
+
+          yield sleep 1000
+
           {rows} = yield @provisioning
             .allDocs startkey:"carrier:#{@sip_domain_name}:", endkey:"carrier:#{@sip_domain_name};", include_docs:yes
             .catch -> rows:null
           carrier_rows = rows
 
-        until gateway_rows?
           {rows} = yield @provisioning
             .query "#{design}/gateways", startkey:[@sip_domain_name], endkey:[@sip_domain_name,{}]
             .catch -> rows:null
