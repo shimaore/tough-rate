@@ -2,8 +2,7 @@ Live test with FreeSwitch
 =========================
 
     chai = require 'chai'
-    chai.use require 'chai-as-promised'
-    should = chai.should()
+    chai.should()
 
     Promise = require 'bluebird'
     real_exec = Promise.promisify (require 'child_process').exec
