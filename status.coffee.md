@@ -17,6 +17,7 @@ Stays in faulty state for at least `faulty_timeout` and downgrades to suspicious
 
     module.exports = class Status extends EventEmitter
       constructor: ->
+        super()
         @state = 'active'
         @_timer = null
         @_interval = null
