@@ -3,7 +3,6 @@
 - place the calls
 
     pkg = require '../package'
-    seem = require 'seem'
     Promise = require 'bluebird'
     Promise.config cancellation:true
 
@@ -778,7 +777,7 @@ Gateways are randomized within carriers.
           one_call ctx, 'default'
           null
 
-        it 'should insert winner data', seem (done) ->
+        it 'should insert winner data', (done) ->
           @timeout 6*1000
           ctx =
             data:
@@ -800,7 +799,7 @@ Gateways are randomized within carriers.
                     body:
                       billmsec: 2000
 
-          {session} = yield one_call ctx, 'default'
+          {session} = await one_call ctx, 'default'
           session.should.have.property 'winner'
           session.winner.should.have.property 'carrierid', 'the_other_company'
           null

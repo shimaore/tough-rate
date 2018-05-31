@@ -1,10 +1,9 @@
-    seem = require 'seem'
     pkg = require '../package'
     @name = "#{pkg.name}:middleware:format-matcher"
 
     plans = require 'numbering-plans'
 
-    @include = seem ->
+    @include = ->
 
       return unless @session?.direction is 'lcr'
 
@@ -12,12 +11,12 @@
         when true
           return
         when false
-          yield @respond '484'
+          await @respond '484'
         when null
           return
         else
           @session.destination_information = data
-          yield @set
+          await @set
             initial_callee_id_name: data.full_name
             origination_callee_id_name: data.full_name
 

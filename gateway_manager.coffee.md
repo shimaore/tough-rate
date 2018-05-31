@@ -1,7 +1,6 @@
 Gateway (and carriers) manager
 ==============================
 
-    seem = require 'seem'
     sleep = (timeout) -> new Promise (resolve) -> setTimeout resolve, timeout
 
 The gateway manager provides services to the call handler.
@@ -45,7 +44,7 @@ The gateway manager provides services to the call handler.
 * doc.carrier.sip_domain_name (string, required)
 * doc.carrier.carrierid (string, required)
 
-      init: seem ->
+      init: ->
         debug 'GatewayManager init starting'
 
         retries = 10
@@ -54,20 +53,20 @@ The gateway manager provides services to the call handler.
           if retries-- is 0
             throw new Error 'Unable to retrieve carrier/gateway data, is database available?'
 
-          yield sleep 1000
+          await sleep 1000
 
-          {rows} = yield @provisioning
+          {rows} = await @provisioning
             .allDocs startkey:"carrier:#{@sip_domain_name}:", endkey:"carrier:#{@sip_domain_name};", include_docs:yes
             .catch -> rows:null
           carrier_rows = rows
 
-          {rows} = yield @provisioning
+          {rows} = await @provisioning
             .query "#{design}/gateways", startkey:[@sip_domain_name], endkey:[@sip_domain_name,{}]
             .catch -> rows:null
           gateway_rows = rows
 
         for row in carrier_rows when row.doc?
-          yield @_merge_carrier row.doc
+          await @_merge_carrier row.doc
 
         for row in gateway_rows when row.value?
           do (row) => @_merge_gateway row.value
@@ -119,9 +118,9 @@ The gateway manager provides services to the call handler.
 
         return
 
-      _reevaluate_gateways: seem (gateway_names) ->
+      _reevaluate_gateways: (gateway_names) ->
         debug 'GatewayManager reevaluate gateways', gateway_names
-        {rows} = yield @provisioning
+        {rows} = await @provisioning
           .query "#{design}/gateways", keys:gateway_names.map (x) => [@sip_domain_name,x]
 
         for row in rows when row.value?
@@ -130,7 +129,7 @@ The gateway manager provides services to the call handler.
 * doc.carrier.carrierid (string,required) identifier for the carrier, used in doc.carrier._id
 * doc.carrier.disabled (boolean) optional field to mark the carrier as non-existent
 
-      _merge_carrier: seem (value) ->
+      _merge_carrier: (value) ->
         debug 'GatewayManager merge-carrier', value
 
         carrierid = value.carrierid
@@ -141,7 +140,7 @@ The gateway manager provides services to the call handler.
         if value.disabled
           gateway_names = Object.getOwnPropertyNames @carriers[carrierid]._gateways
           delete @carriers[carrierid]
-          yield @_reevaluate_gateways gateway_names
+          await @_reevaluate_gateways gateway_names
           return
 
         @carriers[carrierid] ?= _gateways: {}
@@ -150,16 +149,16 @@ The gateway manager provides services to the call handler.
 
         return
 
-      _retrieve_gateway: seem (name) ->
+      _retrieve_gateway: (name) ->
         # TODO update with dynamic parameters (temporarily_disabled, ...)
         return null unless name of @gateways
         info = {}
         info[k] = v for own k,v of @gateways[name]
         info.temporarily_disabled = @gateway_status[name]?.state in ['faulty']
-        yield info
+        await info
 
-      _retrieve_carrier: seem (name) ->
-        yield @carriers[name]
+      _retrieve_carrier: (name) ->
+        await @carriers[name]
 
 
 Gateway and carrier properties mapping
@@ -167,8 +166,8 @@ Gateway and carrier properties mapping
 
 Return gateway data (inside a list) as long as that gateway is available.
 
-      resolve_gateway: seem (name) ->
-        info = yield @_retrieve_gateway name
+      resolve_gateway: (name) ->
+        info = await @_retrieve_gateway name
         if not info?
           return []
         if info.disabled or info.temporarily_disabled
@@ -177,9 +176,9 @@ Return gateway data (inside a list) as long as that gateway is available.
 
 Return gateway data (inside a list) for a given carrier.
 
-      resolve_carrier:  seem (name) ->
+      resolve_carrier:  (name) ->
         carrier = {}
-        carrier = yield @_retrieve_carrier name
+        carrier = await @_retrieve_carrier name
         if not carrier?
           return []
         if not carrier._gateways?
@@ -187,7 +186,7 @@ Return gateway data (inside a list) for a given carrier.
 
         res = []
         for own gw of carrier._gateways
-          [x] = yield @resolve_gateway gw
+          [x] = await @resolve_gateway gw
           res.push x
 
         res

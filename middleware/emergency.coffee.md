@@ -2,7 +2,6 @@ Emergency Middleware
 ====================
 
     find_rule_in = require '../find_rule_in'
-    seem = require 'seem'
 
 Since this code rewrites the destination before resolving gateways, it must be called early on (i.e. after the rule is located but before the gateways are processed).
 
@@ -12,7 +11,7 @@ Since this code rewrites the destination before resolving gateways, it must be c
     @name = "#{pkg.name}:middleware:emergency"
     @init = ->
       assert @cfg.prov?, 'Missing `prov`.'
-    @include = seem ->
+    @include = ->
 
       return unless @session?.direction is 'lcr'
 
@@ -50,7 +49,7 @@ If it isn't present, we try to retrieve it from the location reference.
 
       if not emergency_ref? and location_ref?
         @debug "Locating", {location_ref}
-        doc = yield provisioning
+        doc = await provisioning
           .get "location:#{location_ref}"
           .catch (error) =>
             @debug.dev "Could not locate #{location_ref}, call from #{@source} to #{@destination}: #{error.stack ? error}"
@@ -68,7 +67,7 @@ If it isn't present, we try to retrieve it from the location reference.
 * doc.emergency._id `emergency:<number>#<emergency-reference>` where `number` is the emergency called number (typically a special number such a `330112` to handle national routing), and `emergency-reference` is doc.location.routing_data.
 * doc.emergency.destination Translated emergency number.
 
-      doc = yield provisioning
+      doc = await provisioning
         .get "emergency:#{emergency_key}"
         .catch (error) ->
           {}
@@ -91,7 +90,7 @@ If only one destination is present, we handle it as a regular call out; the same
       if destinations.length is 1
         destination = destinations[0]
         @res.redirect destination
-        rule = yield find_rule_in destination, @res.ruleset_database, @res.ruleset.key
+        rule = await find_rule_in destination, @res.ruleset_database, @res.ruleset.key
         @res.gateways = rule.gwlist
         delete rule.gwlist
         @res.rule = rule
@@ -101,7 +100,7 @@ If multiple destination numbers are present, we cannot afford to try all combina
       else
         gateways = []
         for destination in destinations
-          rule = yield find_rule_in destination, @res.ruleset_database, @res.ruleset.key
+          rule = await find_rule_in destination, @res.ruleset_database, @res.ruleset.key
           gw = rule.gwlist[0]
           gw.destination_number = destination
           gateways.push gw

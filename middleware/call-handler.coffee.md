@@ -3,8 +3,6 @@ Call Handling Middleware
 
 This middleware is called normally at the end of the stack to process the gateway list and handle responses.
 
-    seem = require 'seem'
-
     class CallHandlerMiddlewareError extends Error
 
     pkg = require '../package.json'
@@ -19,7 +17,7 @@ This middleware is called normally at the end of the stack to process the gatewa
     make_params = (data) ->
       ("#{k}=#{escape v}" for own k,v of data).join ','
 
-    @include = seem ->
+    @include = ->
 
       return unless @session?.direction is 'lcr'
 
@@ -75,14 +73,14 @@ Do not process further if we already responded.
 
 The `it` promise will return either a gateway, `false` if no gateway was found, or null if no gateway was successful.
 
-      yield @set
+      await @set
         continue_on_fail: true
 
       @session.sip_wait_for_aleg_ack ?= true
-      yield @export sip_wait_for_aleg_ack: @session.sip_wait_for_aleg_ack
-      yield @set sip_wait_for_aleg_ack: @session.sip_wait_for_aleg_ack
+      await @export sip_wait_for_aleg_ack: @session.sip_wait_for_aleg_ack
+      await @set sip_wait_for_aleg_ack: @session.sip_wait_for_aleg_ack
       if @session.handled_transfer_context?
-        yield @set force_transfer_context: @session.handled_transfer_context
+        await @set force_transfer_context: @session.handled_transfer_context
 
 If there are gateways, attempt to call through them in the order listed.
 
@@ -104,7 +102,7 @@ Call attempt.
           destination = gateway.destination_number ? @res.destination
           @session.gateway = gateway
           @session.destination = destination
-          res = yield attempt destination, gateway
+          res = await attempt destination, gateway
             .catch (error) =>
               @debug "attempt error: #{error.stack ? error}"
               body: {}
@@ -176,7 +174,7 @@ However we do not propagate errors, since it would mean interrupting the call se
         @debug "CallHandler: No Route."
         @statistics.add 'no-route'
         @tag 'failed'
-        yield @respond '604'
+        await @respond '604'
       else
         @debug "CallHandler: the winning gateway was", winner
         @statistics.add 'route'

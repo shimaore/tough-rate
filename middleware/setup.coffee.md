@@ -6,7 +6,6 @@ This is based on the calling number.
 
     pkg = require '../package.json'
     @name = "#{pkg.name}:middleware:setup"
-    seem = require 'seem'
     @web = ->
       @cfg.versions[pkg.name] = pkg.version
     @include = (ctx) ->
@@ -81,7 +80,7 @@ Manipulate the gateways list.
 Init
 ----
 
-    @server_pre = seem ->
+    @server_pre = ->
 
       return if @cfg.gateway_manager?
 
@@ -98,7 +97,7 @@ Create the gateway-manager.
 
       @cfg.gateway_manager = new GatewayManager @cfg.prov, @cfg.sip_domain_name
 
-      yield @cfg.gateway_manager.init()
+      await @cfg.gateway_manager.init()
       if @cfg.default?
         @cfg.gateway_manager.set @cfg.default
       @debug.dev "Gateway Manager started"

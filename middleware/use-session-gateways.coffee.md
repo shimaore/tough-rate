@@ -1,4 +1,3 @@
-    seem = require 'seem'
     pkg = require '../package'
     @name = "#{pkg.name}:middleware:use-session-gateways"
     @include = ->

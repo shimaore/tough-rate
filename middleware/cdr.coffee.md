@@ -1,8 +1,6 @@
-    seem = require 'seem'
-
     pkg = require '../package.json'
     @name = "#{pkg.name}:middleware:cdr"
-    @include = seem ->
+    @include = ->
 
       return unless @session?.direction is 'lcr'
 
@@ -17,7 +15,7 @@ Compatibility layer for CCNQ3 -- remove once the LCR generates its own CDRs.
       for own k,v of @res.attrs when v?
         attrs[k] = v
       json_attrs = JSON.stringify attrs
-      yield @set
+      await @set
 
 Export attributes towards the carrier SBC (this is used to map carrier-side CDRs with client-side CDRs).
 

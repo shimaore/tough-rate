@@ -1,8 +1,6 @@
 Default `gwid` router plugin
 ============================
 
-    seem = require 'seem'
-
     update = (gateway_manager,entry) ->
 
 * doc.prefix.gwlist[].gwid (string) ID of the destination doc.gateway
@@ -18,7 +16,7 @@ Default `gwid` router plugin
 
     pkg = require '../package.json'
     @name = "#{pkg.name}:middleware:routes-gwid"
-    @include = seem ->
+    @include = ->
 
       return unless @session?.direction is 'lcr'
 
@@ -34,8 +32,8 @@ Default `gwid` router plugin
       unless @res.gateways?
         @debug 'No gateways'
         return
-      @res.gateways = yield promise_all @res.gateways, seem (x) ->
-        r = yield update gateway_manager, x
+      @res.gateways = await promise_all @res.gateways, (x) ->
+        r = await update gateway_manager, x
         for gw in r
           gw.destination_number ?= x.destination_number if x.destination_number?
         r

@@ -1,18 +1,16 @@
 Default `carrierid` router plugin
 =================================
 
-    seem = require 'seem'
-
 Replace all carrierid entries with matching definitions.
 
-    update = seem (gateway_manager,host,entry) ->
+    update = (gateway_manager,host,entry) ->
 
 * doc.prefix.gwlist[].carrierid (string) name of the destination doc.carrier
 * doc.destination.gwlist[].carrierid (string) name of the destination doc.carrier
 * doc.carrier ignore
 
       return entry unless entry.carrierid?
-      gateways = yield gateway_manager.resolve_carrier entry.carrierid
+      gateways = await gateway_manager.resolve_carrier entry.carrierid
       count = gateways[0]?.try
 
       gateways.forEach (gateway) =>
@@ -49,7 +47,7 @@ Middleware definition
 
     pkg = require '../package.json'
     @name = "#{pkg.name}:middleware:routes-carrierid"
-    @include = seem ->
+    @include = ->
 
       return unless @session?.direction is 'lcr'
 
@@ -66,8 +64,8 @@ Middleware definition
       unless @res.gateways?
         @debug 'No gateways'
         return
-      @res.gateways = yield promise_all @res.gateways, seem (x) ->
-        r = yield update gateway_manager, host, x
+      @res.gateways = await promise_all @res.gateways, (x) ->
+        r = await update gateway_manager, host, x
         for gw in r
           gw.destination_number ?= x.destination_number if x.destination_number?
         r

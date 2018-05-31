@@ -1,18 +1,17 @@
 Longest-match rule lookup
 =========================
 
-    seem = require 'seem'
     pkg = require './package'
     @name = "#{pkg.name}:find_rule_in"
     debug = (require 'tangible') @name
     merge = require './field_merger'
 
-    module.exports = find_rule_in = seem (destination,database,key = 'prefix') =>
+    module.exports = find_rule_in = (destination,database,key = 'prefix') =>
       debug 'find', destination
 
       ids = ("#{key}:#{destination[0...l]}" for l in [0..destination.length]).reverse()
 
-      {rows} = yield database.allDocs keys:ids, include_docs: true
+      {rows} = await database.allDocs keys:ids, include_docs: true
       rule = (row.doc for row in rows when row.doc? and not row.doc.disabled)[0]
 
 Lookup the `destination` if any.
@@ -24,7 +23,7 @@ Lookup the `destination` if any.
 
       if rule?.destination?
         debug 'destination', rule.destination
-        destination = yield database
+        destination = await database
           .get "destination:#{rule.destination}"
           .catch (error) ->
             debug 'destination', rule.destination, error.stack ? error.toString()

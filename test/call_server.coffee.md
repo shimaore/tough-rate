@@ -12,8 +12,6 @@ Live test with FreeSwitch
     CaringBand = require 'caring-band'
     fs = Promise.promisifyAll require 'fs'
 
-    seem = require 'seem'
-
 Parameters for docker.io image
 ==============================
 
@@ -35,9 +33,9 @@ Parameters for docker.io image
 Setup
 =====
 
-    ready = seem ->
+    ready = ->
       debug 'ready'
-      yield fs
+      await fs
         .mkdirAsync 'test/live'
         .catch (error) ->
           debug "mkdir #{error.stack ? error} (ignored)"
@@ -55,18 +53,18 @@ Setup
         acls:
           default: [ '127.0.0.0/8' ]
       xml = (require 'huge-play/conf/freeswitch') cfg
-      yield fs
+      await fs
         .writeFileAsync 'test/live/freeswitch.xml', xml, 'utf-8'
         .catch (error) -> debug "write: #{error} in #{process.cwd()} (ignored)"
-      yield exec("docker kill #{p}").catch -> true
-      yield exec("docker rm #{p}").catch -> true
-      yield exec """
+      await exec("docker kill #{p}").catch -> true
+      await exec("docker rm #{p}").catch -> true
+      await exec """
         docker run --net=host -d --name #{p} -v "#{pwd}/test/live:/opt/freeswitch/etc/freeswitch" shimaore/docker.freeswitch /opt/freeswitch/bin/freeswitch -nf -nosql -nonat -nonatmap -nocal -nort -c
       """
       debug 'Docker with FreeSwitch should be running, starting our own server.'
-      server = yield start_server()
+      server = await start_server()
       debug 'Start server OK, waiting...'
-      yield Promise.delay 10000
+      await Promise.delay 10000
       debug 'Start server OK, done.'
       null
 
@@ -79,14 +77,14 @@ Server (Unit Under Test)
     FS = require 'esl'
     options = null
 
-    start_server = seem ->
+    start_server = ->
       debug 'start_server'
       provisioning = null
       sip_domain_name = 'phone.local'
-      yield new PouchDB('live-provisioning').destroy().catch -> true
-      yield new PouchDB('the_default_live_ruleset').destroy().catch -> true
+      await new PouchDB('live-provisioning').destroy().catch -> true
+      await new PouchDB('the_default_live_ruleset').destroy().catch -> true
       provisioning = new PouchDB 'live-provisioning'
-      yield provisioning.bulkDocs [
+      await provisioning.bulkDocs [
         {
           _id:'gateway:phone.local:gw1'
           type:'gateway'
@@ -121,7 +119,7 @@ Server (Unit Under Test)
         }
       ]
       ruleset = new PouchDB 'the_default_live_ruleset'
-      yield ruleset.bulkDocs [
+      await ruleset.bulkDocs [
         {
           _id:'prefix:331'
           gwlist: [
@@ -137,7 +135,7 @@ Server (Unit Under Test)
       ]
       debug 'Inserting Gateway Manager Couch'
       GatewayManager = require '../gateway_manager'
-      yield provisioning.put GatewayManager.couch
+      await provisioning.put GatewayManager.couch
 
       ruleset_of = (x) ->
         provisioning.get "ruleset:#{sip_domain_name}:#{x}"
@@ -183,7 +181,7 @@ Server (Unit Under Test)
       debug 'Declaring Server'
       ctx = cfg: options
       for m in options.use
-        yield m.server_pre?.call ctx
+        await m.server_pre?.call ctx
       CallServer = require 'useful-wind/call_server'
       s = new CallServer options
       s.listen 7002
@@ -254,12 +252,12 @@ Test
           client.connect 5722, '127.0.0.1'
           debug 'test2 connecting'
 
-      after seem ->
+      after ->
         @timeout 20000
         debug "Stopping..."
         server?.stop()
         catcher?.close()
         debug "Server stopped, now stopping docker instance..."
-        yield exec "docker logs #{p} > #{p}.log"
-        yield exec "docker kill #{p}"
-        yield exec "docker rm #{p}"
+        await exec "docker logs #{p} > #{p}.log"
+        await exec "docker kill #{p}"
+        await exec "docker rm #{p}"

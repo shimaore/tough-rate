@@ -1,8 +1,6 @@
 Registrant plugin
 =================
 
-    seem = require 'seem'
-
 This plugin provides `registrant_host` as a gateway.
 
     registrant_fields =
@@ -75,7 +73,7 @@ Deprecated: doc.global_number.registrant_host (array)
     @name = "#{pkg.name}:middleware:routes-registrant"
     @init = ->
       assert @cfg.prov?, 'Missing `prov`.'
-    @include = seem ->
+    @include = ->
 
       return unless @session?.direction is 'lcr'
 
@@ -86,7 +84,7 @@ Deprecated: doc.global_number.registrant_host (array)
         @debug 'Routes Registrant: already finalized.'
         return
 
-      source_doc = yield ref_builder
+      source_doc = await ref_builder
         .call this, provisioning
         .catch -> null
 

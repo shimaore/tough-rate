@@ -2,7 +2,6 @@ Ruleset Loader
 ==============
 
     find_rule_in = require '../find_rule_in'
-    seem = require 'seem'
 
     class CCNQBaseMiddlewareError extends Error
 
@@ -12,7 +11,7 @@ Ruleset Loader
       assert @cfg.prov?, 'Missing `prov`.'
       assert @cfg.ruleset_of?, 'Missing `ruleset_of`.'
 
-    @include = seem ->
+    @include = ->
 
       return unless @session?.direction is 'lcr'
 
@@ -34,7 +33,7 @@ Route based on the route selected by the source, or using a default route.
 
 * doc.global_number.outbound_route (number) Route used for Least Cost Routing (LCR).
 
-      doc = yield provisioning
+      doc = await provisioning
         .get "number:#{source}"
         .catch (error) =>
           @debug "RuleSet Middleware: error retrieving number:#{source}", error.stack ? error.toString()
@@ -47,7 +46,7 @@ Provisioning error
 
       unless route?
         @debug.dev 'missing-route: No route available', {source}
-        yield @res.respond '485'
+        await @res.respond '485'
         return
 
       route = "#{route}"
@@ -57,13 +56,13 @@ Ruleset selection
 =================
 
       @debug "RuleSet Middleware: loading ruleset_of", {source,route}
-      {ruleset,ruleset_database} = yield ruleset_of route
+      {ruleset,ruleset_database} = await ruleset_of route
 
 Management error
 
       unless ruleset? and ruleset_database?
         @debug.dev 'missing-ruleset: No ruleset available', {source,route:@res.route,ruleset,db:ruleset_database.name}
-        yield @res.respond '500'
+        await @res.respond '500'
         return
 
       @res.ruleset = ruleset
@@ -76,7 +75,7 @@ Rule lookup
 
 * doc.ruleset.key (string) The type used for routing rules in the ruleset database. Default: "prefix".
 
-      rule = yield find_rule_in @res.destination, ruleset_database, @res.ruleset.key
+      rule = await find_rule_in @res.destination, ruleset_database, @res.ruleset.key
         .catch (error) ->
           null
 
@@ -84,7 +83,7 @@ Provisioning error or user error
 
       unless rule?
         @debug.dev 'missing-rule: No route available', {source,destination:@res.destination,ruleset:@res.ruleset}
-        yield @res.respond '485'
+        await @res.respond '485'
         return
 
 * doc.prefix.gwlist (array) List of gateways/carriers for this rule.
