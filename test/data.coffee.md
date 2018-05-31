@@ -780,7 +780,7 @@ Gateways are randomized within carriers.
           one_call ctx, 'default'
           null
 
-        it 'should insert winner data', (done) ->
+        it 'should insert winner data', ->
           @timeout 6*1000
           ctx =
             data:
