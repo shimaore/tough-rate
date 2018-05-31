@@ -162,7 +162,10 @@
     statistics = new CaringBand()
 
     class FreeSwitchError extends Error
-      constructor:(@res,@args) ->
+      constructor: (res,args) ->
+        super()
+        @res = res
+        @args = args
 
       toString: ->
         JSON.stringify @args
