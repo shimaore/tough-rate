@@ -59,8 +59,6 @@ Sometimes we'll be provided with a pre-built URI (emergency calls, loopback call
 Middleware
 ----------
 
-      @statistics.add ['incoming-calls',@rule?.prefix]
-
 The route-set might not be modified anymore.
 
       @res.finalize() unless @res.finalized()
@@ -93,10 +91,6 @@ Call attempt.
         try
 
           @debug "CallHandler: handling (next) gateway", gateway
-          @statistics.add 'call-attempts'
-          @statistics.add ['call-attempts',@rule?.prefix]
-          @statistics.add ['call-attempts-gw',gateway.gwid]
-          @statistics.add ['call-attempts-carrier',gateway.carrierid]
           @notify state: 'call-attempt'
 
           destination = gateway.destination_number ? @res.destination
@@ -110,8 +104,6 @@ Call attempt.
           @session.bridge_data ?= []
           @session.bridge_data.push data
 
-          @statistics.add 'call-status'
-
 On CANCEL we get `variable_originate_disposition=ORIGINATOR_CANCEL` instead of a proper `last_bridge_hangup_cause`.
 On successful connection we also get `variable_originate_disposition=SUCCESS, variable_DIALSTATUS=SUCCESS`.
 
@@ -120,12 +112,6 @@ On successful connection we also get `variable_originate_disposition=SUCCESS, va
           unless cause?
             @debug.dev "CallHandler: Unable to parse reply"
             continue
-
-          @statistics.add ['cause',cause]
-          @statistics.add ['cause-gw',cause,gateway.gwid]
-          @statistics.add ['cause-gw',cause,gateway.gwid,@rule?.prefix]
-          @statistics.add ['cause-carrier',cause,gateway.carrierid]
-          @statistics.add ['cause-carrier',cause,gateway.carrierid,@rule?.prefix]
 
           @session.was_connected = cause in ['NORMAL_CALL_CLEARING', 'NORMAL_CLEARING', 'SUCCESS']
           @session.was_transferred = data.variable_transfer_history? or
@@ -136,9 +122,6 @@ On successful connection we also get `variable_originate_disposition=SUCCESS, va
             when @session.was_connected
 
               @debug "CallHandler: connected call: #{cause} when routing #{destination} through", gateway
-              @statistics.add 'connected-calls'
-              @statistics.add ['connected-calls-gw',gateway.gwid]
-              @statistics.add ['connected-calls-carrier',gateway.carrierid]
               winner = gateway # Winner
               @session.winner = gateway
               @tag 'answered'
@@ -146,9 +129,6 @@ On successful connection we also get `variable_originate_disposition=SUCCESS, va
             when @session.was_transferred
 
               @debug "CallHandler: transferred call: #{cause} when routing #{destination} through", gateway
-              @statistics.add 'transferred-calls'
-              @statistics.add ['transferred-calls-gw',gateway.gwid]
-              @statistics.add ['transferred-calls-carrier',gateway.carrierid]
               winner = gateway # Winner
               @session.winner = gateway
               @tag 'transferred'
@@ -157,27 +137,19 @@ On successful connection we also get `variable_originate_disposition=SUCCESS, va
 
               @debug "CallHandler: failed call: #{cause} when routing #{destination} through", gateway
               @emit "gateway:#{cause}", gateway
-              @statistics.add 'failed-attempts'
-              @statistics.add ['failed-attempts-gw',gateway.gwid]
-              @statistics.add ['failed-attempts-gw',gateway.gwid,cause]
-              @statistics.add ['failed-attempts-carrier',gateway.carrierid]
-              @statistics.add ['failed-attempts-carrier',gateway.carrierid,cause]
               # No winner yet
 
 However we do not propagate errors, since it would mean interrupting the call sequence. Since we didn't find any winner, we simply return `null`.
 
         catch error
           @debug 'Internal or FreeSwitch error (ignored, skipping to next gateway): ', error.toString()
-          @statistics.add 'gateway-skip'
 
       if not winner?
         @debug "CallHandler: No Route."
-        @statistics.add 'no-route'
         @tag 'failed'
         await @respond '604'
       else
         @debug "CallHandler: the winning gateway was", winner
-        @statistics.add 'route'
         @res.winner = winner
         @res.attr winner.attrs
 

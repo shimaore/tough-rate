@@ -148,7 +148,6 @@ Server (Unit Under Test)
         host: 'example.net'
         ruleset_of: ruleset_of
         sip_domain_name: sip_domain_name
-        statistics: new CaringBand()
         prefix_admin: ''
         redis: {}
         use: [

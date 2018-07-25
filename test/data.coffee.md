@@ -159,7 +159,6 @@
     Router = require 'useful-wind/router'
     serialize = require 'useful-wind-serialize'
     CaringBand = require 'caring-band'
-    statistics = new CaringBand()
 
     class FreeSwitchError extends Error
       constructor: (res,args) ->
@@ -255,7 +254,6 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
             sip_domain_name
             default_outbound_route: outbound_route
             profile: 'something-egress'
-            statistics
           }
           use = [
             'tangible/middleware'
@@ -328,7 +326,7 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
           ready.then ->
             provisioning.put _id:'number:1234',inbound_uri:'sip:foo@bar'
           .then ->
-            cfg = {prov:provisioning,ruleset_of,sip_domain_name,statistics}
+            cfg = {prov:provisioning,ruleset_of,sip_domain_name}
             router = new Router cfg
             cfg.use = [
               'tangible/middleware'
@@ -355,7 +353,7 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
           ready.then ->
             provisioning.put _id:'number:1244',inbound_uri:'sip:foo@bar', account:'boo'
           .then ->
-            router = new Router cfg = {prov:provisioning,ruleset_of,sip_domain_name,statistics}
+            router = new Router cfg = {prov:provisioning,ruleset_of,sip_domain_name}
             use = [
               'tangible/middleware'
               'huge-play/middleware/setup'
@@ -387,7 +385,7 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
           ready.then ->
             provisioning.put _id:'number:1432',inbound_uri:'sip:foo@bar',account:'foo_bar'
           .then ->
-            router = new Router cfg = {prov:provisioning,ruleset_of,sip_domain_name,statistics}
+            router = new Router cfg = {prov:provisioning,ruleset_of,sip_domain_name}
             use = [
               'tangible/middleware'
               'huge-play/middleware/setup'
@@ -419,7 +417,7 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
           ready.then ->
             provisioning.put _id:'number:3213',registrant_host:'foo',registrant_password:'badabing'
           .then ->
-            router = new Router cfg = {prov:provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name,statistics}
+            router = new Router cfg = {prov:provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name}
             use = [
               'tangible/middleware'
               'huge-play/middleware/setup'
@@ -447,7 +445,7 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
           ready.then ->
             provisioning.put _id:'number:3243',registrant_host:'foo:5080'
           .then ->
-            router = new Router cfg = {prov:provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name,statistics}
+            router = new Router cfg = {prov:provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name}
             use = [
               'tangible/middleware'
               'huge-play/middleware/setup'
@@ -473,7 +471,7 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
           ready.then ->
             provisioning.put _id:'number:3253',registrant_host:['foo:5080']
           .then ->
-            router = new Router cfg = {prov:provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name,statistics}
+            router = new Router cfg = {prov:provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name}
             use = [
               'tangible/middleware'
               'huge-play/middleware/setup'
@@ -502,7 +500,6 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
               prov:provisioning
               ruleset_of
               default_outbound_route:'default'
-              statistics
             }
             use = [
               'tangible/middleware'
@@ -537,7 +534,6 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
               prov:provisioning
               ruleset_of
               default_outbound_route:'default'
-              statistics
             }
             use = [
               'tangible/middleware'
@@ -568,7 +564,6 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
               prov:provisioning
               ruleset_of
               default_outbound_route:'default'
-              statistics
             }
             use = [
               'tangible/middleware'
@@ -605,7 +600,6 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
               prov:provisioning
               ruleset_of
               default_outbound_route:'default'
-              statistics
             }
             use = [
               'tangible/middleware'
@@ -805,25 +799,6 @@ Gateways are randomized within carriers.
           {session} = await one_call ctx, 'default'
           session.should.have.property 'winner'
           session.winner.should.have.property 'carrierid', 'the_other_company'
-          null
-
-        it 'should emit call events', (done) ->
-          ctx =
-            data:
-              'Channel-Destination-Number': '331244'
-              'Channel-Caller-ID-Number': '2348'
-            command: (c,v) ->
-              if c in ['set','export']
-                return Promise.resolve().bind this
-              Promise.resolve
-                body:
-                  variable_last_bridge_hangup_cause: 'NORMAL_CALL_CLEARING'
-
-          statistics.on 'report', (data) ->
-            if data.state is 'call-attempt' and data.source is '2348' and data.destination is '331244'
-              done()
-
-          one_call ctx, 'default'
           null
 
         it 'should report errors', (done) ->

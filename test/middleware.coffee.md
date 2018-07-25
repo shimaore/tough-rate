@@ -16,9 +16,6 @@
           res:
             finalized: -> true
             gateways: []
-          statistics:
-            add: ->
-            emit: ->
           export: ->
           set: ->
           respond: (arg) ->
