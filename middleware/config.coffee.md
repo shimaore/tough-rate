@@ -30,8 +30,10 @@ We do not throw, the error might be a 509, in which case it means another proces
 Push the `tough-rate` design document to the master provisioning database
 -------------------------------------------------------------------------
 
-      await cfg.reject_tombstones cfg.prov
-      await cfg.reject_types cfg.prov
+      await cfg.reject_tombstones(cfg.prov).catch (error) =>
+        @debug 'Reject tombstones failed (ignored)', error.stack ? JSON.stringify error
+      await cfg.reject_types(cfg.prov).catch (error) =>
+        @debug 'Reject types failed (ignored)', error.stack ? JSON.stringify error
 
       unless await cfg.replicate 'provisioning'
         throw new Error "Unable to start replication of the provisioning database."
