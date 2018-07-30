@@ -19,13 +19,13 @@ Configure CouchDB
 Push the GatewayManager design document to the local provisioning database
 --------------------------------------------------------------------------
 
-      @debug "Updating GatewayManager design document."
+      @debug 'Updating GatewayManager design document.'
       await cfg
         .push GatewayManager.couch
         .catch (error) =>
-          @debug "Inserting GatewayManager couchapp failed."
+          @debug 'Inserting GatewayManager couchapp failed (ignored).'
 
-We do not throw, the error might be a 509, in which case it means another process took care of it.
+We do not throw, the error might be a 409, in which case it means another process took care of it.
 
 Push the `tough-rate` design document to the master provisioning database
 -------------------------------------------------------------------------
