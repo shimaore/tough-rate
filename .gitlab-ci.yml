@@ -1,0 +1,12 @@
+image: node:alpine
+
+build:
+  services:
+  - redis
+  before_script:
+  - apk add docker
+  - docker pull shimaore/docker.freeswitch
+  script:
+  - npm install
+  - npm audit
+  - npm test

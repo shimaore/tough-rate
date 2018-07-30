@@ -42,18 +42,18 @@
   "directories": {
     "test": "test"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/shimaore/tough-rate.git"
-  },
   "keywords": [
     "FreeSwitch",
     "LCR",
     "least cost routing",
     "CouchDB"
   ],
-  "bugs": {
-    "url": "https://github.com/shimaore/tough-rate/issues"
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/shimaore/tough-rate.git"
   },
-  "homepage": "https://github.com/shimaore/tough-rate"
+  "bugs": {
+    "url": "https://gitlab.com/shimaore/tough-rate/issues"
+  },
+  "homepage": "https://gitlab.com/shimaore/tough-rate#README"
 }
