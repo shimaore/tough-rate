@@ -22,7 +22,6 @@
     "huge-play": ">=34.3.4",
     "mocha": "^5.0.0",
     "pouchdb-adapter-memory": "^6.4.2",
-    "socket.io-client": "^2.0.4",
     "useful-wind": "^7.8.0",
     "useful-wind-serialize": "^1.4.0"
   },
