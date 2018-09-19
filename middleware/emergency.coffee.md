@@ -33,7 +33,7 @@ Then, see whether the destination number is an emergency number, and process it.
         @debug 'Emergency middleware: not an emergency rule.'
         return
 
-      @tag 'emergency'
+      # @tag 'emergency'
 
 * doc.location Translation of Emergency Locations into Emergency References
 * doc.location._id `location:<location-reference>`

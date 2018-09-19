@@ -124,14 +124,14 @@ On successful connection we also get `variable_originate_disposition=SUCCESS, va
               @debug "CallHandler: connected call: #{cause} when routing #{destination} through", gateway
               winner = gateway # Winner
               @session.winner = gateway
-              @tag 'answered'
+              # @tag 'answered'
 
             when @session.was_transferred
 
               @debug "CallHandler: transferred call: #{cause} when routing #{destination} through", gateway
               winner = gateway # Winner
               @session.winner = gateway
-              @tag 'transferred'
+              # @tag 'transferred'
 
             else
 
@@ -146,7 +146,7 @@ However we do not propagate errors, since it would mean interrupting the call se
 
       if not winner?
         @debug "CallHandler: No Route."
-        @tag 'failed'
+        # @tag 'failed'
         await @respond '604'
       else
         @debug "CallHandler: the winning gateway was", winner
