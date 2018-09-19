@@ -150,6 +150,8 @@ Server (Unit Under Test)
         sip_domain_name: sip_domain_name
         prefix_admin: ''
         redis: {}
+        blue_rings:
+          host: 'a'
         use: [
           'tangible/middleware'
           'huge-play/middleware/setup'

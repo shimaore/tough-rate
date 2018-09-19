@@ -239,6 +239,7 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
             'Channel-Destination-Number': destination
             'variable_ccnq_to_e164': ccnq_to_e164
             'variable_location': location
+          on: ->
           emit: ->
           command: ->
 
@@ -246,6 +247,7 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
         ctx.once ?= ->
           then: ->
         ctx.emit ?= ->
+        ctx.on ?= ->
         ready.then ->
           router = new Router cfg = {
             gateway_manager: gm
