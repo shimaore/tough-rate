@@ -9,6 +9,7 @@ Since this code rewrites the destination before resolving gateways, it must be c
 
     pkg = require '../package.json'
     @name = "#{pkg.name}:middleware:emergency"
+    {debug} = (require 'tangible') @name
     @init = ->
       assert @cfg.prov?, 'Missing `prov`.'
     @include = ->
@@ -18,10 +19,10 @@ Since this code rewrites the destination before resolving gateways, it must be c
       provisioning = @cfg.prov
 
       if not @res.rule?
-        @debug 'Emergency middleware: no rule is present. (ignored)'
+        debug 'Emergency middleware: no rule is present. (ignored)'
         return
       if not @res.ruleset_database?
-        @debug 'Emergency middleware: no ruleset_database is present. (ignored)'
+        debug 'Emergency middleware: no ruleset_database is present. (ignored)'
         return
 
 Then, see whether the destination number is an emergency number, and process it.
@@ -30,7 +31,7 @@ Then, see whether the destination number is an emergency number, and process it.
 * doc.destination.emergency (boolean) true if the rule is a route for an emergency number. See doc.location and doc.emergency for more information.
 
       if not @res.rule.emergency
-        @debug 'Emergency middleware: not an emergency rule.'
+        debug 'Emergency middleware: not an emergency rule.'
         return
 
       # @tag 'emergency'
@@ -48,15 +49,15 @@ If it isn't present, we try to retrieve it from the location reference.
       location_ref = @session.emergency_location
 
       if not emergency_ref? and location_ref?
-        @debug "Locating", {location_ref}
+        debug "Locating", {location_ref}
         doc = await provisioning
           .get "location:#{location_ref}"
           .catch (error) =>
-            @debug.dev "Could not locate #{location_ref}, call from #{@source} to #{@destination}: #{error.stack ? error}"
+            debug.dev "Could not locate #{location_ref}, call from #{@source} to #{@destination}: #{error.stack ? error}"
             {}
         emergency_ref = doc.routing_data
 
-      @debug "Using", {emergency_ref,@source,@destination}
+      debug "Using", {emergency_ref,@source,@destination}
 
       if emergency_ref?
         emergency_key = [@res.destination,emergency_ref].join '#'
@@ -73,12 +74,12 @@ If it isn't present, we try to retrieve it from the location reference.
           {}
 
       if not doc.destination?
-        @debug.dev "Emergency middleware: record for `#{emergency_key} has no `destination`."
+        debug.dev "Emergency middleware: record for `#{emergency_key} has no `destination`."
         return
 
 The `destination` field in a `emergency` record historically is the target, destination number, not a reference to a `destination` record.
 
-      @debug "Emergency middleware: routing call for `#{emergency_key}` to `#{doc.destination}`."
+      debug "Emergency middleware: routing call for `#{emergency_key}` to `#{doc.destination}`."
 
       destinations = doc.destination
       if typeof destinations is 'string'

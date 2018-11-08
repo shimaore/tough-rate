@@ -7,9 +7,10 @@ This middleware is called normally at the end of the stack to process the gatewa
 
     pkg = require '../package.json'
     @name = "#{pkg.name}:middleware:call-handler"
+    {debug} = (require 'tangible') @name
 
     @server_pre = ->
-      @debug 'Missing `profile`.' unless @cfg.profile?
+      debug 'Missing `profile`.' unless @cfg.profile?
 
     escape = (v) ->
       "#{v}".replace ',', ','
@@ -29,7 +30,7 @@ Returns an `esl` promise that completes when the call gets connected.
 
       attempt = (destination,gateway) =>
 
-        @debug "CallHandler: attempt", {destination,gateway}
+        debug "CallHandler: attempt", {destination,gateway}
 
         leg_options = @session?.leg_options ? {}
 
@@ -53,7 +54,7 @@ Sometimes we'll be provided with a pre-built URI (emergency calls, loopback call
         profile ?= @session.sip_profile
         profile ?= @cfg.profile
 
-        @debug "CallHandler: attempt -- bridge [#{leg_options_text}]sofia/#{profile}/#{uri}"
+        debug "CallHandler: attempt -- bridge [#{leg_options_text}]sofia/#{profile}/#{uri}"
         @action 'bridge', "{#{call_options_text}}[#{leg_options_text}]sofia/#{profile}/#{uri}"
 
 Middleware
@@ -66,7 +67,7 @@ The route-set might not be modified anymore.
 Do not process further if we already responded.
 
       if @session.call_failed?
-        @debug "Already responded", @session.first_response_was
+        debug "Already responded", @session.first_response_was
         return
 
 The `it` promise will return either a gateway, `false` if no gateway was found, or null if no gateway was successful.
@@ -90,7 +91,7 @@ Call attempt.
 
         try
 
-          @debug "CallHandler: handling (next) gateway", gateway
+          debug "CallHandler: handling (next) gateway", gateway
           @notify state: 'call-attempt'
 
           destination = gateway.destination_number ? @res.destination
@@ -98,7 +99,7 @@ Call attempt.
           @session.destination = destination
           res = await attempt destination, gateway
             .catch (error) =>
-              @debug "attempt error: #{error.stack ? error}"
+              debug "attempt error: #{error.stack ? error}"
               body: {}
           data = res.body
           @session.bridge_data ?= []
@@ -110,7 +111,7 @@ On successful connection we also get `variable_originate_disposition=SUCCESS, va
           @res.cause = cause = data?.variable_last_bridge_hangup_cause ? data?.variable_originate_disposition
 
           unless cause?
-            @debug.dev "CallHandler: Unable to parse reply"
+            debug.dev "CallHandler: Unable to parse reply"
             continue
 
           @session.was_connected = cause in ['NORMAL_CALL_CLEARING', 'NORMAL_CLEARING', 'SUCCESS']
@@ -121,35 +122,35 @@ On successful connection we also get `variable_originate_disposition=SUCCESS, va
           switch
             when @session.was_connected
 
-              @debug "CallHandler: connected call: #{cause} when routing #{destination} through", gateway
+              debug "CallHandler: connected call: #{cause} when routing #{destination} through", gateway
               winner = gateway # Winner
               @session.winner = gateway
               # @tag 'answered'
 
             when @session.was_transferred
 
-              @debug "CallHandler: transferred call: #{cause} when routing #{destination} through", gateway
+              debug "CallHandler: transferred call: #{cause} when routing #{destination} through", gateway
               winner = gateway # Winner
               @session.winner = gateway
               # @tag 'transferred'
 
             else
 
-              @debug "CallHandler: failed call: #{cause} when routing #{destination} through", gateway
+              debug "CallHandler: failed call: #{cause} when routing #{destination} through", gateway
               @emit "gateway:#{cause}", gateway
               # No winner yet
 
 However we do not propagate errors, since it would mean interrupting the call sequence. Since we didn't find any winner, we simply return `null`.
 
         catch error
-          @debug 'Internal or FreeSwitch error (ignored, skipping to next gateway): ', error.toString()
+          debug 'Internal or FreeSwitch error (ignored, skipping to next gateway): ', error.toString()
 
       if not winner?
-        @debug "CallHandler: No Route."
+        debug "CallHandler: No Route."
         # @tag 'failed'
         await @respond '604'
       else
-        @debug "CallHandler: the winning gateway was", winner
+        debug "CallHandler: the winning gateway was", winner
         @res.winner = winner
         @res.attr winner.attrs
 

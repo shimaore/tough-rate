@@ -3,14 +3,15 @@ Flatten the gateways
 
     pkg = require '../package.json'
     @name = "#{pkg.name}:middleware:flatten"
+    {debug} = (require 'tangible') @name
     @include = ->
 
       return unless @session?.direction is 'lcr'
 
-      @debug "Gateways before ops", @res.gateways
+      debug "Gateways before ops", @res.gateways
 
       unless @res.gateways?
-        @debug 'No gateways'
+        debug 'No gateways'
         return
 
 We must flatten the list so that CallHandler can use it.
@@ -34,9 +35,9 @@ We must flatten the list so that CallHandler can use it.
             @res.rule
           ]
 
-      @debug "Gateways after ops", @res.gateways
+      debug "Gateways after ops", @res.gateways
       @res.gateways = flatten @res.gateways
-      @debug "Gateways after flatten", @res.gateways
+      debug "Gateways after flatten", @res.gateways
       return
 
 Toolbox

@@ -1,5 +1,6 @@
     pkg = require '../package.json'
     @name = "#{pkg.name}:middleware:cdr"
+    {debug} = (require 'tangible') @name
     @include = ->
 
       return unless @session?.direction is 'lcr'

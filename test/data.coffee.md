@@ -258,7 +258,6 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
             profile: 'something-egress'
           }
           use = [
-            'tangible/middleware'
             'huge-play/middleware/setup'
             './standalone'
             '../middleware/setup'
@@ -331,7 +330,6 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
             cfg = {prov:provisioning,ruleset_of,sip_domain_name}
             router = new Router cfg
             cfg.use = [
-              'tangible/middleware'
               'huge-play/middleware/setup'
               './standalone'
               '../middleware/setup'
@@ -357,7 +355,6 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
           .then ->
             router = new Router cfg = {prov:provisioning,ruleset_of,sip_domain_name}
             use = [
-              'tangible/middleware'
               'huge-play/middleware/setup'
               './standalone'
               '../middleware/setup'
@@ -389,7 +386,6 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
           .then ->
             router = new Router cfg = {prov:provisioning,ruleset_of,sip_domain_name}
             use = [
-              'tangible/middleware'
               'huge-play/middleware/setup'
               './standalone'
               '../middleware/setup'
@@ -421,7 +417,6 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
           .then ->
             router = new Router cfg = {prov:provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name}
             use = [
-              'tangible/middleware'
               'huge-play/middleware/setup'
               './standalone'
               '../middleware/setup'
@@ -449,7 +444,6 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
           .then ->
             router = new Router cfg = {prov:provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name}
             use = [
-              'tangible/middleware'
               'huge-play/middleware/setup'
               './standalone'
               '../middleware/setup'
@@ -475,7 +469,6 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
           .then ->
             router = new Router cfg = {prov:provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name}
             use = [
-              'tangible/middleware'
               'huge-play/middleware/setup'
               './standalone'
               '../middleware/setup'
@@ -504,7 +497,6 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
               default_outbound_route:'default'
             }
             use = [
-              'tangible/middleware'
               'huge-play/middleware/setup'
               './standalone'
               '../middleware/setup'
@@ -538,7 +530,6 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
               default_outbound_route:'default'
             }
             use = [
-              'tangible/middleware'
               'huge-play/middleware/setup'
               './standalone'
               '../middleware/setup'
@@ -568,7 +559,6 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
               default_outbound_route:'default'
             }
             use = [
-              'tangible/middleware'
               'huge-play/middleware/setup'
               './standalone'
               '../middleware/setup'
@@ -604,7 +594,6 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
               default_outbound_route:'default'
             }
             use = [
-              'tangible/middleware'
               'huge-play/middleware/setup'
               './standalone'
               '../middleware/setup'

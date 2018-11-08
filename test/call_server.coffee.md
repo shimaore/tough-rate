@@ -153,7 +153,6 @@ Server (Unit Under Test)
         blue_rings:
           host: 'a'
         use: [
-          'tangible/middleware'
           'huge-play/middleware/setup'
           './catcher'
           './standalone'

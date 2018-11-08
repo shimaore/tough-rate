@@ -5,13 +5,14 @@ Mask errors in downstream handling. (Optional. Used by `huge-play`'s `@respond` 
 
     pkg = require '../package.json'
     @name = "#{pkg.name}:middleware:alternate-response"
+    {debug} = (require 'tangible') @name
 
     @include = ->
 
       return unless @session?.direction is 'lcr'
 
       @session.alternate_response = (response) =>
-        @debug 'Response', {response}
+        debug 'Response', {response}
         if response.match /^486/
           return @action 'respond', response
 
@@ -21,5 +22,5 @@ Mask errors in downstream handling. (Optional. Used by `huge-play`'s `@respond` 
         await @action 'respond', '486'
         await @action 'hangup', 'USER_BUSY'
 
-        @debug 'Response completed'
+        debug 'Response completed'
         return

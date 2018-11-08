@@ -1,5 +1,6 @@
     pkg = require '../package'
     @name = "#{pkg.name}:middleware:format-matcher"
+    {debug} = (require 'tangible') @name
 
     plans = require 'numbering-plans'
 

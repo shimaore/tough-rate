@@ -32,7 +32,7 @@
     "lru-cache": "^4.1.1",
     "nimble-direction": "^7.1.0",
     "numbering-plans": "^2.5.3",
-    "tangible": "^2.0.0"
+    "tangible": "^3.0.0"
   },
   "peerDependency": {
     "huge-play": ">=34.3.4",

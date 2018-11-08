@@ -6,13 +6,14 @@ This is based on the calling number.
 
     pkg = require '../package.json'
     @name = "#{pkg.name}:middleware:setup"
+    {debug} = (require 'tangible') @name
     @web = ->
       @cfg.versions[pkg.name] = pkg.version
     @include = (ctx) ->
 
       return unless @session?.direction is 'lcr'
 
-      @debug 'Starting LCR'
+      debug 'Starting LCR'
 
       ctx.res[k] ?= v for own k,v of {
         cause: null
@@ -87,10 +88,10 @@ Init
 Create the gateway-manager.
 
       unless @cfg.prov?
-        @debug.dev 'Missing cfg.prov.'
+        debug.dev 'Missing cfg.prov.'
         return
       unless @cfg.sip_domain_name?
-        @debug.dev 'Missing cfg.sip_domain_name.'
+        debug.dev 'Missing cfg.sip_domain_name.'
         return
 
 * cfg.gateway_manager In pkg:tough-rate, the object that manages gateways and carrier records.
@@ -100,7 +101,7 @@ Create the gateway-manager.
       await @cfg.gateway_manager.init()
       if @cfg.default?
         @cfg.gateway_manager.set @cfg.default
-      @debug.dev "Gateway Manager started"
+      debug.dev "Gateway Manager started"
       null
 
     assert = require 'assert'

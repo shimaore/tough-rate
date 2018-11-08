@@ -1,5 +1,6 @@
     pkg = require '../package'
     @name = "#{pkg.name}:middleware:use-session-gateways"
+    {debug} = (require 'tangible') @name
     @include = ->
 
       return unless @session?.direction is 'lcr'

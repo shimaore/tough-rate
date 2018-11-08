@@ -20,7 +20,7 @@ This plugin provides `registrant_host` as a gateway.
 
     update = (entry,source_doc) ->
       unless entry.source_registrant? and entry.source_registrant is true
-        @debug "Routes Registrant: entry is not source_registrant, skipping", entry
+        debug "Routes Registrant: entry is not source_registrant, skipping", entry
         return entry
 
       return if source_doc.disabled
@@ -35,10 +35,10 @@ This plugin provides `registrant_host` as a gateway.
       else
         address = source_doc.registrant_host
         unless address?
-          @debug 'No registrant_host for source in a route that requires registrant.', source_doc
+          debug 'No registrant_host for source in a route that requires registrant.', source_doc
           return result
 
-        @debug "Routes Registrant: mapping registrant", source_doc
+        debug "Routes Registrant: mapping registrant", source_doc
 
 Deprecated: doc.global_number.registrant_host (array)
 
@@ -66,11 +66,12 @@ Deprecated: doc.global_number.registrant_host (array)
 * session.ref_builder (function) Computes a data record for registrant routing; the first and only parameter is the provisioning database. Default: returns the doc.global_number provisioning record for `number:{@source}`.
 
     build_ref = (provisioning) ->
-      @debug "Routes Registrant build_ref locating #{@source}."
+      debug "Routes Registrant build_ref locating #{@source}."
       provisioning.get "number:#{@source}"
 
     pkg = require '../package.json'
     @name = "#{pkg.name}:middleware:routes-registrant"
+    {debug} = (require 'tangible') @name
     @init = ->
       assert @cfg.prov?, 'Missing `prov`.'
     @include = ->
@@ -81,7 +82,7 @@ Deprecated: doc.global_number.registrant_host (array)
       provisioning = @cfg.prov
 
       if @res.finalized()
-        @debug 'Routes Registrant: already finalized.'
+        debug 'Routes Registrant: already finalized.'
         return
 
       source_doc = await ref_builder
@@ -94,7 +95,7 @@ Deprecated: doc.global_number.registrant_host (array)
       .then (gws) =>
         @res.gateways = gws
       .catch (error) =>
-        @debug "Routes Registrant: #{error}"
+        debug "Routes Registrant: #{error}"
 
 Toolbox
 -------

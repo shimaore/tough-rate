@@ -1,5 +1,6 @@
     pkg = require '../package.json'
     @name = "#{pkg.name}:middleware:response-handlers"
+    {debug} = (require 'tangible') @name
 
     @include = ->
 
@@ -8,7 +9,7 @@
       gateway_manager = @cfg.gateway_manager
 
       unless gateway_manager?
-        @debug.dev 'Missing gateway manager'
+        debug.dev 'Missing gateway manager'
         return
 
       gateway_to_id = (gateway) ->
@@ -16,14 +17,14 @@
 Helper to report a gateway as faulty to the gateway manager.
 
       mark_gateway_as_faulty = (gateway) =>
-        @debug "Asking the gateway manager to mark gateway as faulty.", gateway.name
+        debug "Asking the gateway manager to mark gateway as faulty.", gateway.name
         if gateway.name?
           gateway_manager.mark_gateway_as_faulty gateway.name
 
 Helper to report a gateway as suspicious to the gateway manager.
 
       mark_gateway_as_suspicious = (gateway) =>
-        @debug "Asking the router to mark gateway as suspicious.", gateway.name
+        debug "Asking the router to mark gateway as suspicious.", gateway.name
         if gateway.name?
           gateway_manager.mark_gateway_as_suspicious gateway.name
 

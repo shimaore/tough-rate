@@ -16,6 +16,7 @@ Default `gwid` router plugin
 
     pkg = require '../package.json'
     @name = "#{pkg.name}:middleware:routes-gwid"
+    {debug} = (require 'tangible') @name
     @include = ->
 
       return unless @session?.direction is 'lcr'
@@ -23,14 +24,14 @@ Default `gwid` router plugin
       gateway_manager = @cfg.gateway_manager
 
       unless gateway_manager?
-        @debug.dev 'Missing gateway manager'
+        debug.dev 'Missing gateway manager'
         return
 
       if @res.finalized()
-        @debug 'Routes GwID: already finalized.'
+        debug 'Routes GwID: already finalized.'
         return
       unless @res.gateways?
-        @debug 'No gateways'
+        debug 'No gateways'
         return
       @res.gateways = await promise_all @res.gateways, (x) ->
         r = await update gateway_manager, x
@@ -38,7 +39,7 @@ Default `gwid` router plugin
           gw.destination_number ?= x.destination_number if x.destination_number?
         r
 
-      @debug 'Gateways', @res.gateways
+      debug 'Gateways', @res.gateways
       return
 
     assert = require 'assert'

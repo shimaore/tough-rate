@@ -7,6 +7,7 @@ Ruleset Loader
 
     pkg = require '../package.json'
     @name = "#{pkg.name}:middleware:ruleset"
+    {debug} = (require 'tangible') @name
     @init = ->
       assert @cfg.prov?, 'Missing `prov`.'
       assert @cfg.ruleset_of?, 'Missing `ruleset_of`.'
@@ -36,16 +37,16 @@ Route based on the route selected by the source, or using a default route.
       doc = await provisioning
         .get "number:#{source}"
         .catch (error) =>
-          @debug "RuleSet Middleware: error retrieving number:#{source}", error.stack ? error.toString()
+          debug "RuleSet Middleware: error retrieving number:#{source}", error.stack ? error.toString()
           {}
 
-      @debug "RuleSet Middleware: number:#{source} :", doc
+      debug "RuleSet Middleware: number:#{source} :", doc
       route = doc.outbound_route ? default_outbound_route
 
 Provisioning error
 
       unless route?
-        @debug.dev 'missing-route: No route available', {source}
+        debug.dev 'missing-route: No route available', {source}
         await @res.respond '485'
         return
 
@@ -55,20 +56,20 @@ Provisioning error
 Ruleset selection
 =================
 
-      @debug "RuleSet Middleware: loading ruleset_of", {source,route}
+      debug "RuleSet Middleware: loading ruleset_of", {source,route}
       {ruleset,ruleset_database} = await ruleset_of route
 
 Management error
 
       unless ruleset? and ruleset_database?
-        @debug.dev 'missing-ruleset: No ruleset available', {source,route:@res.route,ruleset,db:ruleset_database.name}
+        debug.dev 'missing-ruleset: No ruleset available', {source,route:@res.route,ruleset,db:ruleset_database.name}
         await @res.respond '500'
         return
 
       @res.ruleset = ruleset
       @res.ruleset_database = ruleset_database
 
-      @debug 'Using ruleset', {source,route:@res.route,ruleset,db:ruleset_database.name}
+      debug 'Using ruleset', {source,route:@res.route,ruleset,db:ruleset_database.name}
 
 Rule lookup
 ===========
@@ -82,7 +83,7 @@ Rule lookup
 Provisioning error or user error
 
       unless rule?
-        @debug.dev 'missing-rule: No route available', {source,destination:@res.destination,ruleset:@res.ruleset}
+        debug.dev 'missing-rule: No route available', {source,destination:@res.destination,ruleset:@res.ruleset}
         await @res.respond '485'
         return
 
@@ -97,11 +98,11 @@ Provisioning error or user error
 
 Missing gateway list is normal for e.g. emergency call routing.
 
-        @debug.dev 'missing-gwlist: Missing gwlist (ignored)', rule
+        debug.dev 'missing-gwlist: Missing gwlist (ignored)', rule
 
       @res.rule = rule
 
-      @debug 'Using rule', rule
+      debug 'Using rule', rule
 
 * doc.prefix.attrs (object) Extra attributes for this rule.
 * doc.destination.attrs (object) Extra attributes for this rule.
