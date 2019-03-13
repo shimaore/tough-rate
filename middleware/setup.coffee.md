@@ -9,13 +9,16 @@ This is based on the calling number.
     {debug} = (require 'tangible') @name
     @web = ->
       @cfg.versions[pkg.name] = pkg.version
-    @include = (ctx) ->
+    @include = ->
 
       return unless @session?.direction is 'lcr'
 
       debug 'Starting LCR'
 
-      ctx.res[k] ?= v for own k,v of {
+      session = @session
+      respond = (v) => @respond v
+
+      @res[k] ?= v for own k,v of {
         cause: null
         destination: @destination
         source: @source
@@ -28,59 +31,59 @@ This is based on the calling number.
         attrs: {}
 
         redirect: (destination) ->
-          if ctx.res.finalized()
+          if @finalized()
             debug.dev "`redirect` called when the route-set is already finalized"
             return
-          ctx.res.destination = destination
+          @destination = destination
 
         resource: (source) ->
-          if ctx.res.finalized()
+          if @finalized()
             debug.dev "`resource` called when the route-set is already finalized"
             return
-          ctx.res.source = source
+          @source = source
 
 Manipulate the gateways list.
 
         finalize: (callback) ->
-          if ctx.res.finalized()
+          if @finalized()
             debug.dev "`finalize` called when the route-set is already finalized"
             return
           debug 'finalizing'
-          ctx.res.__finalized = true
+          @__finalized = true
           callback?()
         finalized: ->
-          ctx.res.__finalized
+          @__finalized
 
         sendto: (uri,profile = null) ->
-          ctx.res.finalize ->
-            ctx.res.gateways = [{uri,profile}]
-            ctx.res.gateways[0]
+          @finalize =>
+            @gateways = [{uri,profile}]
+            @gateways[0]
 
         respond: (v) ->
-          ctx.res.finalize ->
-            ctx.res.gateways = []
-            ctx.session.call_failed = true
-            ctx.respond v
+          @finalize =>
+            @gateways = []
+            session.call_failed = true
+            respond v
 
         attempt: (gateway) ->
-          if ctx.res.finalized()
+          if @finalized()
             debug.dev "`attempt` called when the route-set is already finalized", gateway
             return
-          ctx.res.gateways.push gateway
+          @gateways.push gateway
 
         clear: ->
-          if ctx.res.finalized()
+          if @finalized()
             debug.dev "`clear` called when the route-set is already finalized"
             return
-          ctx.res.gateways = []
+          @gateways = []
 
         attr: (name,value) ->
           return unless name?
           if 'string' is typeof key
-            ctx.res.attrs[name] = value
+            @attrs[name] = value
           else
             for own n,v of name
-              ctx.res.attrs[n] = v
+              @attrs[n] = v
 
       }
 
