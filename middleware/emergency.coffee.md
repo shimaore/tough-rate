@@ -53,11 +53,18 @@ If it isn't present, we try to retrieve it from the location reference.
         doc = await provisioning
           .get "location:#{location_ref}"
           .catch (error) =>
-            debug.dev "Could not locate #{location_ref}, call from #{@source} to #{@destination}: #{error.stack ? error}"
+            debug.dev "Could not locate #{location_ref}, call from #{@res.source} to #{@res.destination}: #{error.stack ? error}"
             {}
         emergency_ref = doc.routing_data
 
-      debug "Using", {emergency_ref,@source,@destination}
+If the location provides an asserted-number, use it instead of the local-number's or endpoint's `asserted_number`.
+This overrides the value set in `huge-play/middleware/client/egress/post.coffee.md`.
+* doc.location.number (string, optional) The global-number associated with this emergency location, if any. When present, overrides the default doc.local_number.asserted_number or doc.src_endpoint.asserted_number when placing an emergency call.
+
+        if doc.number?
+          @res.resource doc.number
+
+      debug "Using", {emergency_ref,source:@res.source,destination:@res.destination}
 
       if emergency_ref?
         emergency_key = [@res.destination,emergency_ref].join '#'
@@ -65,8 +72,8 @@ If it isn't present, we try to retrieve it from the location reference.
         emergency_key = @res.destination
 
 * doc.emergency Emergency Reference document. Translates an Emergency Reference into a called number.
-* doc.emergency._id `emergency:<number>#<emergency-reference>` where `number` is the emergency called number (typically a special number such a `330112` to handle national routing), and `emergency-reference` is doc.location.routing_data.
-* doc.emergency.destination Translated emergency number.
+* doc.emergency._id `emergency:<number>#<emergency-reference>` where `number` is the emergency called number (typically a special number such a `33_112` to handle national routing), and `emergency-reference` is doc.location.routing_data.
+* doc.emergency.destination (string or array of strings) Translated emergency number(s).
 
       doc = await provisioning
         .get "emergency:#{emergency_key}"

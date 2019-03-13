@@ -66,8 +66,8 @@ Deprecated: doc.global_number.registrant_host (array)
 * session.ref_builder (function) Computes a data record for registrant routing; the first and only parameter is the provisioning database. Default: returns the doc.global_number provisioning record for `number:{@source}`.
 
     build_ref = (provisioning) ->
-      debug "Routes Registrant build_ref locating #{@source}."
-      provisioning.get "number:#{@source}"
+      debug "Routes Registrant build_ref locating #{@res.source}."
+      provisioning.get "number:#{@res.source}"
 
     pkg = require '../package.json'
     @name = "#{pkg.name}:middleware:routes-registrant"

@@ -41,6 +41,10 @@ Returns an `esl` promise that completes when the call gets connected.
           for h of gateway.headers
             leg_options["sip_h_#{h}"] = gateway.headers[h]
 
+        if gateway.source?
+          leg_options.effective_caller_id_number =
+          leg_options.origination_caller_id_number = gateway.source
+
         leg_options_text = make_params leg_options
 
         call_options = @session.call_options ? {}

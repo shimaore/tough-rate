@@ -114,6 +114,12 @@
           _id:'location:work'
           type:'location'
           routing_data:'paris'
+        'bob':
+          _id:'location:bob'
+          type:'location'
+          routing_data:'paris'
+          number: '2351'
+
 
       rules:
         default:
@@ -169,9 +175,10 @@
       toString: ->
         JSON.stringify @args
 
-    describe 'Once the database is loaded', ->
+    describe.only 'Once the database is loaded', ->
       dataset = dataset_1
       provisioning = null
+      rr = notify:->
       gm = null
 
 Note: normally `ruleset_of` would query provisioning to find the ruleset and then map it to its database.
@@ -276,6 +283,7 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
           router.use m for m in use
           cfg.dev_logger = true
           cfg.use = use
+          cfg.rr = rr
           serialize cfg, 'init'
           .then ->
             router.route ctx
@@ -329,6 +337,7 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
           .then ->
             cfg = {prov:provisioning,ruleset_of,sip_domain_name}
             router = new Router cfg
+            cfg.rr = rr
             cfg.use = [
               'huge-play/middleware/setup'
               './standalone'
@@ -540,6 +549,7 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
             ].map (m) -> require m
             router.use m for m in use
             cfg.use = use
+            cfg.rr = rr
             serialize cfg, 'init'
             .then ->
               router.route call_ '336718', '347766'
@@ -684,7 +694,7 @@ Gateways are randomized within carriers.
             command: (c,v) ->
               if c in ['set','export']
                 return Promise.resolve().bind this
-              v.should.equal '{}[sip_h_P-Charge-Info=sip:barf@pooh]sofia/something-egress/sip:bar@foo'
+              v.should.equal '{}[sip_h_P-Charge-Info=sip:barf@pooh,origination_caller_id_number=2346,effective_caller_id_number=2346]sofia/something-egress/sip:bar@foo'
               c.should.equal 'bridge'
               done()
               Promise.resolve
@@ -707,7 +717,7 @@ Gateways are randomized within carriers.
             command: (c,v) ->
               if c in ['set','export']
                 return Promise.resolve().bind this
-              v.should.match /// \[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800\]sofia/something-egress/sip:336727@127.0.0.1:506[89] /// # randomized
+              v.should.match /// \[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800,origination_caller_id_number=2347,effective_caller_id_number=2347\]sofia/something-egress/sip:336727@127.0.0.1:506[89] /// # randomized
               c.should.equal 'bridge'
               done()
               Promise.resolve
@@ -730,7 +740,7 @@ Gateways are randomized within carriers.
             command: (c,v) ->
               if c in ['set','export']
                 return Promise.resolve().bind this
-              v.should.match /// \[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800\]sofia/something-egress/sip:3368267@127.0.0.1:506[89] /// # randomized
+              v.should.match /// \[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800,origination_caller_id_number=2348,effective_caller_id_number=2348\]sofia/something-egress/sip:3368267@127.0.0.1:506[89] /// # randomized
               c.should.equal 'bridge'
               done()
               Promise.resolve
@@ -752,7 +762,7 @@ Gateways are randomized within carriers.
                 success = true
               if c in ['set','export']
                 return Promise.resolve().bind this
-              v.should.match /// \[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800\]sofia/something-egress/sip:331234@127.0.0.1:506[89] /// # randomized
+              v.should.match /// \[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800,origination_caller_id_number=2348,effective_caller_id_number=2348\]sofia/something-egress/sip:331234@127.0.0.1:506[89] /// # randomized
               c.should.equal 'bridge'
               if success
                 done()
@@ -774,7 +784,7 @@ Gateways are randomized within carriers.
             command: (c,v) ->
               if c in ['set','export']
                 return Promise.resolve().bind this
-              v.should.match /// \[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800\]sofia/something-egress/sip:331234@127.0.0.1:506[89] /// # randomized
+              v.should.match /// \[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800,origination_caller_id_number=2348,effective_caller_id_number=2348\]sofia/something-egress/sip:331234@127.0.0.1:506[89] /// # randomized
               c.should.equal 'bridge'
               Promise.resolve
                 body:
@@ -847,7 +857,7 @@ Gateways are randomized within carriers.
             command: (c,v) ->
               if c is 'set' or c is 'export'
                 return Promise.resolve().bind this
-              v.should.match /// \[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800\]sofia/something-egress/sip:33156@127.0.0.1:506[89] ///
+              v.should.match /// \[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800,origination_caller_id_number=2348,effective_caller_id_number=2348\]sofia/something-egress/sip:33156@127.0.0.1:506[89] ///
               c.should.equal 'bridge'
               done()
               Promise.resolve
@@ -855,6 +865,25 @@ Gateways are randomized within carriers.
                   variable_last_bridge_hangup_cause: 'NORMAL_CALL_CLEARING'
           one_call ctx, 'default'
           null
+
+        it 'should route emergency (with location number)', (done) ->
+          ctx =
+            data:
+              'Channel-Destination-Number': '33_112'
+              'Channel-Caller-ID-Number': '2350'
+              'variable_location':'bob'
+            command: (c,v) ->
+              if c is 'set' or c is 'export'
+                return Promise.resolve().bind this
+              v.should.match /// \[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800,origination_caller_id_number=2351,effective_caller_id_number=2351\]sofia/something-egress/sip:33158@127.0.0.1:506[89] ///
+              c.should.equal 'bridge'
+              done()
+              Promise.resolve
+                body:
+                  variable_last_bridge_hangup_cause: 'NORMAL_CALL_CLEARING'
+          one_call ctx, 'default'
+          null
+
 
     describe.skip 'The Call Handler', ->
       it 'should handle additional headers', ->

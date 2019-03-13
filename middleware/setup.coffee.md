@@ -17,7 +17,8 @@ This is based on the calling number.
 
       ctx.res[k] ?= v for own k,v of {
         cause: null
-        destination: @destination # aka final_destination
+        destination: @destination
+        source: @source
         __finalized: false
 
 `gateways` is an array that either contains gateways, or arrays of gateways
@@ -27,7 +28,16 @@ This is based on the calling number.
         attrs: {}
 
         redirect: (destination) ->
+          if ctx.res.finalized()
+            debug.dev "`redirect` called when the route-set is already finalized"
+            return
           ctx.res.destination = destination
+
+        resource: (source) ->
+          if ctx.res.finalized()
+            debug.dev "`resource` called when the route-set is already finalized"
+            return
+          ctx.res.source = source
 
 Manipulate the gateways list.
 

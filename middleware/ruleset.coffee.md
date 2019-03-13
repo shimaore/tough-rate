@@ -30,7 +30,7 @@ This is based on the calling number.
 
 Route based on the route selected by the source, or using a default route.
 
-      source = @source
+      source = @res.source
 
 * doc.global_number.outbound_route (number) Route used for Least Cost Routing (LCR).
 

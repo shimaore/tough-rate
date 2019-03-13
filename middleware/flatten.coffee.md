@@ -20,7 +20,7 @@ We must flatten the list so that CallHandler can use it.
         if isArray gateway
           gateway.map (gateway) =>
             field_merger [
-              {destination:@res.destination}
+              {destination:@res.destination,source:@res.source}
               @res.extra
               gateway
               @res.ruleset
@@ -28,7 +28,7 @@ We must flatten the list so that CallHandler can use it.
             ]
         else
           field_merger [
-            {destination:@res.destination}
+            {destination:@res.destination,source:@res.source}
             @res.extra
             gateway
             @res.ruleset
