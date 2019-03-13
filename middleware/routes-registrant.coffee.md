@@ -72,14 +72,12 @@ Deprecated: doc.global_number.registrant_host (array)
     pkg = require '../package.json'
     @name = "#{pkg.name}:middleware:routes-registrant"
     {debug} = (require 'tangible') @name
-    @init = ->
-      assert @cfg.prov?, 'Missing `prov`.'
     @include = ->
 
       return unless @session?.direction is 'lcr'
 
       ref_builder = @session.ref_builder ? build_ref
-      provisioning = @cfg.prov
+      provisioning = new CouchDB (Nimble @cfg).provisioning
 
       if @res.finalized()
         debug 'Routes Registrant: already finalized.'
@@ -102,3 +100,5 @@ Toolbox
 
     assert = require 'assert'
     promise_all = require '../promise-all'
+    Nimble = require 'nimble-direction'
+    CouchDB = require 'most-couchdb'

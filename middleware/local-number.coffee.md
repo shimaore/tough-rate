@@ -5,14 +5,11 @@ Local number middleware
     @name = "#{pkg.name}:middleware:local-number"
     {debug} = (require 'tangible') @name
 
-    @init = ->
-      assert @cfg.prov?, 'Missing `prov`.'
-
     @include = () ->
 
       return unless @session?.direction is 'lcr'
 
-      provisioning = @cfg.prov
+      provisioning = new CouchDB (Nimble @cfg).provisioning
 
       return if @res.finalized()
 
@@ -45,3 +42,5 @@ Toolbox
 
     assert = require 'assert'
     url = require 'url'
+    Nimble = require 'nimble-direction'
+    CouchDB = require 'most-couchdb'

@@ -10,13 +10,11 @@ Since this code rewrites the destination before resolving gateways, it must be c
     pkg = require '../package.json'
     @name = "#{pkg.name}:middleware:emergency"
     {debug} = (require 'tangible') @name
-    @init = ->
-      assert @cfg.prov?, 'Missing `prov`.'
     @include = ->
 
       return unless @session?.direction is 'lcr'
 
-      provisioning = @cfg.prov
+      provisioning = new CouchDB (Nimble @cfg).provisioning
 
       if not @res.rule?
         debug 'Emergency middleware: no rule is present. (ignored)'
@@ -122,3 +120,5 @@ If multiple destination numbers are present, we cannot afford to try all combina
 Toolbox
 
     assert = require 'assert'
+    Nimble = require 'nimble-direction'
+    CouchDB = require 'most-couchdb'

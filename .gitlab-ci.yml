@@ -1,12 +1,16 @@
 image: node:alpine
 
-build:
+test:
   services:
   - redis
+  - couchdb
+  variables:
+    COUCHDB_USER: admin
+    COUCHDB_PASSWORD: password
   before_script:
   - apk add docker
-  - docker pull shimaore/docker.freeswitch
+  - docker pull gitlab.k-net.fr:1234/ccnq/docker.freeswitch:4.4.0
   script:
   - npm install
   - npm audit
-  - DEBUG='*' npm test
+  - npm test

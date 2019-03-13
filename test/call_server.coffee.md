@@ -11,6 +11,7 @@ Live test with FreeSwitch
     pkg = require '../package.json'
     debug = (require 'debug') "#{pkg.name}:test:call_server"
     CaringBand = require 'caring-band'
+    os = require 'os'
 
     sleep = (timeout) -> new Promise (resolve) -> setTimeout resolve, timeout
 
@@ -32,13 +33,23 @@ Parameters for docker.io image
     server = null
     catcher = null
 
+    db_base = "http://#{process.env.COUCHDB_USER}:#{process.env.COUCHDB_PASSWORD}@couchdb:5984/"
+
 Setup
 =====
+
+    address = null
+    for intf,mappings of os.networkInterfaces() when not intf.match /^(docker|veth)/
+      for val in mappings when val.family is 'IPv4' and not val.internal
+        address ?= val.address
+
+    debug 'Selected IP', address
 
     ready = ->
       debug 'ready'
       cfg =
         test: yes
+        socket_ip: address
         profiles:
           'test-sender':
             sip_port: 5062
@@ -49,7 +60,7 @@ Setup
             local_ip: '127.0.0.1'
             socket_port: 7004 # Outbound-Socket port
         acls:
-          default: [ '127.0.0.0/8', '0.0.0.0/0' ]
+          default: [ '0.0.0.0/0' ]
         socket_ip: '0.0.0.0'
         socket_acl: 'default'
       xml = (require 'huge-play/conf/freeswitch') cfg
@@ -65,9 +76,20 @@ Setup
       console.error stderr
 
       console.log "docker run"
-      child = spawn 'docker', ['run', '-i', '-p', '5722:5722', '--name', p, 'shimaore/docker.freeswitch', 'bash', '-c',
+      child = spawn 'docker', ['run', '-i', '-p', '5722:5722', '--name', p, 'gitlab.k-net.fr:1234/ccnq/docker.freeswitch:4.4.0', 'bash', '-c',
         'tee /opt/freeswitch/etc/freeswitch/freeswitch.xml && /opt/freeswitch/bin/freeswitch -nf -nosql -nonat -nonatmap -nocal -nort -c'],
-        stdio: ['pipe',process.stderr,process.stderr]
+        # stdio: ['pipe',process.stdout,process.stderr]
+        stdio: ['pipe','ignore','ignore']
+      child.on 'close', (code,signal) ->
+        debug 'FreeSwitch ended', code, signal
+      ###
+      xml = xml.replace '<param name="loglevel" value="err"/>',
+                        '<param name="loglevel" value="debug"/>'
+      ###
+
+      xml = xml.replace /socket:127\.0\.0\.1:(\d+) async full/g,
+                        "socket:#{address}:$1 async full"
+
       child.stdin.end xml, 'utf-8'
 
       console.log "docker ps"
@@ -87,15 +109,19 @@ Setup
       server = await start_server()
       debug 'Start server OK, waiting...'
       await sleep 10000
+
+      console.log "docker ps"
+      {stdout,stderr} = await exec "docker ps"
+      console.log stdout
+      console.error stderr
       debug 'Start server OK, done.'
+
       null
 
 Server (Unit Under Test)
 ========================
 
-    PouchDB = require 'ccnq4-pouchdb'
-      .plugin require 'pouchdb-adapter-memory'
-      .defaults adapter: 'memory'
+    CouchDB = require './most-couchdb'
     FS = require 'esl'
     options = null
 
@@ -103,9 +129,11 @@ Server (Unit Under Test)
       debug 'start_server'
       provisioning = null
       sip_domain_name = 'phone.local'
-      await new PouchDB('live-provisioning').destroy().catch -> true
-      await new PouchDB('the_default_live_ruleset').destroy().catch -> true
-      provisioning = new PouchDB 'live-provisioning'
+      provisioning = new CouchDB db_base+'live-provisioning'
+      ruleset = new CouchDB db_base+'the_default_live_ruleset'
+      await provisioning.destroy().catch -> true
+      await ruleset.destroy().catch -> true
+      await provisioning.create()
       await provisioning.bulkDocs [
         {
           _id:'gateway:phone.local:gw1'
@@ -140,7 +168,7 @@ Server (Unit Under Test)
           registrant_host: "#{domain_name}:5064"
         }
       ]
-      ruleset = new PouchDB 'the_default_live_ruleset'
+      await ruleset.create()
       await ruleset.bulkDocs [
         {
           _id:'prefix:331'
@@ -163,10 +191,10 @@ Server (Unit Under Test)
         provisioning.get "ruleset:#{sip_domain_name}:#{x}"
         .then (doc) ->
           ruleset: doc
-          ruleset_database: new PouchDB doc.database
+          ruleset_database: new CouchDB db_base + doc.database, true
 
       options =
-        prov: provisioning
+        provisioning: db_base+'live-provisioning'
         profile: 'huge-play-test-sender-egress'
         host: 'example.net'
         ruleset_of: ruleset_of
@@ -198,7 +226,7 @@ Server (Unit Under Test)
       debug 'Declaring Catcher'
       catcher = (require 'esl').server ->
         @command 'answer'
-      catcher.listen 7004
+      catcher.listen 7004, address
 
       debug 'Declaring Server'
       ctx = cfg: options
@@ -206,7 +234,7 @@ Server (Unit Under Test)
         await m.server_pre?.call ctx
       CallServer = require 'useful-wind/call_server'
       s = new CallServer options
-      s.listen 7002
+      s.listen 7002, address
       debug 'start_server done'
       s
 
@@ -217,8 +245,8 @@ Test
 
       @timeout 21000
       before ->
-        @timeout 40000
-        ready()
+        @timeout 60000
+        await ready()
 
       describe 'FreeSwitch', ->
         it 'should process a regular call', (done) ->

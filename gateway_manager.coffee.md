@@ -55,21 +55,22 @@ The gateway manager provides services to the call handler.
 
           await sleep 1000
 
-          {rows} = await @provisioning
-            .allDocs startkey:"carrier:#{@sip_domain_name}:", endkey:"carrier:#{@sip_domain_name};", include_docs:yes
-            .catch -> rows:null
+          rows = @provisioning.queryStream null, '_all_docs',
+            startkey: "carrier:#{@sip_domain_name}:"
+            endkey: "carrier:#{@sip_domain_name};"
+            include_docs:yes
           carrier_rows = rows
 
-          {rows} = await @provisioning
-            .query "#{design}/gateways", startkey:[@sip_domain_name], endkey:[@sip_domain_name,{}]
-            .catch -> rows:null
+          rows = @provisioning.queryStream design, 'gateways',
+            startkey: [@sip_domain_name]
+            endkey: [@sip_domain_name,{}]
           gateway_rows = rows
 
-        for row in carrier_rows when row.doc?
+        for await row from carrier_rows when row.doc?
           await @_merge_carrier row.doc
 
-        for row in gateway_rows when row.value?
-          do (row) => @_merge_gateway row.value
+        for await row from gateway_rows when row.value?
+          await @_merge_gateway row.value
 
         debug 'GatewayManager init completed', {@sip_domain_name,@gateways,@carriers}
         return
@@ -120,11 +121,11 @@ The gateway manager provides services to the call handler.
 
       _reevaluate_gateways: (gateway_names) ->
         debug 'GatewayManager reevaluate gateways', gateway_names
-        {rows} = await @provisioning
-          .query "#{design}/gateways", keys:gateway_names.map (x) => [@sip_domain_name,x]
+        rows = @provisioning.query design, 'gateways',
+          keys:gateway_names.map (x) => [@sip_domain_name,x]
 
-        for row in rows when row.value?
-          do (row) => @_merge_gateway row.value
+        for await row from rows when row.value?
+          await @_merge_gateway row.value
 
 * doc.carrier.carrierid (string,required) identifier for the carrier, used in doc.carrier._id
 * doc.carrier.disabled (boolean) optional field to mark the carrier as non-existent

@@ -1,7 +1,6 @@
-    PouchDB = require 'ccnq4-pouchdb'
+    CouchDB = require 'most-couchdb'
     assert = require 'assert'
-    nimble = require 'nimble-direction'
-    LRU = require 'lru-cache'
+    Nimble = require 'nimble-direction'
     pkg = require '../package.json'
 
     @name = "#{pkg.name}:middleware:server"
@@ -15,36 +14,28 @@
 
       debug "Booting #{pkg.name} #{pkg.version}."
 
+      nimble = Nimble cfg
+      prov = new CouchDB nimble.provisioning
+
 `ruleset_of`
 ------------
 
 Retrieve the ruleset (and ruleset database) for the given ruleset name.
 
       if cfg.prefix_local?
+        {prefix_local} = cfg
 
-Use a cache since the calls to `ruleset_of()` seem to not release the databases.
-
-        cache = new LRU
-          max: cfg.ruleset_database_cache_size ? 100
-          dispose: (key,value) ->
-            debug 'Dispose of', key
-            value?.close?()
-
-        get_db = (name) ->
-          db = cache.get name
-          return db if db?
-          db = new PouchDB name, prefix: cfg.prefix_local
-          cache.set name, db
-          db
+        unless prefix_local.match /\/$/
+          prefix_local += '/'
 
         cfg.ruleset_of = (x) =>
-          cfg.prov.get "ruleset:#{cfg.sip_domain_name}:#{x}"
+          prov.get "ruleset:#{cfg.sip_domain_name}:#{x}"
           .then (doc) =>
             if not doc.database?
               debug "Ruleset #{cfg.sip_domain_name}:#{x} should have a database field."
               return {}
 
-            db = get_db doc.database
+            db = new CouchDB prefix_local + doc.database, true
 
             data =
               ruleset: doc
@@ -61,5 +52,3 @@ We _must_ return an object, even if an error occurred. The router will detect no
         cfg.ruleset_of = =>
           debug "#{pkg.name} #{pkg.version}: `ruleset_of` was called but no `prefix_local` was present in the configuration."
           {}
-
-      nimble cfg

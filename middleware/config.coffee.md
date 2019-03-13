@@ -1,6 +1,6 @@
-    PouchDB = require 'ccnq4-pouchdb'
+    CouchDB = require 'most-couchdb'
     assert = require 'assert'
-    nimble = require 'nimble-direction'
+    Nimble = require 'nimble-direction'
     GatewayManager = require '../gateway_manager'
     pkg = require '../package.json'
 
@@ -16,7 +16,8 @@
 Configure CouchDB
 =================
 
-      await nimble cfg
+      nimble = await Nimble cfg
+      prov = new CouchDB nimble.provisioning
 
 Push the GatewayManager design document to the local provisioning database
 --------------------------------------------------------------------------
@@ -32,22 +33,22 @@ We do not throw, the error might be a 409, in which case it means another proces
 Push the `tough-rate` design document to the master provisioning database
 -------------------------------------------------------------------------
 
-      await cfg.reject_tombstones(cfg.prov).catch (error) =>
+      await nimble.reject_tombstones(prov).catch (error) =>
         debug.dev 'Reject tombstones failed (ignored)', error.stack ? JSON.stringify error
-      await cfg.reject_types(cfg.prov).catch (error) =>
+      await cfg.reject_types(prov).catch (error) =>
         debug.dev 'Reject types failed (ignored)', error.stack ? JSON.stringify error
 
       unless await cfg.replicate 'provisioning'
         throw new Error "Unable to start replication of the provisioning database."
 
-      source = new PouchDB "#{cfg.prefix_source}/provisioning"
+      source = new CouchDB "#{cfg.prefix_source}/provisioning"
       debug "Querying for rulesets on master database."
-      {rows} = await source.allDocs
+      rows = source.query_stream null, '_all_docs',
         startkey: "ruleset:#{cfg.sip_domain_name}:"
         endkey: "ruleset:#{cfg.sip_domain_name};"
         include_docs: true
 
-      for row in rows when row.doc?.database?
+      for await row from rows when row.doc?.database?
         debug "Going to replicate #{row.doc.database}"
         unless await cfg.replicate row.doc.database
           throw new Error "Unable to start replication of #{row.doc.database} database."

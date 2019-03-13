@@ -100,16 +100,18 @@ Init
 
 Create the gateway-manager.
 
-      unless @cfg.prov?
-        debug.dev 'Missing cfg.prov.'
+      nimble = Nimble @cfg
+      unless nimble.provisioning?
+        debug.dev 'Missing provisioning.'
         return
+      prov = new CouchDB nimble.provisioning
       unless @cfg.sip_domain_name?
         debug.dev 'Missing cfg.sip_domain_name.'
         return
 
 * cfg.gateway_manager In pkg:tough-rate, the object that manages gateways and carrier records.
 
-      @cfg.gateway_manager = new GatewayManager @cfg.prov, @cfg.sip_domain_name
+      @cfg.gateway_manager = new GatewayManager prov, @cfg.sip_domain_name
 
       await @cfg.gateway_manager.init()
       if @cfg.default?
@@ -119,3 +121,5 @@ Create the gateway-manager.
 
     assert = require 'assert'
     GatewayManager = require '../gateway_manager'
+    Nimble = require 'nimble-direction'
+    CouchDB = require 'most-couchdb'

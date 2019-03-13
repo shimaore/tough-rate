@@ -17,18 +17,16 @@
     "coffeescript": "^2",
     "debug": "^4.1.1",
     "esl": "^9.0.0",
-    "huge-play": ">=36.4.0",
+    "huge-play": ">=39.0.0",
     "into-stream": "^3.1.0",
     "mocha": "^6.0.2",
-    "pouchdb-adapter-memory": "^7.0.0",
     "useful-wind": "^7.8.0",
     "useful-wind-serialize": "^1.4.0"
   },
   "dependencies": {
     "acoustic-line": "^1.9.0",
-    "ccnq4-pouchdb": "^1.0.0",
     "coffeescript-helpers": "^2.2.0",
-    "lru-cache": "^5.1.1",
+    "most-couchdb": "^2.0.0",
     "nimble-direction": "^9.0.1",
     "numbering-plans": "^2.5.3",
     "tangible": "^3.0.0"

@@ -5,6 +5,7 @@
     pkg = require '../package'
 
     sleep = (timeout) -> new Promise(resolve) -> setTimeout resolve, timeout
+    db_base = "http://#{process.env.COUCHDB_USER}:#{process.env.COUCHDB_PASSWORD}@couchdb:5984/"
 
     sip_domain_name = 'phone.local'
     dataset_1 =
@@ -120,10 +121,26 @@
           routing_data:'paris'
           number: '2351'
 
+      number:
+        '2348':
+          _id:'number:2348'
+          outbound_route: 'default'
+        '2349':
+          _id:'number:2349'
+          outbound_route: 'default'
+        '2350':
+          _id:'number:2350'
+          outbound_route: 'default'
+        '3213':
+          _id:'number:3213'
+          outbound_route: 'registrant'
+        '336718':
+          _id:'number:336718'
+          outbound_route: 'default'
 
       rules:
         default:
-          33:
+          '33':
             _id:'prefix:33'
             type:'prefix'
             prefix:'33'
@@ -131,7 +148,7 @@
             attrs:
               cdr: 'foo-bar'
 
-          336:
+          '336':
             _id:'prefix:336'
             type:'prefix'
             prefix:'336'
@@ -147,7 +164,7 @@
             emergency:true
 
         registrant:
-          33:
+          '33':
             _id:'prefix:33'
             type:'prefix'
             prefix:'33'
@@ -157,9 +174,7 @@
 
     {expect} = chai = require 'chai'
     chai.should()
-    PouchDB = require 'ccnq4-pouchdb'
-      .plugin require 'pouchdb-adapter-memory'
-      .defaults adapter: 'memory'
+    CouchDB = require './most-couchdb'
     pkg = require '../package.json'
     GatewayManager = require '../gateway_manager'
     Router = require 'useful-wind/router'
@@ -175,7 +190,7 @@
       toString: ->
         JSON.stringify @args
 
-    describe.only 'Once the database is loaded', ->
+    describe 'Once the database is loaded', ->
       dataset = dataset_1
       provisioning = null
       rr = notify:->
@@ -188,56 +203,48 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
           throw "Unknown ruleset #{x}"
         response =
           ruleset: dataset.rulesets[x]
-          ruleset_database: new PouchDB dataset.rulesets[x].database
+          ruleset_database: new CouchDB db_base + dataset.rulesets[x].database
         Promise.resolve response
 
-      ready = Promise.resolve true
-      .then ->
-        new PouchDB 'provisioning'
-        .destroy()
-      .then ->
-        provisioning = new PouchDB 'provisioning'
+      before ->
+        @timeout 4000
+        provisioning = new CouchDB db_base + 'provisioning'
+        await provisioning.destroy().catch -> yes
+        await provisioning.create()
         records = []
         (records.push v) for k,v of dataset.gateways
         (records.push v) for k,v of dataset.carriers
         (records.push v) for k,v of dataset.emergency
         (records.push v) for k,v of dataset.location
-        provisioning.bulkDocs records
+        (records.push v) for k,v of dataset.number
+        console.log await provisioning.bulkDocs records
 
-      ready = ready.then ->
-        new PouchDB dataset.rulesets.default.database
-        .destroy()
-      .then ->
-        default_ruleset = new PouchDB dataset.rulesets.default.database
+        default_ruleset = new CouchDB db_base + dataset.rulesets.default.database
+        await default_ruleset.destroy().catch -> yes
+        await default_ruleset.create()
         records = []
         (records.push v) for k,v of dataset.rules.default
         (records.push v) for k,v of dataset.destinations
-        default_ruleset.bulkDocs records
+        await default_ruleset.bulkDocs records
 
-      ready = ready.then ->
-        new PouchDB dataset.rulesets.registrant.database
-        .destroy()
-      .then ->
-        the_ruleset = new PouchDB dataset.rulesets.registrant.database
+        the_ruleset = new CouchDB db_base + dataset.rulesets.registrant.database
+        await the_ruleset.destroy().catch -> yes
+        await the_ruleset.create()
         rules = []
         (rules.push v) for k,v of dataset.rules.registrant
-        the_ruleset.bulkDocs rules
+        await the_ruleset.bulkDocs rules
 
-      ready = ready.then ->
         GatewayManager.should.have.property 'couch'
         GatewayManager.couch.should.have.property 'views'
         GatewayManager.couch.views.should.have.property 'gateways'
         GatewayManager.couch.views.gateways.should.have.property 'map'
-        provisioning.put GatewayManager.couch
-      .then ->
-        provisioning.get "_design/#{pkg.name}-gateway-manager"
-      .then (doc) ->
-          doc.should.have.property 'views'
-          doc.views.should.have.property 'gateways'
-      .then ->
+        await provisioning.put GatewayManager.couch
+        doc = await provisioning.get "_design/#{pkg.name}-gateway-manager"
+        doc.should.have.property 'views'
+        doc.views.should.have.property 'gateways'
         gm = new GatewayManager provisioning, 'phone.local'
-        gm.set 'progress_timeout', 4
-        gm.init()
+        await gm.set 'progress_timeout', 4
+        await gm.init()
 
       call_ = (source,destination,location,ccnq_to_e164) ->
         call =
@@ -255,389 +262,357 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
           then: ->
         ctx.emit ?= ->
         ctx.on ?= ->
-        ready.then ->
+        router = new Router cfg = {
+          gateway_manager: gm
+          prov: provisioning
+          ruleset_of
+          sip_domain_name
+          default_outbound_route: outbound_route
+          profile: 'something-egress'
+        }
+        use = [
+          'huge-play/middleware/setup'
+          './standalone'
+          '../middleware/setup'
+          '../middleware/numeric'
+          '../middleware/response-handlers'
+          '../middleware/local-number'
+          '../middleware/ruleset'
+          '../middleware/emergency'
+          '../middleware/routes-gwid'
+          '../middleware/routes-carrierid'
+          '../middleware/routes-registrant'
+          '../middleware/flatten'
+          '../middleware/cdr'
+          '../middleware/call-handler'
+        ].map (m) -> require m
+        router.use m for m in use
+        cfg.dev_logger = true
+        cfg.use = use
+        cfg.rr = rr
+        cfg.prefix_admin = db_base.replace /\/$/, ''
+        await serialize cfg, 'init'
+        await router.route ctx
+
+      describe 'Gateways', ->
+        it 'should have progress_timeout from their carrier: gw1', ->
+          doc = await gm.resolve_gateway 'gw1'
+          doc.should.have.length 1
+          doc.should.be.an.instanceOf Array
+          doc.should.have.property 0
+          doc[0].should.have.property 'progress_timeout'
+          doc[0].progress_timeout.should.equal dataset.carriers.the_phone_company.progress_timeout
+          doc[0].should.have.property 'timezone', 'US/Eastern'
+          doc[0].should.have.property 'ratings'
+          doc[0].should.have.property 'codecs', 'PCMA'
+
+        it 'should have progress_timeout from their carrier: gw2', ->
+          doc = await  gm.resolve_gateway 'gw2'
+          doc.should.have.length 1
+          doc.should.be.an.instanceOf Array
+          doc.should.have.property 0
+          doc[0].should.have.property 'gwid', 'gw2'
+          doc[0].should.have.property 'progress_timeout'
+          doc[0].progress_timeout.should.equal dataset.carriers.the_phone_company.progress_timeout
+          doc[0].should.have.property 'timezone', 'US/Central'
+
+      describe 'the_phone_company', ->
+        it 'should return its gateways', ->
+          info = await gm.resolve_carrier 'the_phone_company'
+          expect(info).be.an.instanceOf Array
+          info.should.have.length 2
+          info.should.have.property 0
+          info[0].should.have.property 'gwid', 'gw1'
+          info[0].should.have.property 'timezone', 'US/Eastern'
+          info.should.have.property 1
+          info[1].should.have.property 'gwid', 'gw2'
+          info[1].should.have.property 'timezone', 'US/Central'
+
+      describe 'The call router', ->
+        it 'should NOT route invalid local numbers', ->
+          await provisioning.put _id:'number:1234',inbound_uri:'sip:foo@bar'
+          cfg = {prov:provisioning,ruleset_of,sip_domain_name}
+          router = new Router cfg
+          cfg.rr = rr
+          cfg.prefix_admin = db_base.replace /\/$/, ''
+          cfg.use = [
+            'huge-play/middleware/setup'
+            './standalone'
+            '../middleware/setup'
+            '../middleware/local-number'
+            '../middleware/ruleset'
+            '../middleware/flatten'
+          ].map (m) -> require m
+          router.use m for m in cfg.use
+          await serialize cfg, 'init'
+          ctx = await router.route call_ '3213', '1234'
+          ctx.should.have.property 'res'
+          ctx.res.should.have.property 'gateways'
+          ctx.session.should.not.have.property 'destination_onnet'
+          gws = ctx.res.gateways
+          gws.should.be.an.instanceOf Array
+          gws.should.have.length 0
+
+        it 'should route ccnq_to_e164', ->
+          await provisioning.put _id:'number:1244',inbound_uri:'sip:foo@bar', account:'boo'
+          router = new Router cfg = {prov:provisioning,ruleset_of,sip_domain_name}
+          use = [
+            'huge-play/middleware/setup'
+            './standalone'
+            '../middleware/setup'
+            '../middleware/use-ccnq-to-e164'
+            '../middleware/local-number'
+            '../middleware/ruleset'
+            '../middleware/flatten'
+          ].map (m) -> require m
+          router.use m for m in use
+          cfg.use = use
+          cfg.rr = rr
+          cfg.prefix_admin = db_base
+          await serialize cfg, 'init'
+          ctx = await router.route call_ '3213', 'abcd', null, '1244'
+          ctx.should.have.property 'res'
+          ctx.res.should.have.property 'gateways'
+          gws = ctx.res.gateways
+          gws.should.be.an.instanceOf Array
+          gws.should.have.length 1
+          gws.should.have.property 0
+          gws[0].should.have.property 'uri', 'sip:foo@bar'
+          gws[0].should.have.property 'headers'
+          gws[0].headers.should.have.property 'P-Charge-Info', 'sip:boo@phone.local'
+          gws[0].should.have.property 'carrier', 'LOCAL'
+
+        it 'should route local numbers with account', ->
+          await provisioning.put _id:'number:1432',inbound_uri:'sip:foo@bar',account:'foo_bar'
+          router = new Router cfg = {prov:provisioning,ruleset_of,sip_domain_name}
+          use = [
+            'huge-play/middleware/setup'
+            './standalone'
+            '../middleware/setup'
+            '../middleware/local-number'
+            '../middleware/ruleset'
+            '../middleware/flatten'
+          ].map (m) -> require m
+          router.use m for m in use
+          cfg.use = use
+          cfg.prefix_admin = db_base
+          cfg.rr = rr
+          await serialize cfg, 'init'
+          ctx = await router.route call_ '3216', '1432'
+          ctx.should.have.property 'res'
+          ctx.res.should.have.property 'gateways'
+          ctx.session.should.have.property 'destination_onnet', true
+          gws = ctx.res.gateways
+          gws.should.be.an.instanceOf Array
+          gws.should.have.length 1
+          gws.should.have.property 0
+          gws[0].should.have.property 'uri', 'sip:foo@bar'
+          gws[0].should.have.property 'headers'
+          gws[0].headers.should.be.an.instanceOf Object
+          gws[0].headers.should.have.property 'P-Charge-Info', 'sip:foo_bar@phone.local'
+
+        it 'should route registrant_host directly (adding default port)', ->
+          await provisioning.merge 'number:3213', registrant_host:'foo',registrant_password:'badabing'
+          router = new Router cfg = {prov:provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name}
+          use = [
+            'huge-play/middleware/setup'
+            './standalone'
+            '../middleware/setup'
+            '../middleware/ruleset'
+            '../middleware/routes-registrant'
+            '../middleware/flatten'
+          ].map (m) -> require m
+          router.use m for m in use
+          cfg.use = use
+          cfg.rr = rr
+          cfg.prefix_admin = db_base
+          await serialize cfg, 'init'
+          ctx = await router.route call_ '3213', '331234'
+          gws = ctx.res.gateways
+          gws.should.be.an.instanceOf Array
+          gws.should.have.length 1
+          gws.should.have.property 0
+          gws[0].should.have.property 'address', 'foo:5070'
+          gws[0].should.have.property 'headers'
+          gws[0].headers.should.have.property 'X-RP', 'badabing'
+
+        it 'should route registrant_host directly (using provided port)', ->
+          await provisioning.put _id:'number:3243',registrant_host:'foo:5080'
+          router = new Router cfg = {prov:provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name}
+          use = [
+            'huge-play/middleware/setup'
+            './standalone'
+            '../middleware/setup'
+            '../middleware/ruleset'
+            '../middleware/routes-registrant'
+            '../middleware/flatten'
+          ].map (m) -> require m
+          router.use m for m in use
+          cfg.use = use
+          cfg.rr = rr
+          cfg.prefix_admin = db_base
+          await serialize cfg, 'init'
+          ctx = await router.route call_ '3243', '331234'
+          gws = ctx.res.gateways
+          gws.should.be.an.instanceOf Array
+          gws.should.have.length 1
+          gws.should.have.property 0
+          gws[0].should.have.property 'address', 'foo:5080'
+
+        it 'should route registrant_host directly (using array)', ->
+          await provisioning.put _id:'number:3253',registrant_host:['foo:5080']
+          router = new Router cfg = {prov:provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name}
+          use = [
+            'huge-play/middleware/setup'
+            './standalone'
+            '../middleware/setup'
+            '../middleware/ruleset'
+            '../middleware/routes-registrant'
+            '../middleware/flatten'
+          ].map (m) -> require m
+          router.use m for m in use
+          cfg.use = use
+          cfg.rr = rr
+          cfg.prefix_admin = db_base
+          await serialize cfg, 'init'
+          ctx = await router.route call_ '3253', '331234'
+          gws = ctx.res.gateways
+          gws.should.be.an.instanceOf Array
+          gws.should.have.length 1
+          gws.should.have.property 0
+          gws[0].should.have.property 'address', 'foo:5080'
+
+        it 'should route numbers using routes', ->
           router = new Router cfg = {
             gateway_manager: gm
-            prov: provisioning
+            prov:provisioning
             ruleset_of
-            sip_domain_name
-            default_outbound_route: outbound_route
-            profile: 'something-egress'
+            default_outbound_route:'default'
           }
           use = [
             'huge-play/middleware/setup'
             './standalone'
             '../middleware/setup'
-            '../middleware/numeric'
-            '../middleware/response-handlers'
-            '../middleware/local-number'
+            '../middleware/ruleset'
+            '../middleware/routes-gwid'
+            '../middleware/routes-carrierid'
+            '../middleware/flatten'
+          ].map (m) -> require m
+          router.use m for m in use
+          cfg.use = use
+          cfg.rr = rr
+          cfg.prefix_admin = db_base
+          await serialize cfg, 'init'
+          ctx = await router.route call_ '336718', '331234'
+          gws = ctx.res.gateways
+          gws.should.be.an.instanceOf Array
+          gws.should.have.length 2
+          gws.should.have.property 0
+          gws[0].should.have.property 'gwid'
+          gws[0].gwid.should.be.oneOf ['gw3','gw4'] # randomized
+          gws.should.have.property 1
+          gws[1].should.have.property 'gwid', 'backup'
+
+        it 'should report an error when no route is found', ->
+          router = new Router cfg = {
+            gateway_manager: gm
+            prov:provisioning
+            ruleset_of
+            default_outbound_route:'default'
+          }
+          use = [
+            'huge-play/middleware/setup'
+            './standalone'
+            '../middleware/setup'
+            '../middleware/ruleset'
+            '../middleware/routes-gwid'
+            '../middleware/routes-carrierid'
+            '../middleware/flatten'
+          ].map (m) -> require m
+          router.use m for m in use
+          cfg.use = use
+          cfg.prefix_admin = db_base
+          cfg.rr = rr
+          await serialize cfg, 'init'
+          ctx = await router.route call_ '336718', '347766'
+          ctx.session.first_response_was.should.equal '485'
+
+        it 'should route emergency numbers', ->
+          router = new Router cfg = {
+            gateway_manager: gm
+            prov:provisioning
+            ruleset_of
+            default_outbound_route:'default'
+          }
+          use = [
+            'huge-play/middleware/setup'
+            './standalone'
+            '../middleware/setup'
             '../middleware/ruleset'
             '../middleware/emergency'
             '../middleware/routes-gwid'
             '../middleware/routes-carrierid'
-            '../middleware/routes-registrant'
             '../middleware/flatten'
-            '../middleware/cdr'
-            '../middleware/call-handler'
           ].map (m) -> require m
           router.use m for m in use
-          cfg.dev_logger = true
           cfg.use = use
           cfg.rr = rr
-          serialize cfg, 'init'
-          .then ->
-            router.route ctx
-
-      before -> ready
-
-      describe 'Gateways', ->
-        it 'should have progress_timeout from their carrier: gw1', ->
-          ready.then ->
-            gm.resolve_gateway 'gw1'
-          .then (doc) ->
-            doc.should.have.length 1
-            doc.should.be.an.instanceOf Array
-            doc.should.have.property 0
-            doc[0].should.have.property 'progress_timeout'
-            doc[0].progress_timeout.should.equal dataset.carriers.the_phone_company.progress_timeout
-            doc[0].should.have.property 'timezone', 'US/Eastern'
-            doc[0].should.have.property 'ratings'
-            doc[0].should.have.property 'codecs', 'PCMA'
-
-        it 'should have progress_timeout from their carrier: gw2', ->
-          ready.then ->
-            gm.resolve_gateway 'gw2'
-          .then (doc) ->
-            doc.should.have.length 1
-            doc.should.be.an.instanceOf Array
-            doc.should.have.property 0
-            doc[0].should.have.property 'gwid', 'gw2'
-            doc[0].should.have.property 'progress_timeout'
-            doc[0].progress_timeout.should.equal dataset.carriers.the_phone_company.progress_timeout
-            doc[0].should.have.property 'timezone', 'US/Central'
-
-      describe 'the_phone_company', ->
-        it 'should return its gateways', ->
-          ready.then ->
-            gm.resolve_carrier 'the_phone_company'
-          .then (info) ->
-            expect(info).be.an.instanceOf Array
-            info.should.have.length 2
-            info.should.have.property 0
-            info[0].should.have.property 'gwid', 'gw1'
-            info[0].should.have.property 'timezone', 'US/Eastern'
-            info.should.have.property 1
-            info[1].should.have.property 'gwid', 'gw2'
-            info[1].should.have.property 'timezone', 'US/Central'
-
-      describe 'The call router', ->
-        it 'should NOT route invalid local numbers', ->
-          ready.then ->
-            provisioning.put _id:'number:1234',inbound_uri:'sip:foo@bar'
-          .then ->
-            cfg = {prov:provisioning,ruleset_of,sip_domain_name}
-            router = new Router cfg
-            cfg.rr = rr
-            cfg.use = [
-              'huge-play/middleware/setup'
-              './standalone'
-              '../middleware/setup'
-              '../middleware/local-number'
-              '../middleware/ruleset'
-              '../middleware/flatten'
-            ].map (m) -> require m
-            router.use m for m in cfg.use
-            serialize cfg, 'init'
-            .then ->
-              router.route call_ '3213', '1234'
-          .then (ctx) ->
-            ctx.should.have.property 'res'
-            ctx.res.should.have.property 'gateways'
-            ctx.session.should.not.have.property 'destination_onnet'
-            gws = ctx.res.gateways
-            gws.should.be.an.instanceOf Array
-            gws.should.have.length 0
-
-        it 'should route ccnq_to_e164', ->
-          ready.then ->
-            provisioning.put _id:'number:1244',inbound_uri:'sip:foo@bar', account:'boo'
-          .then ->
-            router = new Router cfg = {prov:provisioning,ruleset_of,sip_domain_name}
-            use = [
-              'huge-play/middleware/setup'
-              './standalone'
-              '../middleware/setup'
-              '../middleware/use-ccnq-to-e164'
-              '../middleware/local-number'
-              '../middleware/ruleset'
-              '../middleware/flatten'
-            ].map (m) -> require m
-            router.use m for m in use
-            cfg.use = use
-            serialize cfg, 'init'
-            .then ->
-              router.route call_ '3213', 'abcd', null, '1244'
-          .then (ctx) ->
-            ctx.should.have.property 'res'
-            ctx.res.should.have.property 'gateways'
-            gws = ctx.res.gateways
-            gws.should.be.an.instanceOf Array
-            gws.should.have.length 1
-            gws.should.have.property 0
-            gws[0].should.have.property 'uri', 'sip:foo@bar'
-            gws[0].should.have.property 'headers'
-            gws[0].headers.should.have.property 'P-Charge-Info', 'sip:boo@phone.local'
-            gws[0].should.have.property 'carrier', 'LOCAL'
-
-        it 'should route local numbers with account', ->
-          ready.then ->
-            provisioning.put _id:'number:1432',inbound_uri:'sip:foo@bar',account:'foo_bar'
-          .then ->
-            router = new Router cfg = {prov:provisioning,ruleset_of,sip_domain_name}
-            use = [
-              'huge-play/middleware/setup'
-              './standalone'
-              '../middleware/setup'
-              '../middleware/local-number'
-              '../middleware/ruleset'
-              '../middleware/flatten'
-            ].map (m) -> require m
-            router.use m for m in use
-            cfg.use = use
-            serialize cfg, 'init'
-            .then ->
-              router.route call_ '3216', '1432'
-          .then (ctx) ->
-            ctx.should.have.property 'res'
-            ctx.res.should.have.property 'gateways'
-            ctx.session.should.have.property 'destination_onnet', true
-            gws = ctx.res.gateways
-            gws.should.be.an.instanceOf Array
-            gws.should.have.length 1
-            gws.should.have.property 0
-            gws[0].should.have.property 'uri', 'sip:foo@bar'
-            gws[0].should.have.property 'headers'
-            gws[0].headers.should.be.an.instanceOf Object
-            gws[0].headers.should.have.property 'P-Charge-Info', 'sip:foo_bar@phone.local'
-
-        it 'should route registrant_host directly (adding default port)', ->
-          ready.then ->
-            provisioning.put _id:'number:3213',registrant_host:'foo',registrant_password:'badabing'
-          .then ->
-            router = new Router cfg = {prov:provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name}
-            use = [
-              'huge-play/middleware/setup'
-              './standalone'
-              '../middleware/setup'
-              '../middleware/ruleset'
-              '../middleware/routes-registrant'
-              '../middleware/flatten'
-            ].map (m) -> require m
-            router.use m for m in use
-            cfg.use = use
-            serialize cfg, 'init'
-            .then ->
-              router.route call_ '3213', '331234'
-          .then (ctx) ->
-            gws = ctx.res.gateways
-            gws.should.be.an.instanceOf Array
-            gws.should.have.length 1
-            gws.should.have.property 0
-            gws[0].should.have.property 'address', 'foo:5070'
-            gws[0].should.have.property 'headers'
-            gws[0].headers.should.have.property 'X-RP', 'badabing'
-
-        it 'should route registrant_host directly (using provided port)', ->
-          ready.then ->
-            provisioning.put _id:'number:3243',registrant_host:'foo:5080'
-          .then ->
-            router = new Router cfg = {prov:provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name}
-            use = [
-              'huge-play/middleware/setup'
-              './standalone'
-              '../middleware/setup'
-              '../middleware/ruleset'
-              '../middleware/routes-registrant'
-              '../middleware/flatten'
-            ].map (m) -> require m
-            router.use m for m in use
-            cfg.use = use
-            serialize cfg, 'init'
-            .then ->
-              router.route call_ '3243', '331234'
-          .then (ctx) ->
-            gws = ctx.res.gateways
-            gws.should.be.an.instanceOf Array
-            gws.should.have.length 1
-            gws.should.have.property 0
-            gws[0].should.have.property 'address', 'foo:5080'
-
-        it 'should route registrant_host directly (using array)', ->
-          ready.then ->
-            provisioning.put _id:'number:3253',registrant_host:['foo:5080']
-          .then ->
-            router = new Router cfg = {prov:provisioning,ruleset_of,default_outbound_route:'registrant',sip_domain_name}
-            use = [
-              'huge-play/middleware/setup'
-              './standalone'
-              '../middleware/setup'
-              '../middleware/ruleset'
-              '../middleware/routes-registrant'
-              '../middleware/flatten'
-            ].map (m) -> require m
-            router.use m for m in use
-            cfg.use = use
-            serialize cfg, 'init'
-            .then ->
-              router.route call_ '3253', '331234'
-          .then (ctx) ->
-            gws = ctx.res.gateways
-            gws.should.be.an.instanceOf Array
-            gws.should.have.length 1
-            gws.should.have.property 0
-            gws[0].should.have.property 'address', 'foo:5080'
-
-        it 'should route numbers using routes', ->
-          ready.then ->
-            router = new Router cfg = {
-              gateway_manager: gm
-              prov:provisioning
-              ruleset_of
-              default_outbound_route:'default'
-            }
-            use = [
-              'huge-play/middleware/setup'
-              './standalone'
-              '../middleware/setup'
-              '../middleware/ruleset'
-              '../middleware/routes-gwid'
-              '../middleware/routes-carrierid'
-              '../middleware/flatten'
-            ].map (m) -> require m
-            router.use m for m in use
-            cfg.use = use
-            serialize cfg, 'init'
-            .then ->
-              router.route call_ '336718', '331234'
-          .then (ctx) ->
-            gws = ctx.res.gateways
-            gws.should.be.an.instanceOf Array
-            gws.should.have.length 2
-            gws.should.have.property 0
-            gws[0].should.have.property 'gwid'
-            gws[0].gwid.should.be.oneOf ['gw3','gw4'] # randomized
-            gws.should.have.property 1
-            gws[1].should.have.property 'gwid', 'backup'
-
-        it 'should report an error when no route is found', (done) ->
-          ready.then ->
-
-            router = new Router cfg = {
-              gateway_manager: gm
-              prov:provisioning
-              ruleset_of
-              default_outbound_route:'default'
-            }
-            use = [
-              'huge-play/middleware/setup'
-              './standalone'
-              '../middleware/setup'
-              '../middleware/ruleset'
-              '../middleware/routes-gwid'
-              '../middleware/routes-carrierid'
-              '../middleware/flatten'
-            ].map (m) -> require m
-            router.use m for m in use
-            cfg.use = use
-            cfg.rr = rr
-            serialize cfg, 'init'
-            .then ->
-              router.route call_ '336718', '347766'
-          .then (ctx) ->
-            ctx.session.first_response_was.should.equal '485'
-            done()
-          .catch (error) ->
-            console.error error
-          null
-
-        it 'should route emergency numbers', ->
-          ready.then ->
-            router = new Router cfg = {
-              gateway_manager: gm
-              prov:provisioning
-              ruleset_of
-              default_outbound_route:'default'
-            }
-            use = [
-              'huge-play/middleware/setup'
-              './standalone'
-              '../middleware/setup'
-              '../middleware/ruleset'
-              '../middleware/emergency'
-              '../middleware/routes-gwid'
-              '../middleware/routes-carrierid'
-              '../middleware/flatten'
-            ].map (m) -> require m
-            router.use m for m in use
-            cfg.use = use
-            serialize cfg, 'init'
-            .then ->
-              router.route call_ '336718', '33_112', 'home'
-          .then (ctx) ->
-            ctx.res.should.have.property 'destination', '33156'
-            ctx.session.should.have.property 'destination_emergency', true
-            gws = ctx.res.gateways
-            gws.should.be.an.instanceOf Array
-            gws.should.have.length 2
-            gws.should.have.property 0
-            gws[0].should.have.property 'gwid'
-            gws[0].gwid.should.be.oneOf ['gw3','gw4'] # randomized
-            gws.should.have.property 1
-            gws[1].should.have.property 'gwid', 'backup'
+          cfg.prefix_admin = db_base
+          await serialize cfg, 'init'
+          ctx = await router.route call_ '336718', '33_112', 'home'
+          ctx.res.should.have.property 'destination', '33156'
+          ctx.session.should.have.property 'destination_emergency', true
+          gws = ctx.res.gateways
+          gws.should.be.an.instanceOf Array
+          gws.should.have.length 2
+          gws.should.have.property 0
+          gws[0].should.have.property 'gwid'
+          gws[0].gwid.should.be.oneOf ['gw3','gw4'] # randomized
+          gws.should.have.property 1
+          gws[1].should.have.property 'gwid', 'backup'
 
         it 'should route emergency numbers with multiple destinations', ->
-          ready.then ->
-            router = new Router cfg = {
-              gateway_manager: gm
-              prov:provisioning
-              ruleset_of
-              default_outbound_route:'default'
-            }
-            use = [
-              'huge-play/middleware/setup'
-              './standalone'
-              '../middleware/setup'
-              '../middleware/ruleset'
-              '../middleware/emergency'
-              '../middleware/routes-gwid'
-              '../middleware/routes-carrierid'
-              '../middleware/flatten'
-            ].map (m) -> require m
-            router.use m for m in use
-            cfg.use = use
-            serialize cfg, 'init'
-            .then ->
-              router.route call_ '336718', '33_112', 'work'
-          .then (ctx) ->
-            ctx.should.have.property 'res'
-            ctx.res.should.have.property 'destination', '33_112'
-            ctx.res.should.have.property 'gateways'
-            ctx.session.should.have.property 'destination_emergency', true
-            gws = ctx.res.gateways
-            expect(gws).to.not.be.null
-            gws.should.be.an.instanceOf Array
-            gws.should.have.length 2
-            gws.should.have.property 0
-            gws[0].should.have.property 'destination_number', '33157'
-            gws.should.have.property 1
-            gws[1].should.have.property 'destination_number', '33158'
+          router = new Router cfg = {
+            gateway_manager: gm
+            prov:provisioning
+            ruleset_of
+            default_outbound_route:'default'
+          }
+          use = [
+            'huge-play/middleware/setup'
+            './standalone'
+            '../middleware/setup'
+            '../middleware/ruleset'
+            '../middleware/emergency'
+            '../middleware/routes-gwid'
+            '../middleware/routes-carrierid'
+            '../middleware/flatten'
+          ].map (m) -> require m
+          router.use m for m in use
+          cfg.use = use
+          cfg.rr = rr
+          cfg.prefix_admin = db_base
+          await serialize cfg, 'init'
+          ctx = await router.route call_ '336718', '33_112', 'work'
+          ctx.should.have.property 'res'
+          ctx.res.should.have.property 'destination', '33_112'
+          ctx.res.should.have.property 'gateways'
+          ctx.session.should.have.property 'destination_emergency', true
+          gws = ctx.res.gateways
+          expect(gws).to.not.be.null
+          gws.should.be.an.instanceOf Array
+          gws.should.have.length 2
+          gws.should.have.property 0
+          gws[0].should.have.property 'destination_number', '33157'
+          gws.should.have.property 1
+          gws[1].should.have.property 'destination_number', '33158'
 
 Gateways are randomized within carriers.
 
-            gws[0].should.have.property 'gwid'
-            gws[0].gwid.should.be.oneOf ['gw3','gw4']
-            gws[1].should.have.property 'gwid'
-            gws[1].gwid.should.be.oneOf ['gw3','gw4']
+          gws[0].should.have.property 'gwid'
+          gws[0].gwid.should.be.oneOf ['gw3','gw4']
+          gws[1].should.have.property 'gwid'
+          gws[1].gwid.should.be.oneOf ['gw3','gw4']
 
       describe 'The call handler', ->
 
@@ -701,12 +676,10 @@ Gateways are randomized within carriers.
                 body:
                   variable_last_bridge_hangup_cause: 'NORMAL_CALL_CLEARING'
 
-          ready.then ->
-            provisioning.put _id:'number:1236',inbound_uri:'sip:bar@foo', account:'barf'
-          .catch done
-          .then ->
-            one_call ctx, null, 'pooh'
-          .catch done
+          (do ->
+            await provisioning.put _id:'number:1236',inbound_uri:'sip:bar@foo', account:'barf'
+            await one_call ctx, null, 'pooh'
+          ).catch done
           null
 
         it 'should route known destinations for specific sources', (done) ->
@@ -724,12 +697,10 @@ Gateways are randomized within carriers.
                 body:
                   variable_last_bridge_hangup_cause: 'NORMAL_CALL_CLEARING'
 
-          ready.then ->
-            provisioning.put _id:'number:2347',outbound_route:'default'
-          .catch done
-          .then ->
-            one_call ctx
-          .catch done
+          (do ->
+            await provisioning.put _id:'number:2347',outbound_route:'default'
+            await one_call ctx
+          ).catch done
           null
 
         it 'should route known routes', (done) ->
@@ -747,7 +718,7 @@ Gateways are randomized within carriers.
                 body:
                   variable_last_bridge_hangup_cause: 'NORMAL_CALL_CLEARING'
 
-          one_call ctx, 'default'
+          (do -> await one_call ctx, 'default').catch done
           null
 
         it 'should insert CDR data', (done) ->
@@ -772,7 +743,7 @@ Gateways are randomized within carriers.
                 body:
                   variable_last_bridge_hangup_cause: 'NORMAL_CALL_CLEARING'
 
-          one_call ctx, 'default'
+          (do -> await one_call ctx, 'default').catch done
           null
 
         it 'should insert winner data', ->
@@ -817,9 +788,7 @@ Gateways are randomized within carriers.
                 Promise.resolve()
             emit: ->
 
-          ready.then ->
-            one_call ctx, 'default'
-          .catch done
+          (do -> await one_call ctx, 'default').catch done
           null
 
         it 'should report failed destinations', (done) ->
@@ -841,9 +810,7 @@ Gateways are randomized within carriers.
                 Promise.resolve()
             emit: ->
 
-          ready.then ->
-            one_call ctx, 'default'
-          .catch done
+          (do -> await one_call ctx, 'default').catch done
           null
 
         it 'should route emergency', (done) ->
@@ -861,7 +828,7 @@ Gateways are randomized within carriers.
               Promise.resolve
                 body:
                   variable_last_bridge_hangup_cause: 'NORMAL_CALL_CLEARING'
-          one_call ctx, 'default'
+          (do -> await one_call ctx, 'default').catch done
           null
 
         it 'should route emergency (with location number)', (done) ->
@@ -879,7 +846,7 @@ Gateways are randomized within carriers.
               Promise.resolve
                 body:
                   variable_last_bridge_hangup_cause: 'NORMAL_CALL_CLEARING'
-          one_call ctx, 'default'
+          (do -> await one_call ctx, 'default').catch done
           null
 
 

@@ -6,13 +6,11 @@ This is a dedicated bit of code that should be inserted before `ruleset` to forc
     pkg = require '../package.json'
     @name = "#{pkg.name}:middleware:override-route-from-endpoint"
     {debug} = (require 'tangible') @name
-    @init = ->
-      assert @cfg.prov?, 'Missing `prov`'
     @include = ->
 
       return unless @session?.direction is 'lcr'
 
-      provisioning = @cfg.prov
+      provisioning = new CouchDB (Nimble @cfg).provisioning
 
       return if @res.finalized()
 
@@ -27,3 +25,6 @@ This is a dedicated bit of code that should be inserted before `ruleset` to forc
           @res.attempt doc.global_route
       .catch (error) =>
         debug "Override-route-from-endpoint: #{error}"
+
+    Nimble = require 'nimble-direction'
+    CouchDB = require 'most-couchdb'

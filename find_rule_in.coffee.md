@@ -1,18 +1,22 @@
 Longest-match rule lookup
 =========================
 
-    pkg = require './package'
-    @name = "#{pkg.name}:find_rule_in"
-    debug = (require 'tangible') @name
+    debug = (require 'tangible') 'tough-rate:find_rule_in'
     merge = require './field_merger'
 
-    module.exports = find_rule_in = (destination,database,key = 'prefix') =>
-      debug 'find', destination
-
+    find = (destination,database,key) ->
       ids = ("#{key}:#{destination[0...l]}" for l in [0..destination.length]).reverse()
+      rows = database.queryStream null, '_all_docs', keys:ids, include_docs: true
+      rule = null
+      for await row from rows
+        if row.doc? and not row.doc.disabled
+          rule ?= row.doc
+      rule
 
-      {rows} = await database.allDocs keys:ids, include_docs: true
-      rule = (row.doc for row in rows when row.doc? and not row.doc.disabled)[0]
+    find_rule_in = (destination,database,key = 'prefix') ->
+      debug 'find rule in', destination
+
+      rule = await find destination, database, key
 
 Lookup the `destination` if any.
 
@@ -23,11 +27,7 @@ Lookup the `destination` if any.
 
       if rule?.destination?
         debug 'destination', rule.destination
-        destination = await database
-          .get "destination:#{rule.destination}"
-          .catch (error) ->
-            debug 'destination', rule.destination, error.stack ? error.toString()
-            null
+        destination = await database.get "destination:#{rule.destination}"
 
         if destination?
           debug 'merging', {rule,destination}
@@ -37,3 +37,5 @@ Lookup the `destination` if any.
 
       debug 'rule', rule
       rule
+
+    module.exports = find_rule_in

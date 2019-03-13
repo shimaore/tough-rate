@@ -9,14 +9,13 @@ Ruleset Loader
     @name = "#{pkg.name}:middleware:ruleset"
     {debug} = (require 'tangible') @name
     @init = ->
-      assert @cfg.prov?, 'Missing `prov`.'
       assert @cfg.ruleset_of?, 'Missing `ruleset_of`.'
 
     @include = ->
 
       return unless @session?.direction is 'lcr'
 
-      provisioning = @cfg.prov
+      prov = new CouchDB (Nimble @cfg).provisioning
       ruleset_of = @cfg.ruleset_of
       default_outbound_route = @cfg.default_outbound_route
 
@@ -34,14 +33,11 @@ Route based on the route selected by the source, or using a default route.
 
 * doc.global_number.outbound_route (number) Route used for Least Cost Routing (LCR).
 
-      doc = await provisioning
-        .get "number:#{source}"
-        .catch (error) =>
-          debug "RuleSet Middleware: error retrieving number:#{source}", error.stack ? error.toString()
-          {}
-
-      debug "RuleSet Middleware: number:#{source} :", doc
-      route = doc.outbound_route ? default_outbound_route
+      route = null
+      try
+        debug "RuleSet Middleware: number:#{source}"
+        doc = await prov.get "number:#{source}"
+        route = doc.outbound_route ? default_outbound_route
 
 Provisioning error
 
@@ -76,9 +72,9 @@ Rule lookup
 
 * doc.ruleset.key (string) The type used for routing rules in the ruleset database. Default: "prefix".
 
-      rule = await find_rule_in @res.destination, ruleset_database, @res.ruleset.key
-        .catch (error) ->
-          null
+      rule = null
+      try
+        rule = await find_rule_in @res.destination, ruleset_database, @res.ruleset.key
 
 Provisioning error or user error
 
@@ -111,3 +107,5 @@ Missing gateway list is normal for e.g. emergency call routing.
       return
 
     assert = require 'assert'
+    CouchDB = require 'most-couchdb'
+    Nimble = require 'nimble-direction'
