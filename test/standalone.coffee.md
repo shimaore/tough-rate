@@ -6,5 +6,5 @@
       @reference =
         add_tag: ->
         get_in: -> Promise.resolve []
-        get_number_domain: -> Promise.resolve()
-        get_endpoint: -> Promise.resolve()
+        get_number_domain: -> Promise.resolve ''
+        get_endpoint: -> Promise.resolve ''

@@ -3,8 +3,8 @@
 - place the calls
 
     pkg = require '../package'
-    Promise = require 'bluebird'
-    Promise.config cancellation:true
+
+    sleep = (timeout) -> new Promise(resolve) -> setTimeout resolve, timeout
 
     sip_domain_name = 'phone.local'
     dataset_1 =
@@ -648,7 +648,7 @@ Gateways are randomized within carriers.
               'Channel-Caller-ID-Number': '2344'
             command: (c,v) ->
               if c in ['set','export']
-                return Promise.resolve().bind this
+                return Promise.resolve()
               c.should.equal 'respond'
               v.should.equal '484'
               done()
@@ -663,7 +663,7 @@ Gateways are randomized within carriers.
               'Channel-Caller-ID-Number': 'abcd'
             command: (c,v) ->
               if c is 'set'
-                return Promise.resolve().bind this
+                return Promise.resolve()
               c.should.equal 'respond'
               v.should.equal '484'
               done()
@@ -678,7 +678,7 @@ Gateways are randomized within carriers.
               'Channel-Caller-ID-Number': '2345'
             command: (c,v) ->
               if c in ['set','export']
-                return Promise.resolve().bind this
+                return Promise.resolve()
               c.should.equal 'respond'
               v.should.equal '485'
               done()
@@ -693,7 +693,7 @@ Gateways are randomized within carriers.
               'Channel-Caller-ID-Number': '2346'
             command: (c,v) ->
               if c in ['set','export']
-                return Promise.resolve().bind this
+                return Promise.resolve()
               v.should.equal '{}[sip_h_P-Charge-Info=sip:barf@pooh,origination_caller_id_number=2346,effective_caller_id_number=2346]sofia/something-egress/sip:bar@foo'
               c.should.equal 'bridge'
               done()
@@ -716,7 +716,7 @@ Gateways are randomized within carriers.
               'Channel-Caller-ID-Number': '2347'
             command: (c,v) ->
               if c in ['set','export']
-                return Promise.resolve().bind this
+                return Promise.resolve()
               v.should.match /// \[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800,origination_caller_id_number=2347,effective_caller_id_number=2347\]sofia/something-egress/sip:336727@127.0.0.1:506[89] /// # randomized
               c.should.equal 'bridge'
               done()
@@ -739,7 +739,7 @@ Gateways are randomized within carriers.
               'Channel-Caller-ID-Number': '2348'
             command: (c,v) ->
               if c in ['set','export']
-                return Promise.resolve().bind this
+                return Promise.resolve()
               v.should.match /// \[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800,origination_caller_id_number=2348,effective_caller_id_number=2348\]sofia/something-egress/sip:3368267@127.0.0.1:506[89] /// # randomized
               c.should.equal 'bridge'
               done()
@@ -761,7 +761,7 @@ Gateways are randomized within carriers.
                 m[1].should.equal '{"cdr":"foo-bar"}'
                 success = true
               if c in ['set','export']
-                return Promise.resolve().bind this
+                return Promise.resolve()
               v.should.match /// \[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800,origination_caller_id_number=2348,effective_caller_id_number=2348\]sofia/something-egress/sip:331234@127.0.0.1:506[89] /// # randomized
               c.should.equal 'bridge'
               if success
@@ -783,7 +783,7 @@ Gateways are randomized within carriers.
               'Channel-Caller-ID-Number': '2348'
             command: (c,v) ->
               if c in ['set','export']
-                return Promise.resolve().bind this
+                return Promise.resolve()
               v.should.match /// \[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800,origination_caller_id_number=2348,effective_caller_id_number=2348\]sofia/something-egress/sip:331234@127.0.0.1:506[89] /// # randomized
               c.should.equal 'bridge'
               Promise.resolve
@@ -791,11 +791,9 @@ Gateways are randomized within carriers.
                   variable_last_bridge_hangup_cause: 'NORMAL_CALL_CLEARING'
             once: (msg) ->
               if msg is 'CHANNEL_HANGUP_COMPLETE'
-                Promise
-                  .delay 5*1000
-                  .then ->
-                    body:
-                      billmsec: 2000
+                await 5*1000
+                body:
+                  billmsec: 2000
 
           {session} = await one_call ctx, 'default'
           session.should.have.property 'winner'
@@ -809,7 +807,7 @@ Gateways are randomized within carriers.
               'Channel-Caller-ID-Number': '2349'
             command: (c,v) ->
               if c in ['set','export']
-                return Promise.resolve().bind this
+                return Promise.resolve()
               if c is 'bridge'
                 Promise.reject new FreeSwitchError {}, reply: '-ERR I_TOLD_YOU_SO'
               else
@@ -831,7 +829,7 @@ Gateways are randomized within carriers.
               'Channel-Caller-ID-Number': '2349'
             command: (c,v) ->
               if c in ['set','export']
-                return Promise.resolve().bind this
+                return Promise.resolve()
               if c is 'bridge'
                 Promise.resolve
                   body:
@@ -856,7 +854,7 @@ Gateways are randomized within carriers.
               'variable_location':'home'
             command: (c,v) ->
               if c is 'set' or c is 'export'
-                return Promise.resolve().bind this
+                return Promise.resolve()
               v.should.match /// \[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800,origination_caller_id_number=2348,effective_caller_id_number=2348\]sofia/something-egress/sip:33156@127.0.0.1:506[89] ///
               c.should.equal 'bridge'
               done()
@@ -874,7 +872,7 @@ Gateways are randomized within carriers.
               'variable_location':'bob'
             command: (c,v) ->
               if c is 'set' or c is 'export'
-                return Promise.resolve().bind this
+                return Promise.resolve()
               v.should.match /// \[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800,origination_caller_id_number=2351,effective_caller_id_number=2351\]sofia/something-egress/sip:33158@127.0.0.1:506[89] ///
               c.should.equal 'bridge'
               done()

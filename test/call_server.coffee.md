@@ -4,12 +4,15 @@ Live test with FreeSwitch
     chai = require 'chai'
     chai.should()
 
-    Promise = require 'bluebird'
-    real_exec = Promise.promisify (require 'child_process').exec
+    {promisify} = require 'util'
+    real_exec = promisify (require 'child_process').exec
+    {spawn} = require 'child_process'
+    to_stream = require 'into-stream'
     pkg = require '../package.json'
     debug = (require 'debug') "#{pkg.name}:test:call_server"
     CaringBand = require 'caring-band'
-    fs = Promise.promisifyAll require 'fs'
+
+    sleep = (timeout) -> new Promise (resolve) -> setTimeout resolve, timeout
 
 Parameters for docker.io image
 ==============================
@@ -34,10 +37,6 @@ Setup
 
     ready = ->
       debug 'ready'
-      await fs
-        .mkdirAsync 'test/live'
-        .catch (error) ->
-          debug "mkdir #{error.stack ? error} (ignored)"
       cfg =
         test: yes
         profiles:
@@ -50,20 +49,44 @@ Setup
             local_ip: '127.0.0.1'
             socket_port: 7004 # Outbound-Socket port
         acls:
-          default: [ '127.0.0.0/8' ]
+          default: [ '127.0.0.0/8', '0.0.0.0/0' ]
+        socket_ip: '0.0.0.0'
+        socket_acl: 'default'
       xml = (require 'huge-play/conf/freeswitch') cfg
-      await fs
-        .writeFileAsync 'test/live/freeswitch.xml', xml, 'utf-8'
-        .catch (error) -> debug "write: #{error} in #{process.cwd()} (ignored)"
-      await exec("docker kill #{p}").catch -> true
-      await exec("docker rm #{p}").catch -> true
-      await exec """
-        docker run --net=host -d --name #{p} -v "#{pwd}/test/live:/opt/freeswitch/etc/freeswitch" shimaore/docker.freeswitch /opt/freeswitch/bin/freeswitch -nf -nosql -nonat -nonatmap -nocal -nort -c
-      """
+
+      console.log "docker kill"
+      {stdout,stderr} = await exec("docker kill #{p}").catch ({stdout,stderr}) -> {stdout,stderr}
+      console.log stdout
+      console.error stderr
+
+      console.log "docker rm"
+      {stdout,stderr} = await exec("docker rm #{p}").catch ({stdout,stderr}) -> {stdout,stderr}
+      console.log stdout
+      console.error stderr
+
+      console.log "docker run"
+      child = spawn 'docker', ['run', '-i', '-p', '5722:5722', '--name', p, 'shimaore/docker.freeswitch', 'bash', '-c',
+        'tee /opt/freeswitch/etc/freeswitch/freeswitch.xml && /opt/freeswitch/bin/freeswitch -nf -nosql -nonat -nonatmap -nocal -nort -c'],
+        stdio: ['pipe',process.stderr,process.stderr]
+      child.stdin.end xml, 'utf-8'
+
+      console.log "docker ps"
+      {stdout,stderr} = await exec "docker ps"
+      console.log stdout
+      console.error stderr
+
+      await sleep 20000
+
+      console.log "docker ps"
+      {stdout,stderr} = await exec "docker ps"
+      console.log stdout
+      console.error stderr
+
+
       debug 'Docker with FreeSwitch should be running, starting our own server.'
       server = await start_server()
       debug 'Start server OK, waiting...'
-      await Promise.delay 10000
+      await sleep 10000
       debug 'Start server OK, done.'
       null
 
@@ -149,7 +172,7 @@ Server (Unit Under Test)
         ruleset_of: ruleset_of
         sip_domain_name: sip_domain_name
         prefix_admin: ''
-        redis: {}
+        redis: host: 'redis'
         blue_rings:
           host: 'a'
         use: [
@@ -209,7 +232,7 @@ Test
             @api "originate {origination_caller_id_number=#{source}}sofia/huge-play-test-sender-ingress/sip:#{destination}@#{domain} &park"
             .then ->
               debug 'test1: delay'
-              Promise.delay 700
+              await sleep 700
             .then ->
               debug 'test1: client.end'
               client.end()
@@ -257,6 +280,5 @@ Test
         server?.stop()
         catcher?.close()
         debug "Server stopped, now stopping docker instance..."
-        await exec "docker logs #{p} > #{p}.log"
         await exec "docker kill #{p}"
         await exec "docker rm #{p}"

@@ -9,4 +9,4 @@ build:
   script:
   - npm install
   - npm audit
-  - npm test
+  - DEBUG='*' npm test

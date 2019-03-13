@@ -7,19 +7,18 @@
     "prepublishOnly": "npm run build",
     "build": "npm install --only=dev && rm package-lock.json && coffee -c *.coffee.md middleware/*.coffee.md",
     "pretest": "npm install && npm run build && coffee -c test/*.coffee.md",
-    "test": "mocha",
-    "clean": "rm -f *.js *.js.map middleware/*.js middleware/*.js.map conf/*.js conf/*.js.map npm-debug.log"
+    "test": "mocha"
   },
   "author": "Stéphane Alnet <stephane@shimaore.net> (http://stephane.shimaore.net/)",
   "license": "Unlicense",
   "devDependencies": {
-    "bluebird": "^3.5.1",
     "caring-band": "^1.4.3",
     "chai": "^4.1.2",
     "coffeescript": "^2",
     "debug": "^4.1.1",
     "esl": "^9.0.0",
-    "huge-play": ">=34.3.4",
+    "huge-play": ">=36.4.0",
+    "into-stream": "^3.1.0",
     "mocha": "^6.0.2",
     "pouchdb-adapter-memory": "^7.0.0",
     "useful-wind": "^7.8.0",
