@@ -24,7 +24,7 @@ Retrieve the ruleset (and ruleset database) for the given ruleset name.
 
 Use a cache since the calls to `ruleset_of()` seem to not release the databases.
 
-        cache = LRU
+        cache = new LRU
           max: cfg.ruleset_database_cache_size ? 100
           dispose: (key,value) ->
             debug 'Dispose of', key
