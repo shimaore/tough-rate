@@ -78,14 +78,15 @@ Setup
       console.log "docker run"
       child = spawn 'docker', ['run', '-i', '-p', '5722:5722', '--name', p, 'gitlab.k-net.fr:1234/ccnq/docker.freeswitch:4.4.0', 'bash', '-c',
         'tee /opt/freeswitch/etc/freeswitch/freeswitch.xml && /opt/freeswitch/bin/freeswitch -nf -nosql -nonat -nonatmap -nocal -nort -c'],
-        # stdio: ['pipe',process.stdout,process.stderr]
-        stdio: ['pipe','ignore','ignore']
+        stdio: if process.env.DEBUG_FREESWITCH is 'true'
+            ['pipe',process.stdout,process.stderr]
+          else
+            ['pipe','ignore','ignore']
       child.on 'close', (code,signal) ->
         debug 'FreeSwitch ended', code, signal
-      ###
-      xml = xml.replace '<param name="loglevel" value="err"/>',
-                        '<param name="loglevel" value="debug"/>'
-      ###
+      if process.env.DEBUG_FREESWITCH is 'true'
+        xml = xml.replace '<param name="loglevel" value="err"/>',
+                          '<param name="loglevel" value="debug"/>'
 
       xml = xml.replace /socket:127\.0\.0\.1:(\d+) async full/g,
                         "socket:#{address}:$1 async full"
@@ -97,7 +98,7 @@ Setup
       console.log stdout
       console.error stderr
 
-      await sleep 20000
+      await sleep 40000
 
       console.log "docker ps"
       {stdout,stderr} = await exec "docker ps"
@@ -245,7 +246,7 @@ Test
 
       @timeout 21000
       before ->
-        @timeout 60000
+        @timeout 80000
         await ready()
 
       describe 'FreeSwitch', ->
