@@ -1,7 +1,7 @@
 Default `gwid` router plugin
 ============================
 
-    update = (gateway_manager,entry) ->
+    update = (entry,gateway_manager) ->
 
 * doc.prefix.gwlist[].gwid (string) ID of the destination doc.gateway
 * doc.destination.gwlist[].gwid (string) ID of the destination doc.gateway
@@ -12,7 +12,10 @@ Default `gwid` router plugin
       return entry unless entry.gwid?
       entry.name ?= "gateway #{entry.gwid}"
       # TODO Add lookup for gateway-faulty or suspicious, and skip the resolution in that case.
-      gateway_manager.resolve_gateway entry.gwid
+      gateways = await gateway_manager.resolve_gateway entry.gwid
+
+      {destination_number} = entry
+      gateways.map (gw) -> Object.assign gw, {destination_number}
 
     pkg = require '../package.json'
     @name = "#{pkg.name}:middleware:routes-gwid"
@@ -33,11 +36,7 @@ Default `gwid` router plugin
       unless @res.gateways?
         debug 'No gateways'
         return
-      @res.gateways = await promise_all @res.gateways, (x) ->
-        r = await update gateway_manager, x
-        for gw in r
-          gw.destination_number ?= x.destination_number if x.destination_number?
-        r
+      @res.gateways = await promise_all @res.gateways, (x) -> await update x, gateway_manager
 
       debug 'Gateways', @res.gateways
       return

@@ -96,7 +96,10 @@ Missing gateway list is normal for e.g. emergency call routing.
 
         debug.dev 'missing-gwlist: Missing gwlist (ignored)', rule
 
-      @res.rule = rule
+      @res.rule = Object.assign {
+        source_number: @res.source
+        destination_number: @res.destination
+      }, rule
 
       debug 'Using rule', rule
 

@@ -28,9 +28,9 @@ Attempt Call
 Convert fields found in the record into fields for FreeSwitch `bridge` command.
 Returns an `esl` promise that completes when the call gets connected.
 
-      attempt = (destination,gateway) =>
+      attempt = (gateway) =>
 
-        debug "CallHandler: attempt", {destination,gateway}
+        debug "CallHandler: attempt", gateway
 
         leg_options = @session?.leg_options ? {}
 
@@ -41,9 +41,8 @@ Returns an `esl` promise that completes when the call gets connected.
           for h of gateway.headers
             leg_options["sip_h_#{h}"] = gateway.headers[h]
 
-        if gateway.source?
-          leg_options.effective_caller_id_number =
-          leg_options.origination_caller_id_number = gateway.source
+        leg_options.effective_caller_id_number =
+        leg_options.origination_caller_id_number = gateway.source_number
 
         leg_options_text = make_params leg_options
 
@@ -53,7 +52,7 @@ Returns an `esl` promise that completes when the call gets connected.
 
 Sometimes we'll be provided with a pre-built URI (emergency calls, loopback calls). In other cases we build the URI from the destination number and the gateway's address.
 
-        uri = gateway.uri ? "sip:#{destination}@#{gateway.address}"
+        uri = gateway.uri ? "sip:#{gateway.destination_number}@#{gateway.address}"
         profile = gateway.profile
         profile ?= @session.sip_profile
         profile ?= @cfg.profile
@@ -98,10 +97,11 @@ Call attempt.
           debug "CallHandler: handling (next) gateway", gateway
           @notify state: 'call-attempt'
 
-          destination = gateway.destination_number ? @res.destination
           @session.gateway = gateway
-          @session.destination = destination
-          res = await attempt destination, gateway
+          @session.source = gateway.source_number
+          @session.destination = gateway.destination_number
+
+          res = await attempt gateway
             .catch (error) =>
               debug "attempt error: #{error.stack ? error}"
               body: {}
@@ -126,21 +126,21 @@ On successful connection we also get `variable_originate_disposition=SUCCESS, va
           switch
             when @session.was_connected
 
-              debug "CallHandler: connected call: #{cause} when routing #{destination} through", gateway
+              debug "CallHandler: connected call: #{cause} when routing #{gateway.destination_number} through", gateway
               winner = gateway # Winner
               @session.winner = gateway
               # @tag 'answered'
 
             when @session.was_transferred
 
-              debug "CallHandler: transferred call: #{cause} when routing #{destination} through", gateway
+              debug "CallHandler: transferred call: #{cause} when routing #{gateway.destination_number} through", gateway
               winner = gateway # Winner
               @session.winner = gateway
               # @tag 'transferred'
 
             else
 
-              debug "CallHandler: failed call: #{cause} when routing #{destination} through", gateway
+              debug "CallHandler: failed call: #{cause} when routing #{gateway.destination_number} through", gateway
               @emit "gateway:#{cause}", gateway
               # No winner yet
 
@@ -157,11 +157,6 @@ However we do not propagate errors, since it would mean interrupting the call se
         debug "CallHandler: the winning gateway was", winner
         @res.winner = winner
         @res.attr winner.attrs
-
-Release leaking fields
-
-      @res.ruleset = null
-      @res.ruleset_database = null
 
       return
 

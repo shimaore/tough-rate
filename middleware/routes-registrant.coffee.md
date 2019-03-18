@@ -28,7 +28,7 @@ This plugin provides `registrant_host` as a gateway.
 * doc.global_number.address (string, internal) If specified, the registrant routing address (i.e. the host and port to send the call to). The field might also be created by a custom session.ref_builder function, for example to translate a doc.global_number.registrant_host to the matching carrier-side SBC. Default: doc.global_number.registrant_host is used.
 * doc.global_number.registrant_host (string) If specified, the host (default port: 5070) or the `{host}:{port}` used as the registrant routing address (i.e. the host and port for our registrant OpenSIPS server). Should match the value of doc.global_number.registrant_socket (except it might use a host-name instead of an IP address).
 
-      result = []
+      gateways = []
 
       if source_doc.address?
         address = source_doc.address
@@ -36,7 +36,7 @@ This plugin provides `registrant_host` as a gateway.
         address = source_doc.registrant_host
         unless address?
           debug 'No registrant_host for source in a route that requires registrant.', source_doc
-          return result
+          return gateways
 
         debug "Routes Registrant: mapping registrant", source_doc
 
@@ -60,14 +60,15 @@ Deprecated: doc.global_number.registrant_host (array)
       for field, header of registrant_fields
         gateway.headers[header] = source_doc[field] if source_doc[field]?
 
-      result.push gateway
-      result
+      gateways.push gateway
+      {destination_number} = entry
+      gateways.map (gw) -> Object.assign gw, {destination_number}
 
-* session.ref_builder (function) Computes a data record for registrant routing; the first and only parameter is the provisioning database. Default: returns the doc.global_number provisioning record for `number:{@source}`.
+* session.ref_builder (function) Computes a data record for registrant routing; the first parameter is the provisioning database, the second parameter is the source (calling) number. Default: returns the doc.global_number provisioning record for `number:{source}`.
 
-    build_ref = (provisioning) ->
-      debug "Routes Registrant build_ref locating #{@res.source}."
-      provisioning.get "number:#{@res.source}"
+    build_ref = (provisioning,source) ->
+      debug "Routes Registrant build_ref locating #{source}."
+      provisioning.get "number:#{source}"
 
     pkg = require '../package.json'
     @name = "#{pkg.name}:middleware:routes-registrant"
@@ -76,24 +77,25 @@ Deprecated: doc.global_number.registrant_host (array)
 
       return unless @session?.direction is 'lcr'
 
-      ref_builder = @session.ref_builder ? build_ref
-      provisioning = new CouchDB (Nimble @cfg).provisioning
-
       if @res.finalized()
         debug 'Routes Registrant: already finalized.'
         return
 
+      ref_builder = @session.ref_builder ? build_ref
+      delete @session.ref_builder
+
+      provisioning = new CouchDB (Nimble @cfg).provisioning
+
       source_doc = await ref_builder
-        .call this, provisioning
+        .call this, provisioning, @session.asserted_number ? @source
         .catch -> null
 
       return unless source_doc?
 
-      promise_all @res.gateways, (x) => update.call this, x, source_doc
-      .then (gws) =>
-        @res.gateways = gws
-      .catch (error) =>
-        debug "Routes Registrant: #{error}"
+      @res.gateways = await promise_all @res.gateways, (x) => update x, source_doc
+
+      debug 'Gateways', @res.gateways
+      return
 
 Toolbox
 -------

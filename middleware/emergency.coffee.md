@@ -48,12 +48,14 @@ If it isn't present, we try to retrieve it from the location reference.
       emergency_ref = @session.emergency_ref
       location_ref = @session.emergency_location
 
+      {source_number,destination_number} = @res.rule
+
       if not emergency_ref? and location_ref?
         debug "Locating", {location_ref}
         doc = await provisioning
           .get "location:#{location_ref}"
           .catch (error) =>
-            debug.dev "Could not locate #{location_ref}, call from #{@res.source} to #{@res.destination}: #{error.stack ? error}"
+            debug.dev "Could not locate #{location_ref}, call from #{source_number} to #{destination_number}: #{error.stack ? error}"
             {}
         emergency_ref = doc.routing_data
 
@@ -62,14 +64,14 @@ This overrides the value set in `huge-play/middleware/client/egress/post.coffee.
 * doc.location.number (string, optional) The global-number associated with this emergency location, if any. When present, overrides the default doc.local_number.asserted_number or doc.src_endpoint.asserted_number when placing an emergency call.
 
         if doc.number?
-          @res.resource doc.number
+          source_number = doc.number
 
-      debug "Using", {emergency_ref,source:@res.source,destination:@res.destination}
+      debug "Using", {emergency_ref,source_number,destination_number}
 
       if emergency_ref?
-        emergency_key = [@res.destination,emergency_ref].join '#'
+        emergency_key = [destination_number,emergency_ref].join '#'
       else
-        emergency_key = @res.destination
+        emergency_key = destination_number
 
 * doc.emergency Emergency Reference document. Translates an Emergency Reference into a called number.
 * doc.emergency._id `emergency:<number>#<emergency-reference>` where `number` is the emergency called number (typically a special number such a `33_112` to handle national routing), and `emergency-reference` is doc.location.routing_data.
@@ -92,28 +94,27 @@ The `destination` field in a `emergency` record historically is the target, dest
       if typeof destinations is 'string'
         destinations = [destinations]
 
-The processing is very distinct based on how many destinations are present.
-If only one destination is present, we handle it as a regular call out; the same number is tried on differente gateways in order.
+Final processing: gather all possible gateways
 
-      if destinations.length is 1
-        destination = destinations[0]
-        @res.redirect destination
-        rule = await find_rule_in destination, @res.ruleset_database, @res.ruleset.key
-        @res.gateways = rule.gwlist
-        delete rule.gwlist
-        @res.rule = rule
+      @res.rule = {source_number}
+      gwlists = []
+      max_len = 0
 
-If multiple destination numbers are present, we cannot afford to try all combinations of (numbers x gateways). We only try the first gateway for each number.
+We will try each number in order (round-robin) until we run out of gateways.
 
-      else
-        gateways = []
-        for destination in destinations
-          rule = await find_rule_in destination, @res.ruleset_database, @res.ruleset.key
-          gw = rule.gwlist[0]
-          gw.destination_number = destination
-          gateways.push gw
-        @res.gateways = gateways
-        @res.rule = {}
+      for destination in destinations
+        {gwlist} = await find_rule_in destination, @res.ruleset_database, @res.ruleset.key
+        max_len = gwlist.length if gwlist.length > max_len
+        gwlists.push gwlist.map (gw) -> Object.assign gw, destination_number: destination
+
+      debug 'gwlists', gwlists
+
+      @res.gateways = []
+      for i in [0...max_len]
+        for gwlist in gwlists when gwlist.length >= i
+          @res.gateways.push gwlist[i]
+
+      debug 'res.gateways', @res.gateways
 
 * hdr.X-At.emergency True if the called number is a translated emergency number.
 

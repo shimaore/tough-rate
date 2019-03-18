@@ -8,7 +8,7 @@ Flatten the gateways
 
       return unless @session?.direction is 'lcr'
 
-      debug "Gateways before ops", @res.gateways
+      debug "Gateways before merge", @res.gateways
 
       unless @res.gateways?
         debug 'No gateways'
@@ -16,28 +16,29 @@ Flatten the gateways
 
 We must flatten the list so that CallHandler can use it.
 
+      merge = (gateway) =>
+        field_merger [
+          @res.extra
+          gateway
+          @res.ruleset
+          @res.rule
+        ]
+
       @res.gateways = @res.gateways.map (gateway) =>
         if isArray gateway
-          gateway.map (gateway) =>
-            field_merger [
-              {destination:@res.destination,source:@res.source}
-              @res.extra
-              gateway
-              @res.ruleset
-              @res.rule
-            ]
+          gateway.map merge
         else
-          field_merger [
-            {destination:@res.destination,source:@res.source}
-            @res.extra
-            gateway
-            @res.ruleset
-            @res.rule
-          ]
+          merge gateway
 
-      debug "Gateways after ops", @res.gateways
+      debug "Gateways after merge", @res.gateways
       @res.gateways = flatten @res.gateways
       debug "Gateways after flatten", @res.gateways
+
+Release (leaking) fields
+
+      delete @res.ruleset
+      delete @res.ruleset_database
+      delete @res.rule
       return
 
 Toolbox

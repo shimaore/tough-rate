@@ -13,34 +13,23 @@ This is based on the calling number.
 
       return unless @session?.direction is 'lcr'
 
-      debug 'Starting LCR'
-
       session = @session
       respond = (v) => @respond v
 
       @res[k] ?= v for own k,v of {
         cause: null
         destination: @destination
-        source: @source
+        source: @session.asserted ? @source
         __finalized: false
 
 `gateways` is an array that either contains gateways, or arrays of gateways
 
         gateways: []
+        rule: null
+        ruleset: null
+        extra: null
         winner: null
         attrs: {}
-
-        redirect: (destination) ->
-          if @finalized()
-            debug.dev "`redirect` called when the route-set is already finalized"
-            return
-          @destination = destination
-
-        resource: (source) ->
-          if @finalized()
-            debug.dev "`resource` called when the route-set is already finalized"
-            return
-          @source = source
 
 Manipulate the gateways list.
 
@@ -86,6 +75,8 @@ Manipulate the gateways list.
               @attrs[n] = v
 
       }
+
+      debug "Starting LCR for call #{@res.source} → #{@res.destination}"
 
       return
 

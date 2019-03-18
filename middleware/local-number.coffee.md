@@ -18,29 +18,32 @@ Used by `astonishing-competition`.
       @session.destination_onnet = false
 
       debug "Checking whether #{@destination} is local."
-      provisioning.get "number:#{@destination}"
-      .then (doc) =>
-        if doc.disabled
-          debug "#{doc._id} is local but is disabled."
-          return
-        if not doc.account?
-          debug "#{doc._id} is local but has no account."
-          return
+      doc = await provisioning
+        .get "number:#{@destination}"
+        .catch -> null
 
-        gw = @res.sendto doc.inbound_uri
-        gw.headers =
-          'P-Charge-Info': url.format {
-            protocol:'sip:'
-            auth: doc.account
-            hostname: @cfg.sip_domain_name ? @cfg.host ? 'local'
-          }
-        gw.name = 'local number'
-        gw.local_number = true
-        gw.carrier = 'LOCAL'
-        @session.destination_onnet = true
-        null
-      .catch (error) =>
-        debug "Checking whether #{@destination} is local: #{error.stack ? error}"
+      return unless doc?
+
+      if doc.disabled
+        debug "#{doc._id} is local but is disabled."
+        return
+      if not doc.account?
+        debug "#{doc._id} is local but has no account."
+        return
+
+      gw = @res.sendto doc.inbound_uri
+      gw.headers =
+        'P-Charge-Info': url.format {
+          protocol:'sip:'
+          auth: doc.account
+          hostname: @cfg.sip_domain_name ? @cfg.host ? 'local'
+        }
+      gw.name = 'local number'
+      gw.local_number = true
+      gw.carrier = 'LOCAL'
+      gw.source_number = @res.source
+      @session.destination_onnet = true
+      null
 
 Toolbox
 

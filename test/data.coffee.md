@@ -348,7 +348,8 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
           ctx = await router.route call_ '3213', '1234'
           ctx.should.have.property 'res'
           ctx.res.should.have.property 'gateways'
-          ctx.session.should.not.have.property 'destination_onnet'
+          ctx.session.should.have.property 'destination_onnet'
+          ctx.session.destination_onnet.should.equal false
           gws = ctx.res.gateways
           gws.should.be.an.instanceOf Array
           gws.should.have.length 0
@@ -560,7 +561,7 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
           cfg.prefix_admin = db_base
           await serialize cfg, 'init'
           ctx = await router.route call_ '336718', '33_112', 'home'
-          ctx.res.should.have.property 'destination', '33156'
+          ctx.res.should.have.property 'destination', '33_112'
           ctx.session.should.have.property 'destination_emergency', true
           gws = ctx.res.gateways
           gws.should.be.an.instanceOf Array
@@ -568,8 +569,11 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
           gws.should.have.property 0
           gws[0].should.have.property 'gwid'
           gws[0].gwid.should.be.oneOf ['gw3','gw4'] # randomized
+          gws[0].should.have.property 'carrierid', 'the_other_company'
+          gws[0].should.have.property 'destination_number', '33156'
           gws.should.have.property 1
           gws[1].should.have.property 'gwid', 'backup'
+          gws[1].should.have.property 'destination_number', '33156'
 
         it 'should route emergency numbers with multiple destinations', ->
           router = new Router cfg = {
@@ -601,11 +605,15 @@ Note: normally `ruleset_of` would query provisioning to find the ruleset and the
           gws = ctx.res.gateways
           expect(gws).to.not.be.null
           gws.should.be.an.instanceOf Array
-          gws.should.have.length 2
+          gws.should.have.length 4
           gws.should.have.property 0
           gws[0].should.have.property 'destination_number', '33157'
           gws.should.have.property 1
           gws[1].should.have.property 'destination_number', '33158'
+          gws.should.have.property 2
+          gws[2].should.have.property 'destination_number', '33157'
+          gws.should.have.property 3
+          gws[3].should.have.property 'destination_number', '33158'
 
 Gateways are randomized within carriers.
 
@@ -613,6 +621,11 @@ Gateways are randomized within carriers.
           gws[0].gwid.should.be.oneOf ['gw3','gw4']
           gws[1].should.have.property 'gwid'
           gws[1].gwid.should.be.oneOf ['gw3','gw4']
+          gws[2].should.have.property 'gwid'
+          gws[2].gwid.should.equal 'backup'
+          gws[3].should.have.property 'gwid'
+          gws[3].gwid.should.equal 'backup'
+
 
       describe 'The call handler', ->
 
@@ -661,7 +674,7 @@ Gateways are randomized within carriers.
             emit: ->
           null
 
-        it 'should route known (local) destinations', (done) ->
+        it.only 'should route known (local) destinations', (done) ->
           ctx =
             data:
               'Channel-Destination-Number': '1236'
@@ -669,9 +682,12 @@ Gateways are randomized within carriers.
             command: (c,v) ->
               if c in ['set','export']
                 return Promise.resolve()
-              v.should.equal '{}[sip_h_P-Charge-Info=sip:barf@pooh,origination_caller_id_number=2346,effective_caller_id_number=2346]sofia/something-egress/sip:bar@foo'
-              c.should.equal 'bridge'
-              done()
+              try
+                v.should.equal '{}[sip_h_P-Charge-Info=sip:barf@pooh,origination_caller_id_number=2346,effective_caller_id_number=2346]sofia/something-egress/sip:bar@foo'
+                c.should.equal 'bridge'
+                done()
+              catch error
+                done error
               Promise.resolve
                 body:
                   variable_last_bridge_hangup_cause: 'NORMAL_CALL_CLEARING'
@@ -840,9 +856,12 @@ Gateways are randomized within carriers.
             command: (c,v) ->
               if c is 'set' or c is 'export'
                 return Promise.resolve()
-              v.should.match /// \[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800,origination_caller_id_number=2351,effective_caller_id_number=2351\]sofia/something-egress/sip:33158@127.0.0.1:506[89] ///
-              c.should.equal 'bridge'
-              done()
+              try
+                v.should.match /// \[leg_progress_timeout=4,leg_timeout=90,sofia_session_timeout=28800,origination_caller_id_number=2351,effective_caller_id_number=2351\]sofia/something-egress/sip:33157@127.0.0.1:506[89] ///
+                c.should.equal 'bridge'
+                done()
+              catch error
+                done error
               Promise.resolve
                 body:
                   variable_last_bridge_hangup_cause: 'NORMAL_CALL_CLEARING'

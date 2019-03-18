@@ -3,7 +3,7 @@ Default `carrierid` router plugin
 
 Replace all carrierid entries with matching definitions.
 
-    update = (gateway_manager,host,entry) ->
+    update = (entry,gateway_manager,host) ->
 
 * doc.prefix.gwlist[].carrierid (string) name of the destination doc.carrier
 * doc.destination.gwlist[].carrierid (string) name of the destination doc.carrier
@@ -40,7 +40,8 @@ And select only `try` entries where specified.
       if count? and count > 0
         gateways = gateways[0...count]
 
-      gateways
+      {destination_number} = entry
+      gateways.map (gw) -> Object.assign gw, {destination_number}
 
 Middleware definition
 ---------------------
@@ -65,11 +66,8 @@ Middleware definition
       unless @res.gateways?
         debug 'No gateways'
         return
-      @res.gateways = await promise_all @res.gateways, (x) ->
-        r = await update gateway_manager, host, x
-        for gw in r
-          gw.destination_number ?= x.destination_number if x.destination_number?
-        r
+
+      @res.gateways = await promise_all @res.gateways, (x) -> await update x, gateway_manager, host
 
       debug 'Gateways', @res.gateways
       return
