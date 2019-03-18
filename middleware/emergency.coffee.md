@@ -14,6 +14,10 @@ Since this code rewrites the destination before resolving gateways, it must be c
 
       return unless @session?.direction is 'lcr'
 
+Used by `astonishing-competition`.
+
+      @session.destination_emergency = false
+
       provisioning = new CouchDB (Nimble @cfg).provisioning
 
       if not @res.rule?
@@ -31,8 +35,6 @@ Then, see whether the destination number is an emergency number, and process it.
       if not @res.rule.emergency
         debug 'Emergency middleware: not an emergency rule.'
         return
-
-      # @tag 'emergency'
 
 * doc.location Translation of Emergency Locations into Emergency References
 * doc.location._id `location:<location-reference>`

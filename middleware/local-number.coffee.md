@@ -13,6 +13,10 @@ Local number middleware
 
       return if @res.finalized()
 
+Used by `astonishing-competition`.
+
+      @session.destination_onnet = false
+
       debug "Checking whether #{@destination} is local."
       provisioning.get "number:#{@destination}"
       .then (doc) =>
