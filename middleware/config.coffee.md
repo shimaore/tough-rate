@@ -43,7 +43,7 @@ Push the `tough-rate` design document to the master provisioning database
 
       source = new CouchDB "#{cfg.prefix_source}/provisioning"
       debug "Querying for rulesets on master database."
-      rows = source.query_stream null, '_all_docs',
+      rows = source.queryStream null, '_all_docs',
         startkey: "ruleset:#{cfg.sip_domain_name}:"
         endkey: "ruleset:#{cfg.sip_domain_name};"
         include_docs: true
