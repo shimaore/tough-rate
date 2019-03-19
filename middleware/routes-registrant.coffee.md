@@ -87,7 +87,7 @@ Deprecated: doc.global_number.registrant_host (array)
       provisioning = new CouchDB (Nimble @cfg).provisioning
 
       source_doc = await ref_builder
-        .call this, provisioning, @session.asserted_number ? @source
+        .call this, provisioning, @res.rule.source_number
         .catch -> null
 
       return unless source_doc?
