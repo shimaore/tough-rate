@@ -10,7 +10,7 @@ test:
     # DEBUG_FREESWITCH: 'true'
   before_script:
   - apk add docker
-  - docker pull gitlab.k-net.fr:1234/ccnq/docker.freeswitch:4.4.0
+  - docker pull gitlab.k-net.fr:1234/ccnq/docker.freeswitch:v5.0.1
   script:
   - npm install
   - npm audit

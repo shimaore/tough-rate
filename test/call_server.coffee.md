@@ -76,7 +76,7 @@ Setup
       console.error stderr
 
       console.log "docker run"
-      child = spawn 'docker', ['run', '-i', '-p', '5722:5722', '--name', p, 'gitlab.k-net.fr:1234/ccnq/docker.freeswitch:4.4.0', 'bash', '-c',
+      child = spawn 'docker', ['run', '-i', '-p', '5722:5722', '--name', p, 'gitlab.k-net.fr:1234/ccnq/docker.freeswitch:v5.0.1', 'sh', '-c',
         'tee /opt/freeswitch/etc/freeswitch/freeswitch.xml && /opt/freeswitch/bin/freeswitch -nf -nosql -nonat -nonatmap -nocal -nort -c'],
         stdio: if process.env.DEBUG_FREESWITCH is 'true'
             ['pipe',process.stdout,process.stderr]

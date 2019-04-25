@@ -674,7 +674,7 @@ Gateways are randomized within carriers.
             emit: ->
           null
 
-        it.only 'should route known (local) destinations', (done) ->
+        it 'should route known (local) destinations', (done) ->
           ctx =
             data:
               'Channel-Destination-Number': '1236'
