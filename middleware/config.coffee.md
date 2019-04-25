@@ -23,7 +23,7 @@ Push the GatewayManager design document to the local provisioning database
 --------------------------------------------------------------------------
 
       debug 'Updating GatewayManager design document.'
-      await cfg
+      await nimble
         .push GatewayManager.couch
         .catch (error) =>
           debug.dev 'Inserting GatewayManager couchapp failed (ignored).', error.stack ? JSON.stringify error
